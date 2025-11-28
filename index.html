@@ -288,6 +288,26 @@
                 transform: translateX(0) translateY(-50%);
             }
         }
+/* Animaciones para clic en el logo */
+@keyframes explodeOut {
+    0% {
+        opacity: 1;
+        transform: translate(var(--start-x), var(--start-y)) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(var(--end-x), var(--end-y)) scale(0.3);
+    }
+}
+
+.exploding {
+    animation: explodeOut 0.8s ease-out forwards !important;
+}
+
+.hero-logo.clicked {
+    animation: none !important;
+    transform: scale(1) !important;
+}
 
         /* Secciones */
         .section-content {
@@ -436,6 +456,114 @@
                 padding: 40px 20px 20px;
             }
         }
+.hero-logo {
+    opacity: 0;
+    transform: scale(0.8);
+    animation: 
+        fadeInLogo 1.2s ease-out 3s forwards,
+        heartbeatGlow 4s ease-in-out 4.5s infinite;
+    width: 55%;
+    height: auto;
+    position: relative;
+    z-index: 4;
+    filter: drop-shadow(0 0 12px rgba(212, 175, 55, 0.6));
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer;  /* ← AGREGAR ESTA LÍNEA */
+    transition: transform 0.2s ease;  /* ← AGREGAR ESTA LÍNEA */
+}
+
+/* ← AGREGAR ESTO NUEVO */
+.hero-logo:active {
+    transform: scale(0.95);
+}
+/* Botones de la triqueta */
+.triqueta-btn {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border: 2px solid #d4af37;
+    border-radius: 50%;
+    background: rgba(212, 175, 55, 0.1);
+    backdrop-filter: blur(5px);
+    color: #d4af37;
+    font-size: 1.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    z-index: 5;
+    transition: all 0.3s ease;
+    font-family: 'Cinzel', serif;
+    pointer-events: none;
+}
+
+.triqueta-btn:hover {
+    background: rgba(212, 175, 55, 0.3);
+    box-shadow: 0 0 30px rgba(212, 175, 55, 0.6);
+    transform: scale(1.1);
+}
+
+.triqueta-btn.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+#btn-norte {
+    top: 14%;
+    left: 45%;
+    transform: translate(-50%, -50%);
+}
+
+#btn-oeste {
+    bottom: 18%;
+    left: 18%;
+    transform: translate(-50%, 50%);
+}
+
+#btn-este {
+    bottom: 18%;
+    right: 18%;
+    transform: translate(50%, 50%);
+}
+
+@keyframes btnAppear {
+    from {
+        opacity: 0;
+        transform: translate(var(--tx), var(--ty)) scale(0);
+    }
+    to {
+        opacity: 1;
+        transform: translate(var(--tx), var(--ty)) scale(1);
+    }
+}
+
+@media (max-width: 768px) {
+    .triqueta-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+    }
+}
+/* Animación de reaparición del logo */
+@keyframes logoReappear {
+    0% {
+        opacity: 0;
+        transform: scale(0.5);
+        filter: drop-shadow(0 0 0 rgba(212, 175, 55, 0));
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+        filter: drop-shadow(0 0 12px rgba(212, 175, 55, 0.6));
+    }
+}
+
+.hero-logo.reappearing {
+    animation: logoReappear 1.5s ease-out forwards, heartbeatGlow 4s ease-in-out 1.5s infinite !important;
+}
+
     </style>
 </head>
 <body>
@@ -456,11 +584,16 @@
 
     <div id="hero">
         <div class="hero-container">
-            <img src="logo.png" alt="Logo Artilugios" class="hero-logo" id="hero-logo" />
-            <img src="laurel.png" alt="Laurel" id="laurel" />
-            <img src="sol.png" alt="Símbolo del Sol" class="hero-symbol" id="sol" />
-            <img src="luna.png" alt="Símbolo de la Luna" class="hero-symbol" id="luna" />
-        </div>
+    <img src="logo.png" alt="Logo Artilugios" class="hero-logo" id="hero-logo" />
+    <img src="laurel.png" alt="Laurel" id="laurel" />
+    <img src="sol.png" alt="Símbolo del Sol" class="hero-symbol" id="sol" />
+    <img src="luna.png" alt="Símbolo de la Luna" class="hero-symbol" id="luna" />
+    
+    <!-- AGREGAR ESTOS 3 BOTONES -->
+    <button class="triqueta-btn" id="btn-norte">🌙</button>
+    <button class="triqueta-btn" id="btn-oeste">🔮</button>
+    <button class="triqueta-btn" id="btn-este">🌿</button>
+</div>
     </div>
 
     <footer id="contacto">
@@ -633,6 +766,95 @@ document.querySelectorAll('.nav-links a').forEach(link => {
             if (luna) luna.style.animation = 'slideInFromRight 1.2s ease-out forwards';
         }
         setTimeout(showSymbols, 11500);
+// Efecto de onda expansiva al hacer clic en el logo
+let exploded = false;
+
+document.getElementById('hero-logo').addEventListener('click', function() {
+    if (exploded) return; // Solo permitir una explosión
+    exploded = true;
+    
+    const logo = this;
+    const laurel = document.getElementById('laurel');
+    const sol = document.getElementById('sol');
+    const luna = document.getElementById('luna');
+    
+    // Detener animación del logo y ocultarlo
+    logo.classList.add('clicked');
+    logo.style.opacity = '0';
+    
+    // Crear onda visual
+    const rect = logo.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    const pulseWave = document.createElement('div');
+    pulseWave.style.position = 'fixed';
+    pulseWave.style.left = `${centerX}px`;
+    pulseWave.style.top = `${centerY}px`;
+    pulseWave.style.width = '0';
+    pulseWave.style.height = '0';
+    pulseWave.style.borderRadius = '50%';
+    pulseWave.style.border = '2px solid rgba(212, 175, 55, 0.6)';
+    pulseWave.style.pointerEvents = 'none';
+    pulseWave.style.zIndex = '10';
+    document.body.appendChild(pulseWave);
+    
+    pulseWave.animate([
+        { width: '0', height: '0', opacity: 1 },
+        { width: '2000px', height: '2000px', opacity: 0 }
+    ], {
+        duration: 1000,
+        easing: 'ease-out'
+    });
+    
+    setTimeout(() => pulseWave.remove(), 1000);
+    
+    // Explotar elementos
+    [laurel, sol, luna].forEach(el => {
+        if (!el) return;
+        
+        const elRect = el.getBoundingClientRect();
+        const elCenterX = elRect.left + elRect.width / 2;
+        const elCenterY = elRect.top + elRect.height / 2;
+        
+        const dx = elCenterX - centerX;
+        const dy = elCenterY - centerY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        const pushDistance = 800;
+        const endX = (dx / distance) * pushDistance;
+        const endY = (dy / distance) * pushDistance;
+        
+        el.style.setProperty('--start-x', '0px');
+        el.style.setProperty('--start-y', '0px');
+        el.style.setProperty('--end-x', `${endX}px`);
+        el.style.setProperty('--end-y', `${endY}px`);
+        
+        el.classList.add('exploding');
+    });
+    
+    // Reaparecer el logo después de la explosión
+    setTimeout(() => {
+        logo.style.opacity = '1';
+        logo.classList.remove('clicked');
+        logo.classList.add('reappearing');
+        
+        // Hacer aparecer los botones después del logo
+        setTimeout(() => {
+            const btnNorte = document.getElementById('btn-norte');
+            const btnOeste = document.getElementById('btn-oeste');
+            const btnEste = document.getElementById('btn-este');
+            
+            [btnNorte, btnOeste, btnEste].forEach((btn, index) => {
+                setTimeout(() => {
+                    btn.classList.add('visible');
+                    btn.style.animation = 'btnAppear 0.6s ease-out forwards';
+                }, index * 150);
+            });
+        }, 1000);
+    }, 1000);
+});
+
     </script>
 </body>
 </html>
