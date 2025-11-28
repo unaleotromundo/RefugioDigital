@@ -158,14 +158,15 @@
             padding: 148px 20px 60px;  /* ← Cambiado según solicitud */
         }
 
-        .hero-container {
-            position: relative;
-            width: min(80vw, 550px);
-            aspect-ratio: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+.hero-container {
+    position: relative;
+    width: min(80vw, 550px);
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 40px;  /* ← AGREGAR esta línea */
+}
 
         .hero-logo {
             opacity: 0;
@@ -541,11 +542,11 @@
 }
 
 @media (max-width: 768px) {
-    .triqueta-btn {
-        width: 50px;
-        height: 50px;
-        font-size: 1.5rem;
+    #hero {
+        padding: 140px 20px 40px;  /* ← Cambiar de 100px a 140px */
+        min-height: 90vh;
     }
+}
     
     /* AGREGAR ESTO NUEVO */
     #btn-norte {
@@ -627,7 +628,8 @@ html {
 
 <!-- AGREGAR ESTO NUEVO -->
 <section class="header-subtitle">
-    <p>Proyecto vivo de sabiduría ancestral. Conectando lo terrenal con lo divino de la mano de Agus.</p>
+    <h2>Proyecto vivo</h2>
+    <p>Portal místico de sabiduría ancestral. Conectando lo terrenal con lo divino desde tiempos inmemoriales.</p>
 </section>
 
     <div id="hero">
