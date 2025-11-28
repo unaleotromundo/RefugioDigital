@@ -418,11 +418,29 @@
         }
 
         /* Responsive */
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2.5rem;
-            }
-
+@media (max-width: 768px) {
+    .triqueta-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+    }
+    
+    /* AGREGAR ESTO NUEVO */
+    #btn-norte {
+        top: 12%;
+        left: 43%;
+    }
+    
+    #btn-oeste {
+        bottom: 12%;
+        left: 12%;
+    }
+    
+    #btn-este {
+        bottom: 12%;
+        right: 12%;
+    }
+}
             nav {
                 flex-direction: column;
                 gap: 20px;
@@ -809,7 +827,7 @@ document.getElementById('hero-logo').addEventListener('click', function() {
     
     pulseWave.animate([
         { width: '0', height: '0', opacity: 1 },
-        { width: '2000px', height: '2000px', opacity: 0 }
+        { width: '150vw', height: '150vw', opacity: 0 }
     ], {
         duration: 1000,
         easing: 'ease-out'
