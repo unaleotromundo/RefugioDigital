@@ -290,6 +290,31 @@
         }
 
         /* Secciones */
+        .section {
+            display: none;
+            min-height: 100vh;
+            padding: 140px 20px 80px;
+            position: relative;
+            z-index: 2;
+            animation: section-enter 0.8s ease-out;
+            background: transparent;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes section-enter {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         .section-content {
             max-width: 1200px;
             margin: 0 auto;
@@ -297,6 +322,28 @@
             z-index: 3;
         }
 
+        #vivero .section-content::before,
+        #oraculo .section-content::before,
+        #santeria .section-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            border-radius: 12px;
+            backdrop-filter: blur(2px);
+            background: rgba(10, 27, 10, 0.4);
+        }
+
+        #oraculo .section-content::before {
+            background: rgba(26, 13, 27, 0.4);
+        }
+
+        #santeria .section-content::before {
+            background: rgba(27, 13, 13, 0.4);
+        }
 
         h1 {
             font-size: 4rem;
@@ -317,6 +364,65 @@
             color: #c4b088;
             position: relative;
             z-index: 4;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 90px;
+            left: 30px;
+            background: rgba(212, 175, 55, 0.1);
+            border: 2px solid #d4af37;
+            color: #d4af37;
+            padding: 12px 30px;
+            font-size: 1rem;
+            cursor: pointer;
+            z-index: 600;
+            transition: all 0.3s ease;
+            font-family: 'Cinzel', serif;
+            letter-spacing: 2px;
+        }
+
+        .back-btn:hover {
+            background: rgba(212, 175, 55, 0.3);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+            transform: translateX(-5px);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+            position: relative;
+            z-index: 4;
+        }
+
+        .card {
+            background: rgba(212, 175, 55, 0.05);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            padding: 30px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(2px);
+            position: relative;
+            z-index: 2;
+        }
+
+        .card:hover {
+            background: rgba(212, 175, 55, 0.15);
+            border-color: #d4af37;
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
+            transform: translateY(-5px);
+        }
+
+        .card h3 {
+            color: #d4af37;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .card p {
+            color: #c4b088;
+            line-height: 1.6;
         }
 
         /* Footer */
@@ -416,6 +522,12 @@
                 width: 90vw;
             }
 
+            .back-btn {
+                left: 10px;
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+
             .footer-content {
                 grid-template-columns: 1fr;
                 text-align: center;
@@ -449,6 +561,7 @@
             </div>
             <ul class="nav-links">
                 <li><a href="#hero">INICIO</a></li>
+                <li><a href="#nosotros">PROYECTO VIVO</a></li>
                 <li><a href="#contacto">CONTACTO</a></li>
             </ul>
         </nav>
@@ -460,6 +573,81 @@
             <img src="laurel.png" alt="Laurel" id="laurel" />
             <img src="sol.png" alt="Símbolo del Sol" class="hero-symbol" id="sol" />
             <img src="luna.png" alt="Símbolo de la Luna" class="hero-symbol" id="luna" />
+        </div>
+    </div>
+
+    <div id="vivero" class="section">
+        <button class="back-btn" onclick="goBack()">← VOLVER AL INICIO</button>
+        <div class="section-content">
+            <h1>VIVERO</h1>
+            <p class="description">
+                En este sagrado espacio de vida y crecimiento, la energía de la tierra se manifiesta. 
+                Aquí cultivamos las semillas del conocimiento ancestral y las plantas de poder.
+            </p>
+            <div class="grid">
+                <div class="card">
+                    <h3>Plantas Sagradas</h3>
+                    <p>Colección de especies botánicas utilizadas en rituales y ceremonias ancestrales.</p>
+                </div>
+                <div class="card">
+                    <h3>Cultivo Místico</h3>
+                    <p>Técnicas tradicionales para el cuidado y crecimiento de plantas medicinales.</p>
+                </div>
+                <div class="card">
+                    <h3>Conexión Natural</h3>
+                    <p>Talleres y experiencias para reconectar con la sabiduría de la naturaleza.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="oraculo" class="section">
+        <button class="back-btn" onclick="goBack()">← VOLVER AL INICIO</button>
+        <div class="section-content">
+            <h1>ORÁCULO</h1>
+            <p class="description">
+                Portal hacia los secretos del destino y la adivinación. 
+                Aquí los antiguos métodos revelan los caminos ocultos del tiempo y el espíritu.
+            </p>
+            <div class="grid">
+                <div class="card">
+                    <h3>Lectura de Tarot</h3>
+                    <p>Interpretación profunda de las cartas ancestrales para guiar tu camino.</p>
+                </div>
+                <div class="card">
+                    <h3>Runas Antiguas</h3>
+                    <p>Consulta de símbolos nórdicos para desentrañar los mensajes del universo.</p>
+                </div>
+                <div class="card">
+                    <h3>Visiones Místicas</h3>
+                    <p>Sesiones de clarividencia y conexión con planos superiores de consciencia.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="santeria" class="section">
+        <button class="back-btn" onclick="goBack()">← VOLVER AL INICIO</button>
+        <div class="section-content">
+            <h1>SANTERÍA</h1>
+            <p class="description">
+                Reino de los Orishas y las tradiciones afrocaribeñas. 
+                Espacio sagrado donde la fe, los rituales y los santos convergen en armonía.
+            </p>
+            <div class="grid">
+                <div class="card">
+                    <h3>Rituales Sagrados</h3>
+                    <p>Ceremonias tradicionales para honrar a los Orishas y solicitar su guía.</p>
+                </div>
+                <div class="card">
+                    <h3>Consulta Espiritual</h3>
+                    <p>Lectura de caracoles y conexión con las deidades para orientación divina.</p>
+                </div>
+                <div class="card">
+                    <h3>Protección Mística</h3>
+                    <p>Trabajos espirituales de limpieza, protección y apertura de caminos.</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -596,27 +784,33 @@
         }, 4500);
 
         // --- Navegación ---
+        function goBack() {
+            document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
-// Prevenir comportamiento por defecto de los links del header
-document.querySelectorAll('.nav-links a').forEach(link => {
-    link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const hash = link.getAttribute('href').substring(1);
-        
-        if (hash === 'contacto') {
+        window.addEventListener('hashchange', () => {
+    const hash = window.location.hash.substring(1);
+    if (['vivero', 'oraculo', 'santeria'].includes(hash)) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.getElementById(hash)?.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (hash === 'contacto') {
+        goBack();
+        setTimeout(() => {
             const footer = document.getElementById('contacto');
             if (footer) {
                 const footerTop = footer.offsetTop;
                 window.scrollTo({ top: footerTop, behavior: 'smooth' });
             }
-        } else {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-        
-        // Actualizar URL sin recargar
-        window.history.pushState(null, '', `#${hash}`);
-    });
+        }, 100);
+    } else if (hash === 'hero' || hash === 'nosotros') {
+        goBack();
+    } else {
+        goBack();
+    }
 });
+
 
         // --- Gestión del laurel ---
         function initLaurel() {
