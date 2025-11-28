@@ -588,7 +588,25 @@ html {
 #hero {
     overflow: hidden;  /* ← Contener la explosión dentro del hero */
 }
+.header-subtitle {
+    position: fixed;
+    top: 80px;
+    left: 0;
+    right: 0;
+    background: rgba(10, 10, 10, 0.9);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    padding: 20px 40px;
+    z-index: 999;
+    text-align: center;
+}
 
+.header-subtitle h2 {
+    color: #d4af37;
+    font-size: 1.8rem;
+    letter-spacing: 3px;
+    margin-bottom: 10px;
+    text-shadow: 0 0 15
     </style>
 </head>
 <body>
@@ -607,6 +625,12 @@ html {
         </nav>
     </header>
 
+<!-- AGREGAR ESTO NUEVO -->
+<section class="header-subtitle">
+    <h2>Proyecto vivo</h2>
+    <p>Portal místico de sabiduría ancestral. Conectando lo terrenal con lo divino desde tiempos inmemoriales.</p>
+</section>
+
     <div id="hero">
         <div class="hero-container">
     <img src="logo.png" alt="Logo Artilugios" class="hero-logo" id="hero-logo" />
@@ -623,10 +647,6 @@ html {
 
     <footer id="contacto">
         <div class="footer-content">
-            <div class="footer-section">
-                <h3>ARTILUGIOS</h3>
-                <p>Portal místico de sabiduría ancestral. Conectando lo terrenal con lo divino desde tiempos inmemoriales.</p>
-            </div>
             <div class="footer-section">
                 <h3>CONTACTO</h3>
                 <p>📧 info@triqueta.com</p>
