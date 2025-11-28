@@ -419,50 +419,56 @@
         }
 
         /* Responsive */
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2.5rem;
-            }
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2.5rem;
+    }
 
-            nav {
-                flex-direction: column;
-                gap: 20px;
-                padding: 0 20px;
-            }
+    nav {
+        flex-direction: column;
+        gap: 20px;
+        padding: 0 20px;
+    }
 
-            .nav-links {
-                gap: 20px;
-            }
+    .nav-links {
+        gap: 20px;
+    }
 
-            .hero-container {
-                width: 90vw;
-            }
-
-            .footer-content {
-                grid-template-columns: 1fr;
-                text-align: center;
-            }
-
-            .social-links {
-                justify-content: center;
-            }
-
-
-            /* ← AGREGADO SEGÚN SOLICITUD */
-
-    .header-subtitle {
-        top: 100px;  /* ← AGREGAR esto para bajar el subtítulo en mobile */
-        padding: 15px 20px;  /* ← Opcional: reducir padding en mobile */
+    /* ← AGREGAR ESTO NUEVO */
+    header {
+        padding: 15px 0;  /* Reducir padding del header */
     }
     
+    .header-subtitle {
+        top: 120px;  /* Bajar el subtítulo más abajo */
+        padding: 15px 20px;
+    }
+    
+    .header-subtitle h2 {
+        font-size: 1.4rem;  /* Reducir tamaño del título */
+        margin-bottom: 8px;
+    }
+    
+    .header-subtitle p {
+        font-size: 0.85rem;  /* Reducir tamaño del texto */
+    }
+
+    .hero-container {
+        width: 90vw;
+    }
+
     #hero {
-        padding: 180px 20px 40px;  /* ← Ajustar también el hero para compensar */
+        padding: 220px 20px 40px;  /* Aumentar padding-top para dar espacio */
         min-height: 90vh;
     }
-            footer {
-                margin-top: 40px;
-                padding: 40px 20px 20px;
-            }
+
+    footer {
+        margin-top: 40px;
+        padding: 40px 20px 20px;
+    }
+    
+    /* ... resto del código mobile ... */
+}
         }
 .hero-logo {
     opacity: 0;
@@ -635,7 +641,7 @@ html {
 <!-- AGREGAR ESTO NUEVO -->
 <section class="header-subtitle">
     <h2>Proyecto vivo</h2>
-    <p>Portal místico de sabiduría ancestral. Conectando lo terrenal con lo divino</p>
+    <p>Portal místico de sabiduría ancestral. Conectando lo terrenal con lo divino </p>
 </section>
 
     <div id="hero">
