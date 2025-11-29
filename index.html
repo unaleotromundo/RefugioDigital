@@ -827,6 +827,19 @@ html {
         right: 20px;
     }
 }
+.hero-logo {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.hero-container * {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
     </style>
 </head>
 <body>
@@ -834,7 +847,7 @@ html {
 
     <header>
         <nav>
-<div class="logo" style="cursor: pointer;" onclick="location.reload()">
+<div class="logo" style="cursor: pointer;" id="logoHeader">
     <img src="logo.png" alt="Logo Artilugios" class="header-logo" />
     <span class="logo-text">Artilugios</span>
 </div>
@@ -1383,6 +1396,11 @@ musicBtn.addEventListener('click', () => {
         musicBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
     }
     isPlaying = !isPlaying;
+});
+document.getElementById('logoHeader').addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    location.reload();
 });
 
    </script>
