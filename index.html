@@ -642,6 +642,33 @@ html {
     max-width: 600px;
     margin: 0 auto;
 }
+
+#btn-norte.fading {
+    opacity: 0 !important;
+    transition: opacity 0.4s ease;
+}
+
+.santeria-text-overlay {
+    position: absolute;
+    top: 10%;
+    left: 52%;
+    transform: translate(-50%, -50%);
+    color: #d4af37;
+    font-size: 2.1rem;
+    font-weight: bold;
+    letter-spacing: 3px;
+    text-shadow: 0 0 20px rgba(212, 175, 55, 1);
+    white-space: nowrap;
+    z-index: 6;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+.santeria-text-overlay.visible {
+    opacity: 1;
+}
     </style>
 </head>
 <body>
@@ -937,13 +964,19 @@ document.getElementById('hero-logo').addEventListener('click', function() {
             
             // AGREGAR ESTAS LÍNEAS AQUÍ ↓
             // Reset botón norte
-            btnNorte.innerHTML = '🕯️';
-            btnNorte.style.width = '60px';
-            btnNorte.style.height = '60px';
-            btnNorte.style.padding = '0';
-            btnNorte.style.borderRadius = '50%';
-            btnNorte.style.fontSize = '1.8rem';
-            btnNorte.style.letterSpacing = '0';
+btnNorte.innerHTML = '🕯️';
+btnNorte.style.width = '60px';
+btnNorte.style.height = '60px';
+btnNorte.style.padding = '0';
+btnNorte.style.borderRadius = '50%';
+btnNorte.style.fontSize = '1.8rem';
+btnNorte.style.letterSpacing = '0';
+btnNorte.classList.remove('fading');
+btnNorte.style.opacity = '1';
+const overlayText = document.querySelector('.santeria-text-overlay');
+if (overlayText) {
+    overlayText.remove();
+}
             
             [btnNorte, btnOeste, btnEste].forEach((btn, index) => {
                 setTimeout(() => {
@@ -960,29 +993,35 @@ const btnNorte = document.getElementById('btn-norte');
 // ESCRITORIO: Hover
 btnNorte.addEventListener('mouseenter', function() {
     if (window.innerWidth > 768 && !santeriaClicked) {
-        this.innerHTML = 'SANTERÍA';
-        this.style.width = '120px';
-        this.style.height = 'auto';
-        this.style.padding = '12px 20px';
-        this.style.borderRadius = '8px';
-        this.style.fontSize = '1.1rem';
-        this.style.letterSpacing = '2px';
-        this.style.whiteSpace = 'nowrap';
+        // Desvanecer botón
+        this.classList.add('fading');
+        
+        // Crear texto superpuesto si no existe
+        if (!document.querySelector('.santeria-text-overlay')) {
+            const text = document.createElement('span');
+            text.className = 'santeria-text-overlay';
+            text.textContent = 'SANTERÍA';
+            document.querySelector('.hero-container').appendChild(text);
+            
+            setTimeout(() => text.classList.add('visible'), 10);
+        } else {
+            document.querySelector('.santeria-text-overlay').classList.add('visible');
+        }
     }
 });
 
 btnNorte.addEventListener('mouseleave', function() {
     if (window.innerWidth > 768 && !santeriaClicked) {
-        this.innerHTML = '🕯️';
-        this.style.width = '60px';
-        this.style.height = '60px';
-        this.style.padding = '0';
-        this.style.borderRadius = '50%';
-        this.style.fontSize = '1.8rem';
-        this.style.letterSpacing = '0';
+        // Mostrar botón
+        this.classList.remove('fading');
+        
+        // Ocultar texto
+        const text = document.querySelector('.santeria-text-overlay');
+        if (text) {
+            text.classList.remove('visible');
+        }
     }
 });
-
 // Click
 btnNorte.addEventListener('click', function() {
     const isMobile = window.innerWidth <= 768;
@@ -1002,18 +1041,10 @@ btnNorte.addEventListener('click', function() {
             subtitle.style.opacity = '1';
         }, 100);
     } else {
-        // ESCRITORIO: Fijar transformación
+        // ESCRITORIO: Fijar texto visible
         santeriaClicked = true;
-        this.innerHTML = 'SANTERÍA';
-        this.style.width = '120px';
-        this.style.height = 'auto';
-        this.style.padding = '12px 20px';
-        this.style.borderRadius = '8px';
-        this.style.fontSize = '1.1rem';
-        this.style.letterSpacing = '2px';
-        this.style.whiteSpace = 'nowrap';
     }
 });
-    </script>
+   </script>
 </body>
 </html>
