@@ -715,6 +715,9 @@ html {
         const PULSE_DURATION = 800;
         const MAX_RADIUS = 300;
 
+// AGREGAR ESTA LÍNEA AQUÍ ↓
+let santeriaClicked = false;
+
         // --- Partículas ---
         const particlesContainer = document.getElementById('particles');
         const particles = [];
@@ -932,6 +935,16 @@ document.getElementById('hero-logo').addEventListener('click', function() {
             const btnOeste = document.getElementById('btn-oeste');
             const btnEste = document.getElementById('btn-este');
             
+            // AGREGAR ESTAS LÍNEAS AQUÍ ↓
+            // Reset botón norte
+            btnNorte.innerHTML = '🕯️';
+            btnNorte.style.width = '60px';
+            btnNorte.style.height = '60px';
+            btnNorte.style.padding = '0';
+            btnNorte.style.borderRadius = '50%';
+            btnNorte.style.fontSize = '1.8rem';
+            btnNorte.style.letterSpacing = '0';
+            
             [btnNorte, btnOeste, btnEste].forEach((btn, index) => {
                 setTimeout(() => {
                     btn.classList.add('visible');
@@ -943,7 +956,6 @@ document.getElementById('hero-logo').addEventListener('click', function() {
 });
 // Funcionalidad del botón Santería
 const btnNorte = document.getElementById('btn-norte');
-let santeriaClicked = false;
 
 // ESCRITORIO: Hover
 btnNorte.addEventListener('mouseenter', function() {
