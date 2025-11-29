@@ -180,7 +180,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: -40px;  /* ← AGREGAR esta línea */
+    margin-top: -46px;  /* ← AGREGAR esta línea */
 }
 
         .hero-logo {
@@ -1407,7 +1407,8 @@ musicBtn.addEventListener('click', () => {
 document.getElementById('logoHeader').addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();
-    location.reload();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => location.reload(), 300);
 });
 
    </script>
