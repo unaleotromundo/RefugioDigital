@@ -851,8 +851,14 @@ else {
 let exploded = false;
 
 document.getElementById('hero-logo').addEventListener('click', function() {
-    if (exploded) return; // Solo permitir una explosión
+    if (exploded) return;
     exploded = true;
+    
+    // AGREGAR ESTAS LÍNEAS AQUÍ ↓
+    // Reset del texto y botones
+    santeriaClicked = false;
+    document.getElementById('subtitle-title').textContent = 'Proyecto vivo';
+    document.getElementById('subtitle-description').textContent = 'Portal místico de sabiduría ancestral. Conectando lo terrenal con lo divino';
     
     const logo = this;
     const laurel = document.getElementById('laurel');
@@ -936,21 +942,65 @@ document.getElementById('hero-logo').addEventListener('click', function() {
     }, 1000);
 });
 // Funcionalidad del botón Santería
-document.getElementById('btn-norte').addEventListener('click', function() {
-    const subtitle = document.getElementById('header-subtitle');
-    const title = document.getElementById('subtitle-title');
-    const description = document.getElementById('subtitle-description');
+const btnNorte = document.getElementById('btn-norte');
+let santeriaClicked = false;
+
+// ESCRITORIO: Hover
+btnNorte.addEventListener('mouseenter', function() {
+    if (window.innerWidth > 768 && !santeriaClicked) {
+        this.innerHTML = 'SANTERÍA';
+        this.style.width = '120px';
+        this.style.height = 'auto';
+        this.style.padding = '12px 20px';
+        this.style.borderRadius = '8px';
+        this.style.fontSize = '1.1rem';
+        this.style.letterSpacing = '2px';
+        this.style.whiteSpace = 'nowrap';
+    }
+});
+
+btnNorte.addEventListener('mouseleave', function() {
+    if (window.innerWidth > 768 && !santeriaClicked) {
+        this.innerHTML = '🕯️';
+        this.style.width = '60px';
+        this.style.height = '60px';
+        this.style.padding = '0';
+        this.style.borderRadius = '50%';
+        this.style.fontSize = '1.8rem';
+        this.style.letterSpacing = '0';
+    }
+});
+
+// Click
+btnNorte.addEventListener('click', function() {
+    const isMobile = window.innerWidth <= 768;
     
-    // Cambiar contenido
-    title.innerHTML = '<a href="#" class="santeria-btn">SANTERÍA</a>';
-    description.innerHTML = '<p class="santeria-description">Religión afrocubana que fusiona creencias yorubas con el catolicismo. Honra a los Orishas, deidades que representan fuerzas de la naturaleza y aspectos de la vida humana.</p>';
-    
-    // Animación de aparición
-    subtitle.style.opacity = '0';
-    setTimeout(() => {
-        subtitle.style.transition = 'opacity 0.6s ease';
-        subtitle.style.opacity = '1';
-    }, 100);
+    if (isMobile) {
+        // MÓVIL: Cambiar texto abajo
+        const subtitle = document.getElementById('header-subtitle');
+        const title = document.getElementById('subtitle-title');
+        const description = document.getElementById('subtitle-description');
+        
+        title.innerHTML = '<a href="#" class="santeria-btn">SANTERÍA</a>';
+        description.innerHTML = '<p class="santeria-description">Religión afrocubana que fusiona creencias yorubas con el catolicismo. Honra a los Orishas, deidades que representan fuerzas de la naturaleza y aspectos de la vida humana.</p>';
+        
+        subtitle.style.opacity = '0';
+        setTimeout(() => {
+            subtitle.style.transition = 'opacity 0.6s ease';
+            subtitle.style.opacity = '1';
+        }, 100);
+    } else {
+        // ESCRITORIO: Fijar transformación
+        santeriaClicked = true;
+        this.innerHTML = 'SANTERÍA';
+        this.style.width = '120px';
+        this.style.height = 'auto';
+        this.style.padding = '12px 20px';
+        this.style.borderRadius = '8px';
+        this.style.fontSize = '1.1rem';
+        this.style.letterSpacing = '2px';
+        this.style.whiteSpace = 'nowrap';
+    }
 });
     </script>
 </body>
