@@ -170,19 +170,24 @@
 }
 
         .hero-logo {
-            opacity: 0;
-            transform: scale(0.8);
-            animation: 
-                fadeInLogo 1.2s ease-out 3s forwards,
-                heartbeatGlow 4s ease-in-out 4.5s infinite;
-            width: 65%;
-            height: auto;
-            position: relative;
-            z-index: 4;
-            filter: drop-shadow(0 0 12px rgba(212, 175, 55, 0.6));
-            background: transparent !important;
-            border: none !important;
-        }
+    opacity: 0;
+    transform: scale(0.8);
+    animation: 
+        fadeInLogo 1.2s ease-out 3s forwards,
+        heartbeatGlow 4s ease-in-out 4.5s infinite;
+    width: 65%;
+    height: auto;
+    position: relative;
+    z-index: 4;
+    filter: drop-shadow(0 0 12px rgba(212, 175, 55, 0.6));
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer;  /* ← AGREGAR */
+    transition: transform 0.2s ease;  /* ← AGREGAR */
+}
+.hero-logo:active {
+    transform: scale(0.95);
+}
 
         @keyframes fadeInLogo {
             to {
@@ -419,7 +424,7 @@
             font-size: 0.9rem;
         }
 
-        /* Responsive */
+/* Responsive */
 @media (max-width: 768px) {
     h1 {
         font-size: 2.5rem;
@@ -435,9 +440,31 @@
         gap: 20px;
     }
 
-    /* ← AGREGAR ESTO NUEVO */
     header {
-        padding: 15px 0;  /* Reducir padding del header */
+        padding: 15px 0;
+    }
+    
+    .hero-container {
+        width: 90vw;
+    }
+
+    #hero {
+        padding: 100px 20px 40px;
+        min-height: 90vh;
+    }
+
+    footer {
+        margin-top: 40px;
+        padding: 40px 20px 20px;
+    }
+
+    .footer-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .social-links {
+        justify-content: center;
     }
     
     .header-subtitle {
@@ -452,42 +479,30 @@
     .header-subtitle p {
         font-size: 0.9rem;
     }
+
+    .triqueta-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+    }
     
-    #hero {
-        padding: 100px 20px 40px;  /* ← Volver a menos padding */
-        min-height: 90vh;
+    #btn-norte {
+        top: 5%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+    
+    #btn-oeste {
+        bottom: 8%;
+        left: 8%;
+    }
+    
+    #btn-este {
+        bottom: 8%;
+        right: 8%;
     }
 }
 
-    footer {
-        margin-top: 40px;
-        padding: 40px 20px 20px;
-    }
-    
-    /* ... resto del código mobile ... */
-}
-        }
-.hero-logo {
-    opacity: 0;
-    transform: scale(0.8);
-    animation: 
-        fadeInLogo 1.2s ease-out 3s forwards,
-        heartbeatGlow 4s ease-in-out 4.5s infinite;
-    width: 55%;
-    height: auto;
-    position: relative;
-    z-index: 4;
-    filter: drop-shadow(0 0 12px rgba(212, 175, 55, 0.6));
-    background: transparent !important;
-    border: none !important;
-    cursor: pointer;  /* ← AGREGAR ESTA LÍNEA */
-    transition: transform 0.2s ease;  /* ← AGREGAR ESTA LÍNEA */
-}
-
-/* ← AGREGAR ESTO NUEVO */
-.hero-logo:active {
-    transform: scale(0.95);
-}
 /* Botones de la triqueta */
 .triqueta-btn {
     position: absolute;
@@ -523,7 +538,7 @@
 
 #btn-norte {
     top: 14%;
-    left: 45%;
+    left: 48%;
     transform: translate(-50%, -50%);
 }
 
@@ -547,30 +562,6 @@
     to {
         opacity: 1;
         transform: translate(var(--tx), var(--ty)) scale(1);
-    }
-}
-
-@media (max-width: 768px) {
-    #hero {
-        padding: 140px 20px 40px;  /* ← Cambiar de 100px a 140px */
-        min-height: 90vh;
-    }
-}
-    
-    /* AGREGAR ESTO NUEVO */
-    #btn-norte {
-        top: 9%;
-        left: 43%;
-    }
-    
-    #btn-oeste {
-        bottom: 12%;
-        left: 12%;
-    }
-    
-    #btn-este {
-        bottom: 12%;
-        right: 12%;
     }
 }
 
@@ -617,7 +608,7 @@ html {
     font-size: 1.8rem;
     letter-spacing: 3px;
     margin-bottom: 10px;
-    text-shadow: 0 0 15
+    text-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
     </style>
 </head>
 <body>
