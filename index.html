@@ -6,6 +6,9 @@
     <title>Artilugios - Proyecto Vivo</title>
     <link rel="icon" type="image/png" href="logos.png">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<audio id="bgMusic" loop>
+    <source src="tu-archivo.mp3" type="audio/mpeg">
+</audio>
     <style>
         * {
             margin: 0;
@@ -784,6 +787,46 @@ html {
     max-width: 600px;
     margin: 0 auto;
 }
+.music-toggle {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background: rgba(212, 175, 55, 0.15);
+    border: 2px solid #d4af37;
+    border-radius: 50%;
+    color: #d4af37;
+    font-size: 1.3rem;
+    cursor: pointer;
+    z-index: 1001;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: float 3s ease-in-out infinite;
+}
+
+.music-toggle:hover {
+    background: rgba(212, 175, 55, 0.3);
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+@media (max-width: 768px) {
+    .music-toggle {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+        bottom: 20px;
+        right: 20px;
+    }
+}
     </style>
 </head>
 <body>
@@ -848,6 +891,9 @@ html {
         <div class="footer-bottom">
             <p>&copy; 2025 Artilugios - Proyecto vivo. Todos los derechos reservados.</p>
         </div>
+<button class="music-toggle" id="musicBtn">
+    <i class="fas fa-volume-mute"></i>
+</button>
     </footer>
 
     <script>
@@ -1315,6 +1361,30 @@ btnOeste.addEventListener('click', function() {
         oraculoClicked = true;
     }
 });
+const music = document.getElementById('bgMusic');
+const musicBtn = document.getElementById('musicBtn');
+let isPlaying = true;
+
+// Iniciar música automáticamente
+window.addEventListener('load', () => {
+    music.play().catch(() => {
+        // Si el navegador bloquea autoplay, cambiar ícono
+        isPlaying = false;
+        musicBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+    });
+});
+
+musicBtn.addEventListener('click', () => {
+    if (isPlaying) {
+        music.pause();
+        musicBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+    } else {
+        music.play();
+        musicBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+    }
+    isPlaying = !isPlaying;
+});
+
    </script>
 </body>
 </html>

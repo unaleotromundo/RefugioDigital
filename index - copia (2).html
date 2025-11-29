@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Artilugios - Proyecto Vivo</title>
     <link rel="icon" type="image/png" href="logos.png">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -18,6 +19,7 @@
             background: #000;
             color: #d4af37;
             position: relative;
+	    overflow-x: hidden;  /* ← Ya está, pero asegurate que esté */
         }
 
         /* Partículas de fondo */
@@ -67,7 +69,7 @@
             background: rgba(10, 10, 10, 0.85);
             backdrop-filter: blur(8px);
             border-bottom: 1px solid rgba(212, 175, 55, 0.3);
-            z-index: 500;
+            z-index: 1000;
             padding: 20px 0;
         }
 
@@ -146,40 +148,47 @@
         }
 
         /* Hero – con logo animado */
-        #hero {
-            min-height: 100vh;
-            background: transparent;
-            position: relative;
-            z-index: 2;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 100px 20px 60px;  /* ← Cambiado según solicitud */
-        }
+#hero {
+    min-height: 100vh;
+    background: transparent;
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;  /* ← AGREGAR esto */
+    align-items: center;
+    justify-content: center;
+    padding: 100px 20px 60px;  /* ← Volver al original */
+}
 
-        .hero-container {
-            position: relative;
-            width: min(80vw, 550px);
-            aspect-ratio: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+.hero-container {
+    position: relative;
+    width: min(80vw, 550px);
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 40px;  /* ← AGREGAR esta línea */
+}
 
         .hero-logo {
-            opacity: 0;
-            transform: scale(0.8);
-            animation: 
-                fadeInLogo 1.2s ease-out 3s forwards,
-                heartbeatGlow 4s ease-in-out 4.5s infinite;
-            width: 65%;
-            height: auto;
-            position: relative;
-            z-index: 4;
-            filter: drop-shadow(0 0 12px rgba(212, 175, 55, 0.6));
-            background: transparent !important;
-            border: none !important;
-        }
+    opacity: 0;
+    transform: scale(0.8);
+    animation: 
+    fadeInLogo 1.2s ease-out 1.5s forwards,
+    heartbeatGlow 4s ease-in-out 2.5s infinite;
+    width: 65%;
+    height: auto;
+    position: relative;
+    z-index: 4;
+    filter: drop-shadow(0 0 12px rgba(212, 175, 55, 0.6));
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer;  /* ← AGREGAR */
+    transition: transform 0.2s ease;  /* ← AGREGAR */
+}
+.hero-logo:active {
+    transform: scale(0.95);
+}
 
         @keyframes fadeInLogo {
             to {
@@ -288,33 +297,28 @@
                 transform: translateX(0) translateY(-50%);
             }
         }
+/* Animaciones para clic en el logo */
+@keyframes explodeOut {
+    0% {
+        opacity: 1;
+        transform: translate(var(--start-x), var(--start-y)) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(var(--end-x), var(--end-y)) scale(0.3);
+    }
+}
+
+.exploding {
+    animation: explodeOut 0.8s ease-out forwards !important;
+}
+
+.hero-logo.clicked {
+    animation: none !important;
+    transform: scale(1) !important;
+}
 
         /* Secciones */
-        .section {
-            display: none;
-            min-height: 100vh;
-            padding: 140px 20px 80px;
-            position: relative;
-            z-index: 2;
-            animation: section-enter 0.8s ease-out;
-            background: transparent;
-        }
-
-        .section.active {
-            display: block;
-        }
-
-        @keyframes section-enter {
-            from {
-                opacity: 0;
-                transform: translateY(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
         .section-content {
             max-width: 1200px;
             margin: 0 auto;
@@ -322,28 +326,6 @@
             z-index: 3;
         }
 
-        #vivero .section-content::before,
-        #oraculo .section-content::before,
-        #santeria .section-content::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: -1;
-            border-radius: 12px;
-            backdrop-filter: blur(2px);
-            background: rgba(10, 27, 10, 0.4);
-        }
-
-        #oraculo .section-content::before {
-            background: rgba(26, 13, 27, 0.4);
-        }
-
-        #santeria .section-content::before {
-            background: rgba(27, 13, 13, 0.4);
-        }
 
         h1 {
             font-size: 4rem;
@@ -364,65 +346,6 @@
             color: #c4b088;
             position: relative;
             z-index: 4;
-        }
-
-        .back-btn {
-            position: fixed;
-            top: 90px;
-            left: 30px;
-            background: rgba(212, 175, 55, 0.1);
-            border: 2px solid #d4af37;
-            color: #d4af37;
-            padding: 12px 30px;
-            font-size: 1rem;
-            cursor: pointer;
-            z-index: 600;
-            transition: all 0.3s ease;
-            font-family: 'Cinzel', serif;
-            letter-spacing: 2px;
-        }
-
-        .back-btn:hover {
-            background: rgba(212, 175, 55, 0.3);
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
-            transform: translateX(-5px);
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin-top: 60px;
-            position: relative;
-            z-index: 4;
-        }
-
-        .card {
-            background: rgba(212, 175, 55, 0.05);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            padding: 30px;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(2px);
-            position: relative;
-            z-index: 2;
-        }
-
-        .card:hover {
-            background: rgba(212, 175, 55, 0.15);
-            border-color: #d4af37;
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
-            transform: translateY(-5px);
-        }
-
-        .card h3 {
-            color: #d4af37;
-            margin-bottom: 15px;
-            font-size: 1.5rem;
-        }
-
-        .card p {
-            color: #c4b088;
-            line-height: 1.6;
         }
 
         /* Footer */
@@ -502,52 +425,365 @@
             font-size: 0.9rem;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2.5rem;
-            }
+/* Responsive */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2.5rem;
+    }
 
-            nav {
-                flex-direction: column;
-                gap: 20px;
-                padding: 0 20px;
-            }
+    nav {
+        flex-direction: column;
+        gap: 20px;
+        padding: 0 20px;
+    }
 
-            .nav-links {
-                gap: 20px;
-            }
+    .nav-links {
+        gap: 20px;
+    }
 
-            .hero-container {
-                width: 90vw;
-            }
+    header {
+        padding: 15px 0;
+    }
+    
+    .hero-container {
+        width: 90vw;
+    }
 
-            .back-btn {
-                left: 10px;
-                padding: 10px 20px;
-                font-size: 0.9rem;
-            }
+    #hero {
+        padding: 100px 20px 40px;
+        min-height: 90vh;
+    }
 
-            .footer-content {
-                grid-template-columns: 1fr;
-                text-align: center;
-            }
+    footer {
+        margin-top: 40px;
+        padding: 40px 20px 20px;
+    }
 
-            .social-links {
-                justify-content: center;
-            }
+    .footer-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
 
-            /* ← AGREGADO SEGÚN SOLICITUD */
-            #hero {
-                padding: 100px 20px 40px;
-                min-height: 90vh;
-            }
+    .social-links {
+        justify-content: center;
+    }
+    
+    .header-subtitle {
+        padding: 30px 20px 0;
+    }
+    
+    .header-subtitle h2 {
+        font-size: 1.4rem;
+        margin-bottom: 8px;
+    }
+    
+    .header-subtitle p {
+        font-size: 0.9rem;
+    }
 
-            footer {
-                margin-top: 40px;
-                padding: 40px 20px 20px;
-            }
-        }
+    .triqueta-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+    }
+    
+    #btn-norte {
+    top: 4% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+}
+
+#btn-oeste {
+    bottom: 5% !important;
+    left: 5% !important;
+}
+
+#btn-este {
+    bottom: 5% !important;
+    right: 5% !important;
+}
+}
+
+/* Botones de la triqueta - ESCRITORIO */
+.triqueta-btn {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border: 2px solid #d4af37;
+    border-radius: 50%;
+    background: rgba(212, 175, 55, 0.1);
+    backdrop-filter: blur(5px);
+    color: #d4af37;
+    font-size: 1.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    z-index: 5;
+    transition: all 0.3s ease;
+    font-family: 'Cinzel', serif;
+    pointer-events: none;
+}
+
+.triqueta-btn:hover {
+    background: rgba(212, 175, 55, 0.3);
+    box-shadow: 0 0 30px rgba(212, 175, 55, 0.6);
+    transform: scale(1.1);
+}
+
+.triqueta-btn.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+#btn-norte {
+    top: 6%;
+    left: 45%;
+    transform: translate(-50%, -50%);
+}
+
+#btn-oeste {
+    bottom: 14%;
+    left: 10%;
+    transform: translate(-50%, 50%);
+}
+
+#btn-este {
+    bottom: 14%;
+    right: 10%;
+    transform: translate(50%, 50%);
+}
+
+@keyframes btnAppear {
+    from {
+        opacity: 0;
+        transform: translate(var(--tx), var(--ty)) scale(0);
+    }
+    to {
+        opacity: 1;
+        transform: translate(var(--tx), var(--ty)) scale(1);
+    }
+}
+
+/* Animación de reaparición del logo */
+@keyframes logoReappear {
+    0% {
+        opacity: 0;
+        transform: scale(0.5);
+        filter: drop-shadow(0 0 0 rgba(212, 175, 55, 0));
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+        filter: drop-shadow(0 0 12px rgba(212, 175, 55, 0.6));
+    }
+}
+
+.hero-logo.reappearing {
+    animation: logoReappear 1.5s ease-out forwards, heartbeatGlow 4s ease-in-out 1.5s infinite !important;
+}
+html {
+    overflow-x: hidden;
+}
+
+#hero {
+    overflow: hidden;  /* ← Contener la explosión dentro del hero */
+}
+.header-subtitle {
+    position: relative;  /* ← Cambiar de fixed a relative */
+    top: auto;  /* ← Cambiar */
+    left: auto;
+    right: auto;
+    background: transparent;  /* ← Cambiar o sacar */
+    backdrop-filter: none;  /* ← Cambiar o sacar */
+    padding: 40px 20px 0;  /* ← Ajustar padding */
+    z-index: 4;
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.header-subtitle h2 {
+    color: #d4af37;
+    font-size: 1.8rem;
+    letter-spacing: 3px;
+    margin-bottom: 10px;
+    text-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+}
+
+/* Botón de Santería */
+.santeria-btn {
+    display: inline-block;
+    padding: 15px 40px;
+    background: rgba(212, 175, 55, 0.15);
+    border: 2px solid #d4af37;
+    border-radius: 8px;
+    color: #d4af37;
+    font-size: 1.8rem;
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    text-decoration: none;
+    margin-bottom: 15px;
+    text-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+    backdrop-filter: blur(5px);
+}
+
+.santeria-btn:hover {
+    background: rgba(212, 175, 55, 0.3);
+    box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+    transform: translateY(-2px);
+}
+
+.santeria-description {
+    font-size: 1rem;
+    color: #c4b088;
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+#btn-norte.fading {
+    opacity: 0 !important;
+    transition: opacity 0.4s ease;
+}
+
+.santeria-text-overlay {
+    position: absolute;
+    top: 10%;
+    left: 52%;
+    transform: translate(-50%, -50%);
+    color: #d4af37;
+    font-size: 2.1rem;
+    font-weight: bold;
+    letter-spacing: 3px;
+    text-shadow: 0 0 20px rgba(212, 175, 55, 1);
+    white-space: nowrap;
+    z-index: 6;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+.santeria-text-overlay.visible {
+    opacity: 1;
+}
+#btn-este.fading {
+    opacity: 0 !important;
+    transition: opacity 0.4s ease;
+}
+
+.vivero-text-overlay {
+    position: absolute;
+    bottom: 14%;
+    right: 10%;
+    transform: translate(50%, 50%);
+    color: #d4af37;
+    font-size: 1.5rem;
+    font-weight: bold;
+    letter-spacing: 3px;
+    text-shadow: 0 0 20px rgba(212, 175, 55, 1);
+    white-space: nowrap;
+    z-index: 6;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+.vivero-text-overlay.visible {
+    opacity: 1;
+}
+
+.vivero-btn {
+    display: inline-block;
+    padding: 15px 40px;
+    background: rgba(212, 175, 55, 0.15);
+    border: 2px solid #d4af37;
+    border-radius: 8px;
+    color: #d4af37;
+    font-size: 1.8rem;
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    text-decoration: none;
+    margin-bottom: 15px;
+    text-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+    backdrop-filter: blur(5px);
+}
+
+.vivero-btn:hover {
+    background: rgba(212, 175, 55, 0.3);
+    box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+    transform: translateY(-2px);
+}
+
+.vivero-description {
+    font-size: 1rem;
+    color: #c4b088;
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0 auto;
+}
+#btn-oeste.fading {
+    opacity: 0 !important;
+    transition: opacity 0.4s ease;
+}
+
+.oraculo-text-overlay {
+    position: absolute;
+    bottom: 14%;
+    left: 10%;
+    transform: translate(-50%, 50%);
+    color: #d4af37;
+    font-size: 1.5rem;
+    font-weight: bold;
+    letter-spacing: 3px;
+    text-shadow: 0 0 20px rgba(212, 175, 55, 1);
+    white-space: nowrap;
+    z-index: 6;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+.oraculo-text-overlay.visible {
+    opacity: 1;
+}
+
+.oraculo-btn {
+    display: inline-block;
+    padding: 15px 40px;
+    background: rgba(212, 175, 55, 0.15);
+    border: 2px solid #d4af37;
+    border-radius: 8px;
+    color: #d4af37;
+    font-size: 1.8rem;
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    text-decoration: none;
+    margin-bottom: 15px;
+    text-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+    backdrop-filter: blur(5px);
+}
+
+.oraculo-btn:hover {
+    background: rgba(212, 175, 55, 0.3);
+    box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+    transform: translateY(-2px);
+}
+
+.oraculo-description {
+    font-size: 1rem;
+    color: #c4b088;
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0 auto;
+}
     </style>
 </head>
 <body>
@@ -555,113 +791,43 @@
 
     <header>
         <nav>
-            <div class="logo">
-                <img src="logo.png" alt="Logo Artilugios" class="header-logo" />
-                <span class="logo-text">Artilugios</span>
-            </div>
+<div class="logo" style="cursor: pointer;" onclick="location.reload()">
+    <img src="logo.png" alt="Logo Artilugios" class="header-logo" />
+    <span class="logo-text">Artilugios</span>
+</div>
             <ul class="nav-links">
                 <li><a href="#hero">INICIO</a></li>
-                <li><a href="#nosotros">PROYECTO VIVO</a></li>
                 <li><a href="#contacto">CONTACTO</a></li>
             </ul>
         </nav>
     </header>
 
-    <div id="hero">
-        <div class="hero-container">
-            <img src="logo.png" alt="Logo Artilugios" class="hero-logo" id="hero-logo" />
-            <img src="laurel.png" alt="Laurel" id="laurel" />
-            <img src="sol.png" alt="Símbolo del Sol" class="hero-symbol" id="sol" />
-            <img src="luna.png" alt="Símbolo de la Luna" class="hero-symbol" id="luna" />
-        </div>
+<div id="hero">
+    <div class="hero-container">
+        <img src="logo.png" alt="Logo Artilugios" class="hero-logo" id="hero-logo" />
+        <img src="laurel.png" alt="Laurel" id="laurel" />
+        <img src="sol.png" alt="Símbolo del Sol" class="hero-symbol" id="sol" />
+        <img src="luna.png" alt="Símbolo de la Luna" class="hero-symbol" id="luna" />
+        
+        <button class="triqueta-btn" id="btn-norte">🕯️</button>
+        <button class="triqueta-btn" id="btn-oeste">🔮</button>
+        <button class="triqueta-btn" id="btn-este">🌿</button>
     </div>
-
-    <div id="vivero" class="section">
-        <button class="back-btn" onclick="goBack()">← VOLVER AL INICIO</button>
-        <div class="section-content">
-            <h1>VIVERO</h1>
-            <p class="description">
-                En este sagrado espacio de vida y crecimiento, la energía de la tierra se manifiesta. 
-                Aquí cultivamos las semillas del conocimiento ancestral y las plantas de poder.
-            </p>
-            <div class="grid">
-                <div class="card">
-                    <h3>Plantas Sagradas</h3>
-                    <p>Colección de especies botánicas utilizadas en rituales y ceremonias ancestrales.</p>
-                </div>
-                <div class="card">
-                    <h3>Cultivo Místico</h3>
-                    <p>Técnicas tradicionales para el cuidado y crecimiento de plantas medicinales.</p>
-                </div>
-                <div class="card">
-                    <h3>Conexión Natural</h3>
-                    <p>Talleres y experiencias para reconectar con la sabiduría de la naturaleza.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="oraculo" class="section">
-        <button class="back-btn" onclick="goBack()">← VOLVER AL INICIO</button>
-        <div class="section-content">
-            <h1>ORÁCULO</h1>
-            <p class="description">
-                Portal hacia los secretos del destino y la adivinación. 
-                Aquí los antiguos métodos revelan los caminos ocultos del tiempo y el espíritu.
-            </p>
-            <div class="grid">
-                <div class="card">
-                    <h3>Lectura de Tarot</h3>
-                    <p>Interpretación profunda de las cartas ancestrales para guiar tu camino.</p>
-                </div>
-                <div class="card">
-                    <h3>Runas Antiguas</h3>
-                    <p>Consulta de símbolos nórdicos para desentrañar los mensajes del universo.</p>
-                </div>
-                <div class="card">
-                    <h3>Visiones Místicas</h3>
-                    <p>Sesiones de clarividencia y conexión con planos superiores de consciencia.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="santeria" class="section">
-        <button class="back-btn" onclick="goBack()">← VOLVER AL INICIO</button>
-        <div class="section-content">
-            <h1>SANTERÍA</h1>
-            <p class="description">
-                Reino de los Orishas y las tradiciones afrocaribeñas. 
-                Espacio sagrado donde la fe, los rituales y los santos convergen en armonía.
-            </p>
-            <div class="grid">
-                <div class="card">
-                    <h3>Rituales Sagrados</h3>
-                    <p>Ceremonias tradicionales para honrar a los Orishas y solicitar su guía.</p>
-                </div>
-                <div class="card">
-                    <h3>Consulta Espiritual</h3>
-                    <p>Lectura de caracoles y conexión con las deidades para orientación divina.</p>
-                </div>
-                <div class="card">
-                    <h3>Protección Mística</h3>
-                    <p>Trabajos espirituales de limpieza, protección y apertura de caminos.</p>
-                </div>
-            </div>
-        </div>
-    </div>
+    
+    <!-- ← MOVER ESTO ACÁ -->
+    <section class="header-subtitle" id="header-subtitle">
+    <h2 id="subtitle-title">Proyecto vivo</h2>
+    <p id="subtitle-description">Portal místico de sabiduría ancestral. Conectando lo terrenal con lo divino</p>
+</section>
+</div>
 
     <footer id="contacto">
         <div class="footer-content">
             <div class="footer-section">
-                <h3>ARTILUGIOS</h3>
-                <p>Portal místico de sabiduría ancestral. Conectando lo terrenal con lo divino desde tiempos inmemoriales.</p>
-            </div>
-            <div class="footer-section">
                 <h3>CONTACTO</h3>
-                <p>📧 info@triqueta.com</p>
+                <p>📧 info@artilugios.com</p>
                 <p>📱 +598 XX XXX XXX</p>
-                <p>📍 Montevideo, Uruguay</p>
+                <p>📍 El Pinar, Uruguay</p>
             </div>
             <div class="footer-section">
                 <h3>HORARIOS</h3>
@@ -672,15 +838,15 @@
             <div class="footer-section">
                 <h3>SÍGUENOS</h3>
                 <div class="social-links">
-                    <a href="#" title="Facebook">f</a>
-                    <a href="#" title="Instagram">📷</a>
-                    <a href="#" title="WhatsApp">💬</a>
-                    <a href="#" title="YouTube">▶</a>
-                </div>
+    <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+    <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+    <a href="#" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+    <a href="#" title="YouTube"><i class="fab fa-youtube"></i></a>
+</div>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2025 Triqueta - Portal Místico. Todos los derechos reservados.</p>
+            <p>&copy; 2025 Artilugios - Proyecto vivo. Todos los derechos reservados.</p>
         </div>
     </footer>
 
@@ -690,6 +856,11 @@
         const PULSE_INTERVAL = 4000;
         const PULSE_DURATION = 800;
         const MAX_RADIUS = 300;
+
+// AGREGAR ESTA LÍNEA AQUÍ ↓
+let santeriaClicked = false;
+let viveroClicked = false;
+let oraculoClicked = false;
 
         // --- Partículas ---
         const particlesContainer = document.getElementById('particles');
@@ -779,45 +950,41 @@
         }
 
         setTimeout(() => {
-            triggerPulse();
-            setInterval(triggerPulse, PULSE_INTERVAL);
-        }, 4500);
+    triggerPulse();
+    setInterval(triggerPulse, PULSE_INTERVAL);
+}, 2500);
 
         // --- Navegación ---
-        function goBack() {
-            document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
 
-        window.addEventListener('hashchange', () => {
-    const hash = window.location.hash.substring(1);
-    if (['vivero', 'oraculo', 'santeria'].includes(hash)) {
-        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document.getElementById(hash)?.classList.add('active');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else if (hash === 'contacto') {
-        goBack();
-        setTimeout(() => {
-            const footer = document.getElementById('contacto');
-            if (footer) {
-                const footerTop = footer.offsetTop;
-                window.scrollTo({ top: footerTop, behavior: 'smooth' });
-            }
-        }, 100);
-    } else if (hash === 'hero' || hash === 'nosotros') {
-        goBack();
-    } else {
-        goBack();
+// Prevenir comportamiento por defecto de los links del header
+document.querySelectorAll('.nav-links a').forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const hash = link.getAttribute('href').substring(1);
+        
+if (hash === 'contacto') {
+    const footer = document.getElementById('contacto');
+    if (footer) {
+        const footerTop = footer.offsetTop;
+        window.scrollTo({ top: footerTop - 100, behavior: 'smooth' });  // ← AGREGAR - 100
     }
-});
+} 
 
+else {
+            window.scrollTo({ top: 20, behavior: 'smooth' });  // ← Ajusta el número a tu gusto
+        }
+        
+        // Actualizar URL sin recargar
+        window.history.pushState(null, '', `#${hash}`);
+    });
+});
 
         // --- Gestión del laurel ---
         function initLaurel() {
             const laurel = document.getElementById('laurel');
             if (laurel) laurel.style.animation = 'laurelRevealAndSpin 4s ease-out forwards';
         }
-        setTimeout(initLaurel, 7500);
+        setTimeout(initLaurel, 4000);
 
         // --- Símbolos sol y luna ---
         function showSymbols() {
@@ -826,7 +993,328 @@
             if (sol) sol.style.animation = 'slideInFromLeft 1.2s ease-out forwards';
             if (luna) luna.style.animation = 'slideInFromRight 1.2s ease-out forwards';
         }
-        setTimeout(showSymbols, 11500);
-    </script>
+        setTimeout(showSymbols, 7000);
+// Efecto de onda expansiva al hacer clic en el logo
+let exploded = false;
+
+document.getElementById('hero-logo').addEventListener('click', function() {
+    if (exploded) {
+        // Si ya explotó, solo resetear
+        exploded = false;
+        santeriaClicked = false;
+	viveroClicked = false;
+	oraculoClicked = false;
+        
+        document.getElementById('subtitle-title').innerHTML = 'Proyecto vivo';
+        document.getElementById('subtitle-description').innerHTML = 'Portal místico de sabiduría ancestral. Conectando lo terrenal con lo divino';
+        
+        const btnNorte = document.getElementById('btn-norte');
+        btnNorte.classList.remove('fading');
+        btnNorte.style.opacity = '1';
+        
+        const overlayText = document.querySelector('.santeria-text-overlay');
+        if (overlayText) overlayText.remove();
+
+// Reset botón este
+const btnEste = document.getElementById('btn-este');
+btnEste.classList.remove('fading');
+btnEste.style.opacity = '1';
+
+const overlayVivero = document.querySelector('.vivero-text-overlay');
+if (overlayVivero) overlayVivero.remove();
+
+// Reset botón oeste
+const btnOeste = document.getElementById('btn-oeste');
+btnOeste.classList.remove('fading');
+btnOeste.style.opacity = '1';
+
+const overlayOraculo = document.querySelector('.oraculo-text-overlay');
+if (overlayOraculo) overlayOraculo.remove();
+        
+        return;
+    }
+
+    exploded = true;
+    
+    // AGREGAR ESTAS LÍNEAS AQUÍ ↓
+    // Reset del texto y botones
+    santeriaClicked = false;
+    document.getElementById('subtitle-title').textContent = 'Proyecto vivo';
+    document.getElementById('subtitle-description').textContent = 'Portal místico de sabiduría ancestral. Conectando lo terrenal con lo divino';
+    
+    const logo = this;
+    const laurel = document.getElementById('laurel');
+    const sol = document.getElementById('sol');
+    const luna = document.getElementById('luna');
+    
+    // Detener animación del logo y ocultarlo
+    logo.classList.add('clicked');
+    logo.style.opacity = '0';
+    
+    // Crear onda visual
+    const rect = logo.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    const pulseWave = document.createElement('div');
+    pulseWave.style.position = 'fixed';
+    pulseWave.style.left = `${centerX}px`;
+    pulseWave.style.top = `${centerY}px`;
+    pulseWave.style.width = '0';
+    pulseWave.style.height = '0';
+    pulseWave.style.borderRadius = '50%';
+    pulseWave.style.border = '2px solid rgba(212, 175, 55, 0.6)';
+    pulseWave.style.pointerEvents = 'none';
+    pulseWave.style.zIndex = '10';
+    document.body.appendChild(pulseWave);
+    
+    pulseWave.animate([
+        { width: '0', height: '0', opacity: 1 },
+        { width: '150vw', height: '150vw', opacity: 0 }
+    ], {
+        duration: 1000,
+        easing: 'ease-out'
+    });
+    
+    setTimeout(() => pulseWave.remove(), 1000);
+    
+    // Explotar elementos
+    [laurel, sol, luna].forEach(el => {
+        if (!el) return;
+        
+        const elRect = el.getBoundingClientRect();
+        const elCenterX = elRect.left + elRect.width / 2;
+        const elCenterY = elRect.top + elRect.height / 2;
+        
+        const dx = elCenterX - centerX;
+        const dy = elCenterY - centerY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        const pushDistance = 800;
+        const endX = (dx / distance) * pushDistance;
+        const endY = (dy / distance) * pushDistance;
+        
+        el.style.setProperty('--start-x', '0px');
+        el.style.setProperty('--start-y', '0px');
+        el.style.setProperty('--end-x', `${endX}px`);
+        el.style.setProperty('--end-y', `${endY}px`);
+        
+        el.classList.add('exploding');
+    });
+    
+    // Reaparecer el logo después de la explosión
+    setTimeout(() => {
+        logo.style.opacity = '1';
+        logo.classList.remove('clicked');
+        logo.classList.add('reappearing');
+        
+        // Hacer aparecer los botones después del logo
+        setTimeout(() => {
+            const btnNorte = document.getElementById('btn-norte');
+            const btnOeste = document.getElementById('btn-oeste');
+            const btnEste = document.getElementById('btn-este');
+            
+            // AGREGAR ESTAS LÍNEAS AQUÍ ↓
+            // Reset botón norte
+btnNorte.innerHTML = '🕯️';
+btnNorte.style.width = '60px';
+btnNorte.style.height = '60px';
+btnNorte.style.padding = '0';
+btnNorte.style.borderRadius = '50%';
+btnNorte.style.fontSize = '1.8rem';
+btnNorte.style.letterSpacing = '0';
+btnNorte.classList.remove('fading');
+btnNorte.style.opacity = '1';
+const overlayText = document.querySelector('.santeria-text-overlay');
+if (overlayText) {
+    overlayText.remove();
+}
+            
+            [btnNorte, btnOeste, btnEste].forEach((btn, index) => {
+                setTimeout(() => {
+                    btn.classList.add('visible');
+                    btn.style.animation = 'btnAppear 0.6s ease-out forwards';
+                }, index * 150);
+            });
+        }, 1000);
+    }, 1000);
+});
+// Funcionalidad del botón Santería
+const btnNorte = document.getElementById('btn-norte');
+
+// ESCRITORIO: Hover
+btnNorte.addEventListener('mouseenter', function() {
+    if (window.innerWidth > 768 && !santeriaClicked) {
+        // Desvanecer botón
+        this.classList.add('fading');
+        
+        // Crear texto superpuesto si no existe
+        if (!document.querySelector('.santeria-text-overlay')) {
+            const text = document.createElement('span');
+            text.className = 'santeria-text-overlay';
+            text.textContent = 'SANTERÍA';
+            document.querySelector('.hero-container').appendChild(text);
+            
+            setTimeout(() => text.classList.add('visible'), 10);
+        } else {
+            document.querySelector('.santeria-text-overlay').classList.add('visible');
+        }
+    }
+});
+
+btnNorte.addEventListener('mouseleave', function() {
+    if (window.innerWidth > 768 && !santeriaClicked) {
+        // Mostrar botón
+        this.classList.remove('fading');
+        
+        // Ocultar texto
+        const text = document.querySelector('.santeria-text-overlay');
+        if (text) {
+            text.classList.remove('visible');
+        }
+    }
+});
+// Click
+btnNorte.addEventListener('click', function() {
+    const isMobile = window.innerWidth <= 768;
+    
+    if (isMobile) {
+        // MÓVIL: Cambiar texto abajo
+        const subtitle = document.getElementById('header-subtitle');
+        const title = document.getElementById('subtitle-title');
+        const description = document.getElementById('subtitle-description');
+        
+        title.innerHTML = '<a href="#" class="santeria-btn">SANTERÍA</a>';
+        description.innerHTML = '<p class="santeria-description">Artículos para rituales y limpiezas energéticas. Velas, Inciensos, recinas, hierbas y elementos sagrados para tus ceremonias.</p>';
+        
+        subtitle.style.opacity = '0';
+        setTimeout(() => {
+            subtitle.style.transition = 'opacity 0.6s ease';
+            subtitle.style.opacity = '1';
+        }, 100);
+    } else {
+        // ESCRITORIO: Fijar texto visible
+        santeriaClicked = true;
+    }
+});
+// Funcionalidad del botón Vivero
+const btnEste = document.getElementById('btn-este');
+
+// ESCRITORIO: Hover
+btnEste.addEventListener('mouseenter', function() {
+    if (window.innerWidth > 768 && !viveroClicked) {
+        // Desvanecer botón
+        this.classList.add('fading');
+        
+        // Crear texto superpuesto si no existe
+        if (!document.querySelector('.vivero-text-overlay')) {
+            const text = document.createElement('span');
+            text.className = 'vivero-text-overlay';
+            text.textContent = 'VIVERO';
+            document.querySelector('.hero-container').appendChild(text);
+            
+            setTimeout(() => text.classList.add('visible'), 10);
+        } else {
+            document.querySelector('.vivero-text-overlay').classList.add('visible');
+        }
+    }
+});
+
+btnEste.addEventListener('mouseleave', function() {
+    if (window.innerWidth > 768 && !viveroClicked) {
+        // Mostrar botón
+        this.classList.remove('fading');
+        
+        // Ocultar texto
+        const text = document.querySelector('.vivero-text-overlay');
+        if (text) {
+            text.classList.remove('visible');
+        }
+    }
+});
+
+// Click
+btnEste.addEventListener('click', function() {
+    const isMobile = window.innerWidth <= 768;
+    
+    if (isMobile) {
+        // MÓVIL: Cambiar texto abajo
+        const subtitle = document.getElementById('header-subtitle');
+        const title = document.getElementById('subtitle-title');
+        const description = document.getElementById('subtitle-description');
+        
+        title.innerHTML = '<a href="#" class="vivero-btn">VIVERO</a>';
+        description.innerHTML = '<p class="vivero-description">Venta de plantas ornamentales, árboles frutales y de sombra. Encuentra la vegetación perfecta para tu jardín o espacio verde.</p>';
+        
+        subtitle.style.opacity = '0';
+        setTimeout(() => {
+            subtitle.style.transition = 'opacity 0.6s ease';
+            subtitle.style.opacity = '1';
+        }, 100);
+    } else {
+        // ESCRITORIO: Fijar texto visible
+        viveroClicked = true;
+    }
+});
+// Funcionalidad del botón Oráculo
+const btnOeste = document.getElementById('btn-oeste');
+
+// ESCRITORIO: Hover
+btnOeste.addEventListener('mouseenter', function() {
+    if (window.innerWidth > 768 && !oraculoClicked) {
+        // Desvanecer botón
+        this.classList.add('fading');
+        
+        // Crear texto superpuesto si no existe
+        if (!document.querySelector('.oraculo-text-overlay')) {
+            const text = document.createElement('span');
+            text.className = 'oraculo-text-overlay';
+            text.textContent = 'ORÁCULO';
+            document.querySelector('.hero-container').appendChild(text);
+            
+            setTimeout(() => text.classList.add('visible'), 10);
+        } else {
+            document.querySelector('.oraculo-text-overlay').classList.add('visible');
+        }
+    }
+});
+
+btnOeste.addEventListener('mouseleave', function() {
+    if (window.innerWidth > 768 && !oraculoClicked) {
+        // Mostrar botón
+        this.classList.remove('fading');
+        
+        // Ocultar texto
+        const text = document.querySelector('.oraculo-text-overlay');
+        if (text) {
+            text.classList.remove('visible');
+        }
+    }
+});
+
+// Click
+btnOeste.addEventListener('click', function() {
+    const isMobile = window.innerWidth <= 768;
+    
+    if (isMobile) {
+        // MÓVIL: Cambiar texto abajo
+        const subtitle = document.getElementById('header-subtitle');
+        const title = document.getElementById('subtitle-title');
+        const description = document.getElementById('subtitle-description');
+        
+        title.innerHTML = '<a href="#" class="oraculo-btn">ORÁCULO</a>';
+        description.innerHTML = '<p class="oraculo-description">Lectura de Tarot, Runas y otras artes adivinatorias. Descubre los mensajes del universo y encuentra guía en tu camino espiritual.</p>';
+        
+        subtitle.style.opacity = '0';
+        setTimeout(() => {
+            subtitle.style.transition = 'opacity 0.6s ease';
+            subtitle.style.opacity = '1';
+        }, 100);
+    } else {
+        // ESCRITORIO: Fijar texto visible
+        oraculoClicked = true;
+    }
+});
+   </script>
 </body>
 </html>
