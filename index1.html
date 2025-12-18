@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tu Refugio Digital | Luz y Conexión</title>
+    
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: { 
+                extend: { 
+                    colors: { 
+                        warmLight: '#fffaf2',
+                        warmDark: '#0c0e14',
+                        amberGold: '#d97706'
+                    } 
+                } 
+            }
+        }
+    </script>
+
+    <style>
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        /* FONDO DE PARTÍCULAS */
+        #particle-container {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            bottom: -20px;
+            background: radial-gradient(circle, rgba(251, 191, 36, 0.8) 0%, rgba(251, 191, 36, 0) 70%);
+            border-radius: 50%;
+            filter: blur(1px);
+            animation: floatUp var(--duration) linear infinite;
+            opacity: 0;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) translateX(0); opacity: 0; }
+            20% { opacity: var(--opacity); }
+            80% { opacity: var(--opacity); }
+            100% { transform: translateY(-110vh) translateX(var(--drift)); opacity: 0; }
+        }
+
+        /* DISEÑO GENERAL */
+        .swiper { width: 100%; height: 75vh; border-radius: 3rem; }
+        .slide-overlay { 
+            position: absolute; inset: 0; 
+            background: linear-gradient(to top, rgba(12, 14, 20, 0.8) 0%, rgba(12, 14, 20, 0.2) 100%); 
+        }
+
+        .prose { max-width: 850px !important; }
+        .prose img { border-radius: 2.5rem; }
+        .hidden-view { display: none; }
+        
+        .warm-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            transition: all 0.5s ease;
+        }
+        .dark .warm-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(251, 191, 36, 0.1);
+        }
+
+        /* PERSONALIZACIÓN SWIPER */
+        .swiper-button-next, .swiper-button-prev { 
+            color: #fbbf24 !important;
+            background: rgba(255,255,255,0.05);
+            width: 60px; height: 60px; border-radius: 50%;
+            backdrop-filter: blur(5px);
+        }
+    </style>
+</head>
+<body class="bg-warmLight text-slate-800 dark:bg-warmDark dark:text-slate-200 transition-colors duration-1000">
+
+    <!-- CONTENEDOR DE PARTÍCULAS -->
+    <div id="particle-container"></div>
+
+    <!-- NAVEGACIÓN -->
+    <nav class="bg-white/40 dark:bg-black/20 backdrop-blur-md border-b border-amber-500/10 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <button onclick="showHome()" class="text-2xl font-black tracking-tighter text-amber-600 flex items-center gap-2 group">
+                TU REFUGIO <span class="text-slate-900 dark:text-white italic group-hover:text-amber-500 transition">DIGITAL</span>
+            </button>
+
+            <button onclick="toggleDarkMode()" class="p-3 rounded-full bg-amber-100 dark:bg-slate-800 text-amber-600 dark:text-amber-400 hover:rotate-12 transition-all">
+                <svg id="theme-icon" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"></path></svg>
+            </button>
+        </div>
+    </nav>
+
+    <!-- VISTA PRINCIPAL -->
+    <main id="home-view" class="max-w-7xl mx-auto px-6 py-10 relative z-10">
+        
+        <!-- CARRUSEL -->
+        <section class="mb-20">
+            <div class="swiper mySwiper shadow-[0_30px_60px_-15px_rgba(217,119,6,0.3)]">
+                <div class="swiper-wrapper" id="carousel-wrapper"></div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN DE BIENVENIDA (LA CONEXIÓN) -->
+        <section id="welcome-section" class="mb-24 hidden">
+            <div class="warm-card rounded-[4rem] p-10 md:p-20 shadow-xl border border-amber-100/50">
+                <div id="welcome-content" class="prose prose-slate dark:prose-invert lg:prose-2xl mx-auto italic text-center leading-relaxed">
+                </div>
+            </div>
+        </section>
+
+        <!-- GRILLA -->
+        <section>
+            <h2 class="text-4xl font-black mb-16 text-center tracking-tighter">Explorar el <span class="text-amber-600">Saber</span></h2>
+            <div id="posts-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12"></div>
+        </section>
+    </main>
+
+    <!-- VISTA DE LECTURA -->
+    <main id="post-view" class="max-w-5xl mx-auto px-6 py-16 hidden-view relative z-10">
+        <button onclick="showHome()" class="mb-16 flex items-center text-amber-700 dark:text-amber-400 font-bold bg-amber-500/10 px-8 py-4 rounded-full hover:bg-amber-600 hover:text-white transition-all shadow-lg">
+            ← Volver al Refugio
+        </button>
+        <article id="full-article-content" class="prose prose-slate dark:prose-invert lg:prose-2xl mx-auto"></article>
+    </main>
+
+    <footer class="py-24 text-center opacity-50 relative z-10">
+        <p class="text-xs font-bold uppercase tracking-[0.4em]">Tu Refugio Digital • Creado con Alma • 2025</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    
+    <script>
+        // GENERADOR DE PARTÍCULAS (Seres de luz)
+        const particleContainer = document.getElementById('particle-container');
+        function createParticle() {
+            const p = document.createElement('div');
+            const size = Math.random() * 8 + 2;
+            const drift = (Math.random() - 0.5) * 200;
+            const duration = Math.random() * 15 + 10;
+            const opacity = Math.random() * 0.5 + 0.1;
+
+            p.className = 'particle';
+            p.style.width = `${size}px`;
+            p.style.height = `${size}px`;
+            p.style.left = `${Math.random() * 100}%`;
+            p.style.setProperty('--duration', `${duration}s`);
+            p.style.setProperty('--drift', `${drift}px`);
+            p.style.setProperty('--opacity', opacity);
+
+            particleContainer.appendChild(p);
+            setTimeout(() => p.remove(), duration * 1000);
+        }
+        setInterval(createParticle, 400);
+
+        // LÓGICA DEL SITIO
+        let allPosts = [];
+
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+        }
+        if (localStorage.theme === 'dark') document.documentElement.classList.add('dark');
+
+        function showHome() {
+            document.getElementById('home-view').classList.remove('hidden-view');
+            document.getElementById('post-view').classList.add('hidden-view');
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        function openPost(index) {
+            const post = allPosts[index];
+            const content = document.getElementById('full-article-content');
+            content.innerHTML = `
+                <header class="mb-20 text-center">
+                    <h1 class="text-6xl font-black mb-8 tracking-tighter">${post.title.$t}</h1>
+                    <div class="h-1 w-24 bg-amber-500 mx-auto rounded-full"></div>
+                </header>
+                ${post.content.$t}
+            `;
+            document.getElementById('home-view').classList.add('hidden-view');
+            document.getElementById('post-view').classList.remove('hidden-view');
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        function renderBlog(json) {
+            allPosts = json.feed.entry;
+            const carouselWrapper = document.getElementById('carousel-wrapper');
+            const postsGrid = document.getElementById('posts-grid');
+            const welcomeSection = document.getElementById('welcome-section');
+            const welcomeContent = document.getElementById('welcome-content');
+
+            allPosts.forEach((entry, index) => {
+                const title = entry.title.$t;
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = entry.content.$t;
+                const img = tempDiv.querySelector('img') ? tempDiv.querySelector('img').src.replace('/s72-c/', '/s1600/') : 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80&w=1600';
+                const snippet = tempDiv.textContent.trim().substring(0, 150) + "...";
+
+                if (title.includes("La Conexión, tu refugio")) {
+                    welcomeSection.classList.remove('hidden');
+                    welcomeContent.innerHTML = `<span class="text-amber-600 block mb-6 text-sm font-bold uppercase tracking-[0.3em]">Te damos la bienvenida</span>${entry.content.$t}`;
+                }
+
+                // Carrusel con texto elevado y centrado
+                carouselWrapper.innerHTML += `
+                    <div class="swiper-slide relative cursor-pointer" onclick="openPost(${index})">
+                        <img src="${img}" class="absolute inset-0 w-full h-full object-cover">
+                        <div class="slide-overlay"></div>
+                        <div class="relative z-10 p-12 h-full flex flex-col justify-center items-center text-center text-white">
+                            <h3 class="text-4xl md:text-6xl font-extrabold mb-8 tracking-tighter leading-none">${title}</h3>
+                            <p class="text-amber-50 mb-10 max-w-2xl text-lg font-light opacity-90">${snippet}</p>
+                            <button class="bg-amber-600 px-12 py-5 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-white hover:text-amber-600 transition-all shadow-2xl">Entrar al Refugio</button>
+                        </div>
+                    </div>
+                `;
+
+                // Grilla
+                postsGrid.innerHTML += `
+                    <article class="warm-card rounded-[3rem] overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500" onclick="openPost(${index})">
+                        <div class="h-64 overflow-hidden relative">
+                            <img src="${img}" class="w-full h-full object-cover group-hover:scale-110 transition duration-1000">
+                        </div>
+                        <div class="p-10">
+                            <h3 class="font-black text-2xl mb-4 group-hover:text-amber-600 transition leading-tight">${title}</h3>
+                            <p class="text-slate-500 dark:text-slate-400 text-sm mb-8 line-clamp-3 font-medium">${snippet}</p>
+                            <span class="text-amber-600 font-bold text-xs uppercase tracking-widest flex items-center gap-2">Explorar <span class="group-hover:translate-x-2 transition">→</span></span>
+                        </div>
+                    </article>
+                `;
+            });
+
+            new Swiper(".mySwiper", { 
+                loop: true, 
+                speed: 1000,
+                autoplay: { delay: 6000 },
+                pagination: { el: ".swiper-pagination", clickable: true },
+                effect: "fade",
+                fadeEffect: { crossFade: true }
+            });
+        }
+    </script>
+    <script src="https://turefugiodigital.blogspot.com/feeds/posts/default?alt=json-in-script&max-results=500&callback=renderBlog"></script>
+</body>
+</html>

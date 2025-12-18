@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tu Refugio Digital | Luz y Conexión</title>
+    <title>Tu Refugio Digital | Luz, Sonido y Conexión</title>
     
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
@@ -15,9 +15,9 @@
             theme: { 
                 extend: { 
                     colors: { 
-                        warmLight: '#fffaf2',
-                        warmDark: '#0c0e14',
-                        amberGold: '#d97706'
+                        warmLight: '#fffcf7',
+                        warmDark: '#080a0f',
+                        amberGold: '#f59e0b'
                     } 
                 } 
             }
@@ -25,152 +25,155 @@
     </script>
 
     <style>
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            scroll-behavior: smooth;
-            overflow-x: hidden;
-        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; scroll-behavior: smooth; overflow-x: hidden; }
 
-        /* FONDO DE PARTÍCULAS */
-        #particle-container {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            overflow: hidden;
-        }
-
+        /* SISTEMA DE PARTÍCULAS */
+        #particle-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
         .particle {
-            position: absolute;
-            bottom: -20px;
-            background: radial-gradient(circle, rgba(251, 191, 36, 0.8) 0%, rgba(251, 191, 36, 0) 70%);
+            position: absolute; bottom: -50px;
+            background: radial-gradient(circle, rgba(251, 191, 36, 1) 0%, rgba(217, 119, 6, 0.4) 40%, rgba(217, 119, 6, 0) 80%);
             border-radius: 50%;
-            filter: blur(1px);
+            box-shadow: 0 0 20px 5px rgba(251, 191, 36, 0.4);
             animation: floatUp var(--duration) linear infinite;
-            opacity: 0;
+            filter: blur(var(--blur)); opacity: 0;
         }
-
         @keyframes floatUp {
-            0% { transform: translateY(0) translateX(0); opacity: 0; }
-            20% { opacity: var(--opacity); }
+            0% { transform: translateY(0) translateX(0) scale(0.5); opacity: 0; }
+            10% { opacity: var(--opacity); }
             80% { opacity: var(--opacity); }
-            100% { transform: translateY(-110vh) translateX(var(--drift)); opacity: 0; }
+            100% { transform: translateY(-120vh) translateX(var(--drift)) scale(1.2); opacity: 0; }
         }
 
-        /* DISEÑO GENERAL */
-        .swiper { width: 100%; height: 75vh; border-radius: 3rem; }
-        .slide-overlay { 
-            position: absolute; inset: 0; 
-            background: linear-gradient(to top, rgba(12, 14, 20, 0.8) 0%, rgba(12, 14, 20, 0.2) 100%); 
-        }
-
+        /* DISEÑO */
+        .swiper { width: 100%; height: 75vh; border-radius: 3.5rem; }
+        .slide-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(8, 10, 15, 0.85) 0%, rgba(8, 10, 15, 0.2) 100%); }
         .prose { max-width: 850px !important; }
-        .prose img { border-radius: 2.5rem; }
+        .prose img { border-radius: 3rem; }
         .hidden-view { display: none; }
-        
-        .warm-card {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(10px);
-            transition: all 0.5s ease;
-        }
-        .dark .warm-card {
-            background: rgba(30, 41, 59, 0.5);
-            border: 1px solid rgba(251, 191, 36, 0.1);
-        }
-
-        /* PERSONALIZACIÓN SWIPER */
-        .swiper-button-next, .swiper-button-prev { 
-            color: #fbbf24 !important;
-            background: rgba(255,255,255,0.05);
-            width: 60px; height: 60px; border-radius: 50%;
-            backdrop-filter: blur(5px);
-        }
+        .warm-card { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(20px); border: 1px solid rgba(251, 191, 36, 0.1); }
+        .dark .warm-card { background: rgba(15, 23, 42, 0.4); }
     </style>
 </head>
-<body class="bg-warmLight text-slate-800 dark:bg-warmDark dark:text-slate-200 transition-colors duration-1000">
+<body class="bg-warmLight text-slate-800 dark:bg-warmDark dark:text-slate-100 transition-colors duration-1000">
 
-    <!-- CONTENEDOR DE PARTÍCULAS -->
     <div id="particle-container"></div>
+    
+    <!-- AUDIO ELEMENT (Oculto) -->
+    <audio id="bg-player" preload="auto"></audio>
 
     <!-- NAVEGACIÓN -->
-    <nav class="bg-white/40 dark:bg-black/20 backdrop-blur-md border-b border-amber-500/10 sticky top-0 z-50">
+    <nav class="bg-white/20 dark:bg-black/10 backdrop-blur-xl border-b border-amber-500/5 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
             <button onclick="showHome()" class="text-2xl font-black tracking-tighter text-amber-600 flex items-center gap-2 group">
                 TU REFUGIO <span class="text-slate-900 dark:text-white italic group-hover:text-amber-500 transition">DIGITAL</span>
             </button>
+            
+            <div class="flex items-center gap-3">
+                <!-- BOTÓN MUTE -->
+                <button onclick="toggleMusic()" id="music-btn" class="p-3 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:scale-110 transition">
+                    <svg id="speaker-icon" class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77zM3 9v6h4l5 5V4L7 9H3z"/>
+                    </svg>
+                </button>
 
-            <button onclick="toggleDarkMode()" class="p-3 rounded-full bg-amber-100 dark:bg-slate-800 text-amber-600 dark:text-amber-400 hover:rotate-12 transition-all">
-                <svg id="theme-icon" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"></path></svg>
-            </button>
+                <!-- BOTÓN TEMA -->
+                <button onclick="toggleDarkMode()" class="p-3 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:scale-110 transition">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"></path></svg>
+                </button>
+            </div>
         </div>
     </nav>
 
-    <!-- VISTA PRINCIPAL -->
+    <!-- CONTENIDO (Vistas Home y Post) -->
     <main id="home-view" class="max-w-7xl mx-auto px-6 py-10 relative z-10">
-        
-        <!-- CARRUSEL -->
-        <section class="mb-20">
-            <div class="swiper mySwiper shadow-[0_30px_60px_-15px_rgba(217,119,6,0.3)]">
+        <section class="mb-24">
+            <div class="swiper mySwiper shadow-2xl">
                 <div class="swiper-wrapper" id="carousel-wrapper"></div>
                 <div class="swiper-pagination"></div>
             </div>
         </section>
 
-        <!-- SECCIÓN DE BIENVENIDA (LA CONEXIÓN) -->
-        <section id="welcome-section" class="mb-24 hidden">
-            <div class="warm-card rounded-[4rem] p-10 md:p-20 shadow-xl border border-amber-100/50">
-                <div id="welcome-content" class="prose prose-slate dark:prose-invert lg:prose-2xl mx-auto italic text-center leading-relaxed">
-                </div>
+        <section id="welcome-section" class="mb-28 hidden">
+            <div class="warm-card rounded-[5rem] p-12 md:p-24 shadow-2xl">
+                <div id="welcome-content" class="prose prose-slate dark:prose-invert lg:prose-2xl mx-auto italic text-center font-light"></div>
             </div>
         </section>
 
-        <!-- GRILLA -->
         <section>
-            <h2 class="text-4xl font-black mb-16 text-center tracking-tighter">Explorar el <span class="text-amber-600">Saber</span></h2>
-            <div id="posts-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12"></div>
+            <h2 class="text-4xl font-black mb-20 text-center tracking-tighter opacity-80 italic">Explorar el <span class="text-amber-600">Saber</span></h2>
+            <div id="posts-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-14"></div>
         </section>
     </main>
 
-    <!-- VISTA DE LECTURA -->
     <main id="post-view" class="max-w-5xl mx-auto px-6 py-16 hidden-view relative z-10">
-        <button onclick="showHome()" class="mb-16 flex items-center text-amber-700 dark:text-amber-400 font-bold bg-amber-500/10 px-8 py-4 rounded-full hover:bg-amber-600 hover:text-white transition-all shadow-lg">
-            ← Volver al Refugio
-        </button>
+        <button onclick="showHome()" class="mb-20 flex items-center text-amber-700 dark:text-amber-300 font-bold bg-amber-500/10 px-10 py-5 rounded-full hover:bg-amber-600 hover:text-white transition-all shadow-xl">← Regresar al Inicio</button>
         <article id="full-article-content" class="prose prose-slate dark:prose-invert lg:prose-2xl mx-auto"></article>
     </main>
-
-    <footer class="py-24 text-center opacity-50 relative z-10">
-        <p class="text-xs font-bold uppercase tracking-[0.4em]">Tu Refugio Digital • Creado con Alma • 2025</p>
-    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     
     <script>
-        // GENERADOR DE PARTÍCULAS (Seres de luz)
+        // --- SISTEMA DE AUDIO ---
+        const playlist = ['musica1.mp3', 'musica2.mp3', 'musica3.mp3', 'musica4.mp3'];
+        const player = document.getElementById('bg-player');
+        const musicBtn = document.getElementById('music-btn');
+        const speakerIcon = document.getElementById('speaker-icon');
+        let currentTrack = Math.floor(Math.random() * playlist.length);
+        let audioIniciado = false;
+
+        function initAudio() {
+            if (audioIniciado) return;
+            player.src = playlist[currentTrack];
+            player.volume = 0.4;
+            player.play().catch(e => console.log("Esperando interacción..."));
+            audioIniciado = true;
+        }
+
+        // Detectar primera interacción para burlar bloqueo de navegador
+        ['click', 'scroll', 'touchstart', 'keydown'].forEach(evt => {
+            window.addEventListener(evt, initAudio, { once: true });
+        });
+
+        // Al terminar una canción, sigue la siguiente
+        player.onended = () => {
+            currentTrack = (currentTrack + 1) % playlist.length;
+            player.src = playlist[currentTrack];
+            player.play();
+        };
+
+        function toggleMusic() {
+            if (player.muted) {
+                player.muted = false;
+                speakerIcon.innerHTML = '<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77zM3 9v6h4l5 5V4L7 9H3z"/>';
+            } else {
+                player.muted = true;
+                speakerIcon.innerHTML = '<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM4.34 2.93L2.93 4.34 7.29 8.7 7 9H3v6h4l5 5v-6.59l4.18 4.18c-.49.37-1.02.68-1.6.89v2.06c1.13-.23 2.18-.7 3.1-1.35l3.07 3.07 1.41-1.41L4.34 2.93zM10 15.17L7.83 13H5v-2h2.83l.88-.88L10 11.41v3.76zM19 12c0 .82-.15 1.61-.41 2.34l1.53 1.53c.56-1.17.88-2.48.88-3.87 0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zm-7-8l-2.18 2.18L12 8.36V4z"/>';
+            }
+        }
+
+        // --- PARTÍCULAS ---
         const particleContainer = document.getElementById('particle-container');
         function createParticle() {
             const p = document.createElement('div');
-            const size = Math.random() * 8 + 2;
-            const drift = (Math.random() - 0.5) * 200;
-            const duration = Math.random() * 15 + 10;
-            const opacity = Math.random() * 0.5 + 0.1;
-
+            const sizeBase = Math.random();
+            const size = sizeBase > 0.9 ? Math.random() * 40 + 20 : Math.random() * 15 + 4;
+            const drift = (Math.random() - 0.5) * 300;
+            const duration = Math.random() * 20 + 12;
+            const opacity = size > 20 ? Math.random() * 0.15 + 0.05 : Math.random() * 0.5 + 0.2;
             p.className = 'particle';
-            p.style.width = `${size}px`;
-            p.style.height = `${size}px`;
+            p.style.width = `${size}px`; p.style.height = `${size}px`;
             p.style.left = `${Math.random() * 100}%`;
             p.style.setProperty('--duration', `${duration}s`);
             p.style.setProperty('--drift', `${drift}px`);
             p.style.setProperty('--opacity', opacity);
-
+            p.style.setProperty('--blur', size > 20 ? '8px' : '2px');
             particleContainer.appendChild(p);
             setTimeout(() => p.remove(), duration * 1000);
         }
-        setInterval(createParticle, 400);
+        setInterval(createParticle, 300);
 
-        // LÓGICA DEL SITIO
+        // --- LÓGICA BLOG ---
         let allPosts = [];
-
         function toggleDarkMode() {
             document.documentElement.classList.toggle('dark');
             localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
@@ -186,13 +189,7 @@
         function openPost(index) {
             const post = allPosts[index];
             const content = document.getElementById('full-article-content');
-            content.innerHTML = `
-                <header class="mb-20 text-center">
-                    <h1 class="text-6xl font-black mb-8 tracking-tighter">${post.title.$t}</h1>
-                    <div class="h-1 w-24 bg-amber-500 mx-auto rounded-full"></div>
-                </header>
-                ${post.content.$t}
-            `;
+            content.innerHTML = `<header class="mb-24 text-center"><h1 class="text-6xl md:text-7xl font-black mb-10 tracking-tighter leading-tight">${post.title.$t}</h1><div class="h-1.5 w-32 bg-amber-500 mx-auto rounded-full shadow-[0_0_20px_rgba(245,158,11,0.5)]"></div></header>${post.content.$t}`;
             document.getElementById('home-view').classList.add('hidden-view');
             document.getElementById('post-view').classList.remove('hidden-view');
             window.scrollTo({top: 0, behavior: 'smooth'});
@@ -210,49 +207,18 @@
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = entry.content.$t;
                 const img = tempDiv.querySelector('img') ? tempDiv.querySelector('img').src.replace('/s72-c/', '/s1600/') : 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80&w=1600';
-                const snippet = tempDiv.textContent.trim().substring(0, 150) + "...";
+                const snippet = tempDiv.textContent.trim().substring(0, 160) + "...";
 
                 if (title.includes("La Conexión, tu refugio")) {
                     welcomeSection.classList.remove('hidden');
-                    welcomeContent.innerHTML = `<span class="text-amber-600 block mb-6 text-sm font-bold uppercase tracking-[0.3em]">Te damos la bienvenida</span>${entry.content.$t}`;
+                    welcomeContent.innerHTML = `<span class="text-amber-600 block mb-10 text-xs font-bold uppercase tracking-[0.5em]">Te damos la Bienvenida</span>${entry.content.$t}`;
                 }
 
-                // Carrusel con texto elevado y centrado
-                carouselWrapper.innerHTML += `
-                    <div class="swiper-slide relative cursor-pointer" onclick="openPost(${index})">
-                        <img src="${img}" class="absolute inset-0 w-full h-full object-cover">
-                        <div class="slide-overlay"></div>
-                        <div class="relative z-10 p-12 h-full flex flex-col justify-center items-center text-center text-white">
-                            <h3 class="text-4xl md:text-6xl font-extrabold mb-8 tracking-tighter leading-none">${title}</h3>
-                            <p class="text-amber-50 mb-10 max-w-2xl text-lg font-light opacity-90">${snippet}</p>
-                            <button class="bg-amber-600 px-12 py-5 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-white hover:text-amber-600 transition-all shadow-2xl">Entrar al Refugio</button>
-                        </div>
-                    </div>
-                `;
-
-                // Grilla
-                postsGrid.innerHTML += `
-                    <article class="warm-card rounded-[3rem] overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500" onclick="openPost(${index})">
-                        <div class="h-64 overflow-hidden relative">
-                            <img src="${img}" class="w-full h-full object-cover group-hover:scale-110 transition duration-1000">
-                        </div>
-                        <div class="p-10">
-                            <h3 class="font-black text-2xl mb-4 group-hover:text-amber-600 transition leading-tight">${title}</h3>
-                            <p class="text-slate-500 dark:text-slate-400 text-sm mb-8 line-clamp-3 font-medium">${snippet}</p>
-                            <span class="text-amber-600 font-bold text-xs uppercase tracking-widest flex items-center gap-2">Explorar <span class="group-hover:translate-x-2 transition">→</span></span>
-                        </div>
-                    </article>
-                `;
+                carouselWrapper.innerHTML += `<div class="swiper-slide relative cursor-pointer" onclick="openPost(${index})"><img src="${img}" class="absolute inset-0 w-full h-full object-cover"><div class="slide-overlay"></div><div class="relative z-10 p-12 h-full flex flex-col justify-center items-center text-center text-white"><h3 class="text-4xl md:text-7xl font-black mb-10 tracking-tighter leading-none">${title}</h3><p class="text-amber-50/80 mb-12 max-w-2xl text-xl font-light leading-relaxed">${snippet}</p><button class="bg-amber-600 px-14 py-6 rounded-full font-bold uppercase tracking-[0.2em] text-xs hover:bg-white hover:text-amber-600 transition-all shadow-2xl scale-110">Entrar al Saber</button></div></div>`;
+                postsGrid.innerHTML += `<article class="warm-card rounded-[4rem] overflow-hidden group cursor-pointer shadow-xl hover:shadow-[0_40px_80px_-20px_rgba(217,119,6,0.15)] transition-all duration-700" onclick="openPost(${index})"><div class="h-72 overflow-hidden relative"><img src="${img}" class="w-full h-full object-cover group-hover:scale-110 transition duration-1000"></div><div class="p-12"><h3 class="font-black text-2xl mb-6 group-hover:text-amber-600 transition-colors duration-500 leading-tight">${title}</h3><p class="text-slate-500 dark:text-slate-400 text-sm mb-10 line-clamp-3 font-medium leading-relaxed">${snippet}</p><span class="text-amber-600 font-bold text-xs uppercase tracking-widest flex items-center gap-3">Leer más <span class="group-hover:translate-x-3 transition-transform duration-500">→</span></span></div></article>`;
             });
 
-            new Swiper(".mySwiper", { 
-                loop: true, 
-                speed: 1000,
-                autoplay: { delay: 6000 },
-                pagination: { el: ".swiper-pagination", clickable: true },
-                effect: "fade",
-                fadeEffect: { crossFade: true }
-            });
+            new Swiper(".mySwiper", { loop: true, speed: 1200, autoplay: { delay: 7000 }, pagination: { el: ".swiper-pagination", clickable: true }, effect: "fade", fadeEffect: { crossFade: true } });
         }
     </script>
     <script src="https://turefugiodigital.blogspot.com/feeds/posts/default?alt=json-in-script&max-results=500&callback=renderBlog"></script>
