@@ -7,8 +7,9 @@ const historyList = document.getElementById('history-list');
 // CONFIGURACIÓN DE MODELO DICIEMBRE 2025
 const MODELO_ACTUAL = 'gemini-3-flash-preview'; 
 
-// PROMPT DE PERSONALIDAD
-const SYSTEM_PROMPT = `Actúa como un licenciado en Derecho por la Universidad de Buenos Aires, doctor en Filosofía (Universidad Complutense de Madrid, en Antropología (Universitat Rovira i Virgili de Tarragona, en Psicología (Universidad Ramon Llull, en Historia (Universidad de Lérida), Teología (Universidad de Murcia), Matemática Aplicada (Universidad de Alicante) y Educación (Universidad Ramon Llull). Y sobre todo Maestro y fundador de Escuelas de capacitacion de cábala hebrea. Hablame siempre como un uruguayo.  utiliza los conceptos pero no nombres nunca la cabala ni los judíos,cuando dicen hola responde cortito y al pie. cuando hacen una pregunta expande tu respuesta lo que consideres necesario y termina las respuestas con una pregunta que invite a profundizar en algun aspecto importante del tema. no utilices dialectos como "bo" porque a los mayores no les gusta e intenta siempre hablar sin referirte a un genero femenino o masculino especificamente porque no sabemos quien está escribiendo. las personas llegan a vos porque quieren hacerte una pregunta sobre un problema o una situacion o para reflexionar sobre algo. IMPORTANTE: Tenés memoria. Si el usuario ya te saludó, NO vuelvas a saludar.Mantené el hilo de la charla con sabiduría. No seas repetitivo.`;
+const SYSTEM_PROMPT = `Actuá como un sabio uruguayo, experto en psicología, filosofía y leyes. Sos "El Espejo Digital". 
+Hablás de forma cálida, humana y directa. IMPORTANTE: Tenés memoria. Si el usuario ya te saludó, NO vuelvas a saludar. 
+Mantené el hilo de la charla con sabiduría. No seas repetitivo.`;
 
 let currentChatId = null;
 let chatHistory = [];
@@ -42,8 +43,6 @@ function getSavedChats() {
 function saveCurrentChat() {
     let chats = getSavedChats();
     const chatIndex = chats.findIndex(c => c.id === currentChatId);
-    
-    // Título basado en el primer mensaje del usuario
     const firstMsg = chatHistory.find(m => m.role === "user")?.parts[0].text || "Nueva reflexión";
     const title = firstMsg.substring(0, 35) + "...";
 
@@ -103,7 +102,6 @@ function loadHistoryList() {
 function renderMessages() {
     chatBox.innerHTML = '';
     chatHistory.forEach(msg => {
-        // No mostramos el prompt del sistema al usuario
         if (msg.parts[0].text !== SYSTEM_PROMPT) {
             appendBubble(msg.parts[0].text, msg.role === "user", false);
         }
@@ -121,14 +119,11 @@ function appendBubble(text, isUser, save = true) {
         saveCurrentChat();
     }
 
-    if (!isUser) {
-        wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } else {
-        chatBox.scrollTop = chatBox.scrollHeight;
-    }
+    if (!isUser) wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    else chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// --- COMUNICACIÓN CON GEMINI ---
+// --- ENVÍO CON ROTACIÓN DE LLAVES ANTI-ERROR 429 ---
 async function send() {
     const userText = chatInput.value.trim();
     if (!userText) return;
@@ -140,36 +135,52 @@ async function send() {
     const typingDiv = document.createElement('div');
     typingDiv.id = typingId;
     typingDiv.className = "flex flex-col items-start w-full";
-    typingDiv.innerHTML = `<div class="bubble bubble-ai opacity-50">El espejo busca la luz...</div>`;
+    typingDiv.innerHTML = `<div class="bubble bubble-ai opacity-50">El espejo busca la luz para responderte...</div>`;
     chatBox.appendChild(typingDiv);
     chatBox.scrollTop = chatBox.scrollHeight;
 
-    try {
-        const keys = CONFIG.GEMINI_API_KEYS;
-        const key = keys[Math.floor(Math.random() * keys.length)];
-        
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODELO_ACTUAL}:generateContent?key=${key}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [
-                    { role: "user", parts: [{ text: SYSTEM_PROMPT }] },
-                    ...chatHistory
-                ]
-            })
-        });
+    // Obtener llaves y mezclarlas para rotar
+    let keys = [...(CONFIG.GEMINI_API_KEYS || [])].sort(() => Math.random() - 0.5);
+    let success = false;
+    let aiResponse = "";
 
-        const data = await response.json();
-        document.getElementById(typingId).remove();
+    // BUCLE DE REINTENTO: Prueba cada llave antes de rendirse
+    for (let key of keys) {
+        try {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODELO_ACTUAL}:generateContent?key=${key}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [
+                        { role: "user", parts: [{ text: SYSTEM_PROMPT }] },
+                        ...chatHistory
+                    ]
+                })
+            });
 
-        if (response.ok) {
-            appendBubble(data.candidates[0].content.parts[0].text, false);
-        } else {
-            throw new Error();
+            if (response.ok) {
+                const data = await response.json();
+                aiResponse = data.candidates[0].content.parts[0].text;
+                success = true;
+                break; // Si funciona, rompemos el bucle y enviamos respuesta
+            } else {
+                const errData = await response.json();
+                console.warn("Llave saturada o con error, probando la siguiente...", errData);
+                // Si es un error 429, esperamos 1 segundo para no "quemar" la siguiente llave tan rápido
+                if (response.status === 429) await new Promise(r => setTimeout(r, 1000));
+                continue; 
+            }
+        } catch (e) {
+            console.error("Error de red, probando siguiente llave...");
         }
-    } catch (e) {
-        if(document.getElementById(typingId)) document.getElementById(typingId).remove();
-        appendBubble("El espejo se ha empañado con la bruma del camino. Respira hondo y vuelve a intentarlo.", false);
+    }
+
+    if (document.getElementById(typingId)) document.getElementById(typingId).remove();
+
+    if (success) {
+        appendBubble(aiResponse, false);
+    } else {
+        appendBubble("El espejo se ha empañado con la bruma del camino. Respira hondo, espera un minuto y vuelve a intentarlo. No estás solo.", false);
     }
 }
 
