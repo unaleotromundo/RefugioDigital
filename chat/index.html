@@ -12,9 +12,22 @@
     
     <div id="particle-container"></div>
 
-    <!-- Navegación corregida -->
+    <!-- PANEL LATERAL DE HISTORIAL -->
+    <div id="history-sidebar" class="fixed top-0 left-0 h-full w-80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl z-50 transform -translate-x-full transition-transform duration-300 border-r border-amber-500/20 shadow-2xl">
+        <div class="p-6 flex flex-col h-full">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-amber-600 font-black uppercase tracking-widest text-sm">Mis Reflexiones</h2>
+                <button onclick="toggleHistory(false)" class="text-slate-400 hover:text-amber-600 text-3xl">&times;</button>
+            </div>
+            <div id="history-list" class="flex-1 overflow-y-auto space-y-3 pr-2">
+                <!-- Chats guardados dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- NAVEGACIÓN SUPERIOR -->
     <nav class="p-6 flex justify-between items-center max-w-7xl mx-auto w-full relative z-20">
-        <a href="../refugio.html" class="text-xs font-bold uppercase tracking-[0.3em] text-amber-700 dark:text-amber-500 flex items-center gap-2 hover:opacity-70 transition-opacity">
+        <a href="../refugio.html" class="text-xs font-bold uppercase tracking-[0.3em] text-amber-700 dark:text-amber-500 flex items-center gap-2">
             <span class="text-xl">←</span> Volver al Refugio
         </a>
         <button onclick="toggleDarkMode()" class="p-3 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-500 border border-amber-500/20">
@@ -23,22 +36,30 @@
         </button>
     </nav>
 
-    <main>
+    <main class="relative z-10">
+        <!-- BOTONES DE CONTROL DE SESIÓN -->
+        <div class="flex gap-3 mb-4 w-full max-w-3xl mx-auto">
+            <button onclick="createNewChat()" class="flex-1 bg-amber-600 text-white py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-amber-700 transition-all shadow-lg">
+                + Nuevo Chat
+            </button>
+            <button onclick="toggleHistory(true)" class="flex-1 bg-white/80 dark:bg-slate-800/80 border border-amber-500/20 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:border-amber-500 transition-all shadow-sm dark:text-white">
+                ⌛ Historial
+            </button>
+        </div>
+
         <!-- MARCO DEL CHAT -->
         <div class="chat-frame">
             <div class="chat-container" id="chat-box">
-                <div class="bubble bubble-ai italic">
-                    Hola. Soy tu espejo digital. En este espacio no existen los juicios, solo la comprensión. ¿Qué necesitas soltar o entender hoy?
-                </div>
+                <!-- Mensajes -->
             </div>
         </div>
 
         <!-- ENTRADA DE TEXTO -->
-        <div class="mt-4 mb-2 relative">
+        <div class="mt-4 mb-2 relative w-full max-w-3xl mx-auto">
             <input type="text" 
                    id="chat-input" 
                    placeholder="Escribe tu sentir aquí..." 
-                   class="w-full p-5 pr-16 rounded-2xl text-lg italic shadow-lg">
+                   class="w-full p-5 pr-16 rounded-2xl text-lg italic shadow-xl">
             
             <button id="send-btn" class="absolute right-2 top-1/2 -translate-y-1/2 bg-amber-600 text-white p-3.5 rounded-xl hover:bg-amber-700 transition-all">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -46,7 +67,7 @@
                 </svg>
             </button>
         </div>
-        <p class="text-center text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-[0.2em] opacity-80">Conversación Privada</p>
+        <p class="text-center text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-[0.2em] opacity-80">Conversación Privada & Anónima</p>
     </main>
 
     <script>
@@ -59,7 +80,7 @@
             localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
         }
 
-        // Motor de Partículas Mejorado
+        // Motor de Partículas Cayendo
         const container = document.getElementById('particle-container');
         function createParticle() {
             const p = document.createElement('div');
