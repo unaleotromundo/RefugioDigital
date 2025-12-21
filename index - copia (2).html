@@ -70,8 +70,9 @@
 <body class="bg-warmLight text-slate-800 dark:bg-warmDark dark:text-slate-100 transition-colors duration-1000">
 
     <div id="particle-container"></div>
+    <audio id="bg-player" preload="auto"></audio>
 
-    <!-- HEADER -->
+    <!-- HEADER ACTUALIZADO -->
     <nav class="bg-white/20 dark:bg-black/10 backdrop-blur-xl border-b border-amber-500/5 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
             <button onclick="showHome()" class="flex items-center gap-3 group">
@@ -82,18 +83,20 @@
             </button>
             
             <div class="flex items-center gap-2 md:gap-4">
-                <a href="chat/index.html" class="hidden md:block px-5 py-2 md:px-7 md:py-3 rounded-full border border-amber-600 text-amber-600 font-bold text-xs md:text-sm hover:bg-amber-600 hover:text-white transition-all uppercase tracking-widest">
-                    Chat Privado
-                </a>
+ <!--CHAT PRIVADO -->
+    <a href="chat/index.html" class="hidden md:block px-5 py-2 md:px-7 md:py-3 rounded-full border border-amber-600 text-amber-600 font-bold text-xs md:text-sm hover:bg-amber-600 hover:text-white transition-all uppercase tracking-widest">
+        Chat Privado
+    </a>
+                <!--ENTRAR AL REFUGIO -->
                 <a href="refugio.html" class="px-5 py-2 md:px-7 md:py-3 rounded-full bg-amber-600 text-white font-bold text-xs md:text-sm hover:bg-amber-500 hover:scale-105 transition-all shadow-lg shadow-amber-600/20 uppercase tracking-widest">
                     Entrar al Refugio
                 </a>
 
                 <div class="flex items-center gap-1 md:gap-3 border-l border-amber-500/10 pl-2 md:pl-4">
-                    <!-- REPRODUCTOR MUTE (Controlado por music-player.js) -->
+                    <!-- REPRODUCTOR MUTE -->
                     <button onclick="toggleMusic()" id="music-btn" class="p-2 md:p-3 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:scale-110 transition shadow-inner">
                         <svg id="speaker-icon" class="w-5 h-5 md:w-6 md:h-6" fill="currentColor" viewBox="0 0 24 24">
-                            <!-- El icono se actualiza automáticamente mediante el script -->
+                            <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77zM3 9v6h4l5 5V4L7 9H3z"/>
                         </svg>
                     </button>
                     <!-- TEMA DARK/LIGHT -->
@@ -114,6 +117,7 @@
             </div>
         </section>
 
+        <!-- BIENVENIDA EXTRAÍDA DE BLOGGER -->
         <section id="welcome-section" class="mb-28 hidden">
             <div class="warm-card rounded-[5rem] p-12 md:p-24 shadow-2xl border border-amber-500/10">
                 <div id="welcome-content" class="prose prose-slate dark:prose-invert lg:prose-2xl mx-auto italic text-center font-light"></div>
@@ -136,11 +140,40 @@
         <p class="text-xs font-bold uppercase tracking-[0.6em]">Tu Refugio Digital • 2025</p>
     </footer>
 
-    <!-- SCRIPTS EXTERNOS -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    <script src="music-player.js"></script> <!-- NUEVO SCRIPT PERSISTENTE -->
     
     <script>
+        // --- AUDIO ENGINE ---
+        const playlist = ['musica1.mp3', 'musica2.mp3', 'musica3.mp3', 'musica4.mp3'];
+        const player = document.getElementById('bg-player');
+        const speakerIcon = document.getElementById('speaker-icon');
+        let currentTrack = Math.floor(Math.random() * playlist.length);
+        let audioStarted = false;
+
+        function initAudio() {
+            if (audioStarted) return;
+            player.src = playlist[currentTrack];
+            player.volume = 0.35;
+            player.play().catch(() => {});
+            audioStarted = true;
+        }
+
+        window.addEventListener('click', initAudio, { once: true });
+        window.addEventListener('scroll', initAudio, { once: true });
+
+        player.onended = () => {
+            currentTrack = (currentTrack + 1) % playlist.length;
+            player.src = playlist[currentTrack];
+            player.play();
+        };
+
+        function toggleMusic() {
+            player.muted = !player.muted;
+            speakerIcon.innerHTML = player.muted 
+                ? '<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM4.34 2.93L2.93 4.34 7.29 8.7 7 9H3v6h4l5 5v-6.59l4.18 4.18c-.49.37-1.02.68-1.6.89v2.06c1.13-.23 2.18-.7 3.1-1.35l3.07 3.07 1.41-1.41L4.34 2.93zM10 15.17L7.83 13H5v-2h2.83l.88-.88L10 11.41v3.76zM19 12c0 .82-.15 1.61-.41 2.34l1.53 1.53c.56-1.17.88-2.48.88-3.87 0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zm-7-8l-2.18 2.18L12 8.36V4z"/>'
+                : '<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77zM3 9v6h4l5 5V4L7 9H3z"/>';
+        }
+
         // --- PARTICLE ENGINE ---
         const particleContainer = document.getElementById('particle-container');
         function createParticle() {

@@ -10,17 +10,42 @@
     <style>
         .swiper { width: 100%; height: 100vh; }
         .swiper-slide { position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        .bg-image { position: absolute; inset: 0; background-size: cover; background-position: center; filter: brightness(0.3) blur(2px); transform: scale(1.1); transition: 8s ease-out; }
+        
+        /* Efecto de zoom suave en la imagen de fondo */
+        .bg-image { 
+            position: absolute; inset: 0; 
+            background-size: cover; 
+            background-position: center; 
+            filter: brightness(0.3) blur(2px); 
+            transform: scale(1.1); 
+            transition: transform 9s linear; /* Sincronizado con el autoplay */
+        }
         .swiper-slide-active .bg-image { transform: scale(1); }
+
         .content { position: relative; z-index: 10; max-width: 900px; text-align: center; color: white; padding: 3rem; }
         .quote-line { height: 2px; width: 60px; background: #f59e0b; margin: 2rem auto; }
-        .loader { position: fixed; inset: 0; background: black; z-index: 100; display: flex; align-items: center; justify-content: center; color: white; transition: 0.5s; }
+        
+        /* Pantalla de carga */
+        .loader { 
+            position: fixed; inset: 0; background: black; z-index: 100; 
+            display: flex; align-items: center; justify-content: center; 
+            color: white; transition: 0.8s ease-in-out; 
+        }
+
+        /* Estilo de la paginación de Swiper */
+        .swiper-pagination-bullet { background: white !important; opacity: 0.3; }
+        .swiper-pagination-bullet-active { background: #f59e0b !important; opacity: 1; }
     </style>
 </head>
 <body class="bg-black">
-    <div id="loader" class="loader font-bold uppercase tracking-widest text-xs">Conectando con el Refugio...</div>
 
-    <a href="refugio.html" class="fixed top-10 left-10 z-50 text-white font-bold bg-white/10 px-8 py-3 rounded-full backdrop-blur-xl border border-white/10 text-xs uppercase tracking-widest hover:bg-amber-600 transition-all">← Volver al Hub</a>
+    <div id="loader" class="loader font-bold uppercase tracking-widest text-xs italic">
+        Sincronizando con el consciente colectivo...
+    </div>
+
+    <a href="refugio.html" class="fixed top-10 left-10 z-50 text-white font-bold bg-white/10 px-8 py-3 rounded-full backdrop-blur-xl border border-white/10 text-xs uppercase tracking-widest hover:bg-amber-600 transition-all">
+        ← Volver al Hub
+    </a>
 
     <div class="swiper mySwiper">
         <div class="swiper-wrapper" id="wrapper"></div>
@@ -35,50 +60,73 @@
 
         const bgImages = [
             'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1600',
-            'https://images.unsplash.com/photo-1501854140801-50d01674aa3e?q=80&w=1600',
             'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=1600',
-            'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1600'
+            'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=1600',
+            'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1600',
+            'https://images.unsplash.com/photo-1518495973542-4542c06a5843?q=80&w=1600'
         ];
 
         async function initGallery() {
             const wrapper = document.getElementById('wrapper');
-            const { data: posts, error } = await supabaseClient
+            
+            // Traer datos de Supabase
+            const { data: allPosts, error } = await supabaseClient
                 .from('reflexiones')
                 .select('*')
                 .order('created_at', { ascending: false });
 
             if (error) {
-                console.error("Error:", error);
+                console.error("Error cargando reflexiones:", error);
                 return;
             }
 
-            posts.forEach((post, i) => {
+            // Lógica de reordenamiento (Ejemplo primero)
+            const exampleText = "A veces soltar no es un acto de debilidad";
+            const examplePost = allPosts.find(p => p.text.includes(exampleText));
+            const otherPosts = allPosts.filter(p => p.id !== examplePost?.id);
+            const finalPosts = examplePost ? [examplePost, ...otherPosts] : otherPosts;
+
+            // Inyectar slides
+            finalPosts.forEach((post, i) => {
                 const img = bgImages[i % bgImages.length];
                 wrapper.innerHTML += `
                 <div class="swiper-slide">
                     <div class="bg-image" style="background-image: url('${img}')"></div>
                     <div class="content">
-                        <p class="text-3xl md:text-5xl font-light italic leading-tight mb-4">"${post.text}"</p>
+                        <p class="text-3xl md:text-5xl lg:text-6xl font-light italic leading-tight mb-6">"${post.text}"</p>
                         <div class="quote-line"></div>
-                        <p class="text-[10px] md:text-xs uppercase tracking-[0.6em] font-black opacity-50">${post.author}</p>
+                        <p class="text-[10px] md:text-xs uppercase tracking-[0.6em] font-black opacity-40">${post.author}</p>
                     </div>
                 </div>`;
             });
 
-            document.getElementById('loader').style.opacity = '0';
-            setTimeout(() => document.getElementById('loader').remove(), 500);
+            // Ocultar cargador
+            const loader = document.getElementById('loader');
+            loader.style.opacity = '0';
+            setTimeout(() => loader.remove(), 800);
 
+            // Inicializar Swiper con Autoplay de 9 segundos
             new Swiper(".mySwiper", {
                 direction: 'vertical',
-                pagination: { el: ".swiper-pagination", clickable: true },
-                mousewheel: true,
-                speed: 1500,
+                loop: true, // El carrusel se repite infinitamente
+                speed: 2000, // Tiempo que dura la transición (2 segundos para suavidad)
                 effect: 'fade',
-                fadeEffect: { crossFade: true }
+                fadeEffect: { crossFade: true },
+                autoplay: {
+                    delay: 9000, // 9 Segundos por slide
+                    disableOnInteraction: false, // No se detiene al tocar
+                },
+                pagination: { 
+                    el: ".swiper-pagination", 
+                    clickable: true 
+                },
+                mousewheel: true,
+                keyboard: { enabled: true }
             });
         }
 
         initGallery();
     </script>
+<script src="music-player.js"></script>
 </body>
 </html>

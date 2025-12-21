@@ -25,15 +25,26 @@
         </div>
     </div>
 
-    <!-- NAVEGACIÓN SUPERIOR -->
+    <!-- NAVEGACIÓN SUPERIOR CORREGIDA -->
     <nav class="p-6 flex justify-between items-center max-w-7xl mx-auto w-full relative z-20">
         <a href="../refugio.html" class="text-xs font-bold uppercase tracking-[0.3em] text-amber-700 dark:text-amber-500 flex items-center gap-2">
             <span class="text-xl">←</span> Volver al Refugio
         </a>
-        <button onclick="toggleDarkMode()" class="p-3 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-500 border border-amber-500/20">
-            <span class="dark:hidden">🌙</span>
-            <span class="hidden dark:inline">☀️</span>
-        </button>
+        
+        <div class="flex items-center gap-2">
+            <!-- BOTÓN DE MÚSICA -->
+            <button onclick="toggleMusic()" class="p-3 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-500 border border-amber-500/20 hover:scale-110 transition-all">
+                <svg id="speaker-icon" class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <!-- Icono inyectado por music-player.js -->
+                </svg>
+            </button>
+
+            <!-- BOTÓN DE TEMA -->
+            <button onclick="toggleDarkMode()" class="p-3 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-500 border border-amber-500/20">
+                <span class="dark:hidden">🌙</span>
+                <span class="hidden dark:inline">☀️</span>
+            </button>
+        </div>
     </nav>
 
     <main class="relative z-10">
@@ -97,8 +108,10 @@
         }
         setInterval(createParticle, 600);
     </script>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script src="script.js"></script>
+    <!-- SCRIPT DE MÚSICA PERSISTENTE -->
+    <script src="../music-player.js"></script>
 </body>
 </html>
