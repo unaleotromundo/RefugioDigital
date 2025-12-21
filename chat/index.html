@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Chat con Gemini</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        #chat-container { width: 400px; height: 600px; background: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; overflow: hidden; }
+        #header { background: #1a73e8; color: white; padding: 15px; text-align: center; font-weight: bold; }
+        #chat-box { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .message { padding: 10px 15px; border-radius: 18px; max-width: 80%; font-size: 14px; line-height: 1.4; }
+        .user-message { background: #1a73e8; color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .ai-message { background: #e8eaed; color: #333; align-self: flex-start; border-bottom-left-radius: 2px; }
+        #input-area { display: flex; padding: 15px; border-top: 1px solid #ddd; gap: 10px; }
+        input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 20px; outline: none; }
+        button { background: #1a73e8; color: white; border: none; padding: 10px 15px; border-radius: 50%; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #1557b0; }
+        .loading { font-style: italic; color: #888; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+<div id="chat-container">
+    <div id="header">Gemini AI Chat</div>
+    <div id="chat-box">
+        <div class="message ai-message">¡Hola! Soy Gemini. ¿En qué puedo ayudarte hoy?</div>
+    </div>
+    <div id="input-area">
+        <input type="text" id="user-input" placeholder="Escribe un mensaje..." autocomplete="off">
+        <button id="send-btn">➤</button>
+    </div>
+</div>
+
+<!-- IMPORTANTE: Cargar primero la config y luego el script -->
+<script src="config.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
