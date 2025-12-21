@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>Espejo Digital | Tu Refugio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <div id="particle-container"></div>
+
+    <!-- Navegación corregida -->
+    <nav class="p-6 flex justify-between items-center max-w-7xl mx-auto w-full relative z-20">
+        <a href="../refugio.html" class="text-xs font-bold uppercase tracking-[0.3em] text-amber-700 dark:text-amber-500 flex items-center gap-2 hover:opacity-70 transition-opacity">
+            <span class="text-xl">←</span> Volver al Refugio
+        </a>
+        <button onclick="toggleDarkMode()" class="p-3 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-500 border border-amber-500/20">
+            <span class="dark:hidden">🌙</span>
+            <span class="hidden dark:inline">☀️</span>
+        </button>
+    </nav>
+
+    <main>
+        <!-- MARCO DEL CHAT -->
+        <div class="chat-frame">
+            <div class="chat-container" id="chat-box">
+                <div class="bubble bubble-ai italic">
+                    Hola. Soy tu espejo digital. En este espacio no existen los juicios, solo la comprensión. ¿Qué necesitas soltar o entender hoy?
+                </div>
+            </div>
+        </div>
+
+        <!-- ENTRADA DE TEXTO -->
+        <div class="mt-4 mb-2 relative">
+            <input type="text" 
+                   id="chat-input" 
+                   placeholder="Escribe tu sentir aquí..." 
+                   class="w-full p-5 pr-16 rounded-2xl text-lg italic shadow-lg">
+            
+            <button id="send-btn" class="absolute right-2 top-1/2 -translate-y-1/2 bg-amber-600 text-white p-3.5 rounded-xl hover:bg-amber-700 transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                </svg>
+            </button>
+        </div>
+        <p class="text-center text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-[0.2em] opacity-80">Conversación Privada</p>
+    </main>
+
+    <script>
+        // Gestión de Tema
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+        }
+
+        // Motor de Partículas Mejorado
+        const container = document.getElementById('particle-container');
+        function createParticle() {
+            const p = document.createElement('div');
+            const size = Math.random() * 4 + 2;
+            const duration = Math.random() * 12 + 8;
+            p.className = 'particle';
+            p.style.width = `${size}px`; 
+            p.style.height = `${size}px`;
+            p.style.left = `${Math.random() * 100}%`;
+            p.style.setProperty('--duration', `${duration}s`);
+            p.style.setProperty('--opacity', Math.random() * 0.3 + 0.2);
+            container.appendChild(p);
+            setTimeout(() => p.remove(), duration * 1000);
+        }
+        setInterval(createParticle, 600);
+    </script>
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
