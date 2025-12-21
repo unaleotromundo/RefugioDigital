@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     
     <script>
+        // Lógica de detección de tema (Oscuro/Claro)
         if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
         } else {
@@ -31,7 +32,10 @@
         .chat-container { height: calc(100vh - 220px); scroll-behavior: smooth; }
         .bubble { border-radius: 2rem; padding: 1.2rem 1.5rem; max-width: 85%; animation: slideUp 0.3s ease-out; line-height: 1.6; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Scrollbar minimalista */
         ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #d9770644; border-radius: 10px; }
     </style>
 </head>
@@ -45,12 +49,15 @@
     </nav>
 
     <main class="max-w-3xl mx-auto px-6">
+        <!-- Caja de Chat -->
         <div class="chat-container overflow-y-auto p-4 space-y-6" id="chat-box">
+            <!-- Mensaje Inicial -->
             <div class="bubble bg-amber-500/10 self-start text-slate-700 dark:text-amber-100 italic border border-amber-500/5">
                 Hola. Soy tu espejo digital. En este espacio no existen los juicios, solo la comprensión. ¿Qué necesitas soltar o entender hoy?
             </div>
         </div>
 
+        <!-- Barra de entrada de texto -->
         <div class="mt-6 relative group">
             <input type="text" 
                    id="chat-input" 
@@ -64,15 +71,14 @@
                 </svg>
             </button>
         </div>
-        <p class="text-center text-[10px] text-slate-400 mt-4 uppercase tracking-widest opacity-50">Tu voz fluye de forma privada en este refugio digital</p>
+        <p class="text-center text-[10px] text-slate-400 mt-4 uppercase tracking-widest opacity-50">Privacidad total en tu refugio personal</p>
     </main>
 
     <script>
-        // --- CONFIGURACIÓN ---
-        // 1. Prueba cambiar la versión a v1 si v1beta falla
-        // 2. Prueba con 'gemini-1.5-flash-latest' o 'gemini-1.5-pro'
+        // CONFIGURACIÓN DE LA API DE GEMINI
         const API_KEY = "AIzaSyBLdYuJzGVqf8pnlY2-LJmshD9hqvR-QCg";
-        const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`;
+        // Usamos v1beta para máxima compatibilidad con el modelo gemini-1.5-flash
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
         async function send() {
             const input = document.getElementById('chat-input');
@@ -81,7 +87,7 @@
 
             if (!userText) return;
 
-            // Mensaje usuario
+            // 1. Mostrar mensaje del usuario en pantalla
             box.innerHTML += `
                 <div class="flex flex-col items-end">
                     <div class="bubble bg-amber-600 text-white shadow-lg">
@@ -89,9 +95,10 @@
                     </div>
                 </div>`;
             
-            input.value = '';
-            box.scrollTop = box.scrollHeight;
+            input.value = ''; // Limpiar campo
+            box.scrollTop = box.scrollHeight; // Bajar scroll
 
+            // 2. Mostrar indicador de pensamiento
             const typingId = "typing-" + Date.now();
             box.innerHTML += `
                 <div id="${typingId}" class="bubble bg-amber-500/5 self-start text-slate-400 italic border border-amber-500/5">
@@ -100,13 +107,16 @@
             box.scrollTop = box.scrollHeight;
 
             try {
+                // 3. Llamada a la Inteligencia Artificial
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         contents: [{
                             parts: [{
-                                text: `Actúa como un "Espejo Digital" empático y poético. Responde brevemente: ${userText}`
+                                text: `Actúa como el "Espejo Digital" de un espacio de bienestar llamado "El Refugio". 
+                                Eres una presencia comprensiva, filosófica y minimalista. No juzgas, solo devuelves una reflexión breve y poética. 
+                                Responde al siguiente sentimiento del usuario: ${userText}`
                             }]
                         }]
                     })
@@ -114,32 +124,33 @@
 
                 const data = await response.json();
                 
-                // Borrar indicador de carga
+                // Eliminar el mensaje de espera
                 const typingElement = document.getElementById(typingId);
                 if (typingElement) typingElement.remove();
 
-                if (data.error) {
-                    throw new Error(data.error.message || "Error en la API");
-                }
-
+                // 4. Procesar y mostrar la respuesta de Gemini
                 if (data.candidates && data.candidates[0].content) {
                     const aiResponse = data.candidates[0].content.parts[0].text;
+                    
                     box.innerHTML += `
                         <div class="bubble bg-amber-500/10 self-start text-slate-700 dark:text-amber-100 italic border border-amber-500/5">
                             ${aiResponse.replace(/\n/g, '<br>')}
                         </div>`;
+                } else if (data.error) {
+                    throw new Error(data.error.message);
                 } else {
-                    throw new Error("Formato de respuesta desconocido");
+                    throw new Error("Respuesta no válida");
                 }
 
             } catch (error) {
-                console.error("Detalle del error:", error);
+                console.error("Error completo:", error);
                 const typingElement = document.getElementById(typingId);
                 if (typingElement) {
-                    typingElement.innerHTML = `Error: ${error.message}. Verifica que tu API Key tenga permisos para Gemini 1.5.`;
-                    typingElement.classList.add("text-red-400");
+                    typingElement.innerHTML = `<span class="text-red-400">El Refugio está en silencio temporalmente. (Error: ${error.message})</span>`;
                 }
             }
+
+            // Asegurar que el scroll baje al final
             box.scrollTop = box.scrollHeight;
         }
     </script>
