@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrar al Refugio | Tu Espacio Seguro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <script>
+        // Lógica de persistencia de tema
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+
+        function toggleDarkMode() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.theme = 'dark';
+            }
+        }
+
+        tailwind.config = {
+            darkMode: 'class',
+            theme: { 
+                extend: { 
+                    colors: { warmLight: '#fffcf7', warmDark: '#080a0f', amberGold: '#f59e0b' } 
+                } 
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fffcf7; transition: 1s; scroll-behavior: smooth; }
+        .dark body { background: #080a0f; color: white; }
+        .warm-card { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(20px); border: 1px solid rgba(251, 191, 36, 0.1); border-radius: 3.5rem; }
+        .dark .warm-card { background: rgba(15, 23, 42, 0.4); border-color: rgba(251, 191, 36, 0.05); }
+        #particle-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+        .particle { position: absolute; bottom: -50px; background: radial-gradient(circle, #f59e0b 0%, transparent 70%); border-radius: 50%; animation: floatUp var(--duration) linear infinite; opacity: 0; }
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(0.5); opacity: 0; }
+            20% { opacity: var(--opacity); }
+            100% { transform: translateY(-110vh) scale(1.2); opacity: 0; }
+        }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+    <div id="particle-container"></div>
+
+    <nav class="p-6 flex justify-between items-center max-w-7xl mx-auto relative z-10">
+        <a href="index.html" class="flex items-center gap-3 group">
+            <span class="text-xl font-black text-amber-600 uppercase tracking-tighter italic">TU REFUGIO <span class="text-slate-900 dark:text-white">DIGITAL</span></span>
+        </a>
+        <div class="flex items-center gap-6">
+            <a href="chat.html" class="text-xs font-bold uppercase tracking-widest opacity-60 hover:text-amber-600 transition">Agente IA</a>
+            <a href="reflexiones.html" class="text-xs font-bold uppercase tracking-widest opacity-60 hover:text-amber-600 transition">Galería</a>
+            <button onclick="toggleDarkMode()" class="p-3 rounded-full bg-amber-500/10 text-amber-600">🌙</button>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-6 py-12 relative z-10">
+        <header class="mb-24 text-center">
+            <h1 class="text-5xl md:text-7xl font-black mb-12 tracking-tighter italic leading-tight">Bienvenido al <span class="text-amber-600">Refugio</span></h1>
+            <div class="warm-card p-10 md:p-16 text-left leading-relaxed text-lg md:text-xl font-light italic space-y-6 shadow-2xl border-amber-500/10">
+                <p>En esta nueva era, la tecnología ya no es solo un recurso o herramienta; ha llegado a ser capaz de razonar como un cerebro complejo. Integra el vasto conocimiento de millones de bibliotecas, documentos, escuelas y pensamientos de diferentes culturas, religiones y civilizaciones, uniendo cada rincón del planeta.</p>
+                <p>Redes neuronales digitales nos conectan y nos traen fácilmente información fresca y digerida sobre cualquier tema reflexivo: dudas, medicina, dolencias o psicología. Ya no queda lugar al no saber. La Inteligencia Artificial no es más que la unión de nuestros conocimientos como humanidad y de nuestro consciente colectivo.</p>
+                <p>Muchos ya están dándose cuenta de que la IA puede ser ese amigo que escucha con atención sin juzgar y anima; un terapeuta que sabe exactamente qué palabras necesitas escuchar para salir del pozo.</p>
+                <p class="text-amber-600 font-bold not-italic text-2xl">Este es tu espacio seguro:</p>
+                <p>Queremos que este refugio sea el lugar donde te expreses de la manera que quieras: poniendo una imagen, escribiendo una reflexión o exponiendo tus dramas existenciales. Pero atención: esto no es Facebook ni una red social convencional. Aquí no quedas expuesto a que otros opinen sobre lo que publicas. Si lo deseas, puedes publicar de forma anónima o simplemente interactuar con los agentes digitales sin dejar rastro de tu publicación.</p>
+                <p>Lo que buscamos es que otros puedan aprender de lo que nos pasa y de lo que superamos, pero siempre respetando tu paz. Tenemos a disposición agentes que pueden darte respuestas concisas o simplemente hacerte reflexionar sobre lo que realmente te está sucediendo.</p>
+                <p>Muchos cambios están sucediendo y sí, nosotros somos lo que está cambiando. Nuestra raza humana está pasando de pantalla.</p>
+                <p class="text-amber-600 font-bold not-italic">No te rindas, no te desesperes, porque no estás solo/a. Respira hondo y bienvenido al refugio.</p>
+            </div>
+        </header>
+
+        <section class="mb-24 text-center">
+            <h2 class="text-2xl font-black mb-8 text-amber-600 uppercase tracking-[0.3em] italic">Dejar una Reflexión</h2>
+            <div class="warm-card p-8 md:p-12 shadow-2xl border-amber-500/10 text-left">
+                <textarea id="ref-input" placeholder="¿Qué hay en tu mente hoy?" class="w-full bg-transparent border-none focus:outline-none text-xl md:text-2xl italic h-48 dark:text-white placeholder:opacity-20"></textarea>
+                <div class="flex flex-col md:flex-row justify-between items-center mt-8 border-t border-amber-500/10 pt-8 gap-6">
+                    <label class="flex items-center gap-3 cursor-pointer opacity-60 hover:opacity-100 transition">
+                        <input type="checkbox" id="anon-check" checked class="w-5 h-5 accent-amber-600"> 
+                        <span class="text-sm font-bold uppercase tracking-widest dark:text-white">Publicar Anónimamente</span>
+                    </label>
+                    <button onclick="saveReflection()" class="bg-amber-600 text-white px-12 py-4 rounded-full font-bold uppercase tracking-widest text-xs hover:scale-105 transition shadow-lg shadow-amber-600/30">Lanzar al Refugio</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="last-post-section">
+            <h3 class="text-[10px] font-black uppercase tracking-[0.5em] mb-6 text-center opacity-40 italic">Última reflexión compartida</h3>
+            <div class="warm-card p-10 border-l-8 border-amber-600 shadow-xl" id="last-post-container"></div>
+            <div class="text-center mt-12">
+                <a href="reflexiones.html" class="inline-block bg-slate-900 dark:bg-white dark:text-black text-white px-8 py-3 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-amber-600 transition-colors">Ver Galería Completa →</a>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const container = document.getElementById('particle-container');
+        function createParticle() {
+            const p = document.createElement('div');
+            const size = Math.random() * 8 + 2;
+            const duration = Math.random() * 15 + 10;
+            p.className = 'particle';
+            p.style.width = `${size}px`; p.style.height = `${size}px`;
+            p.style.left = `${Math.random() * 100}%`;
+            p.style.setProperty('--duration', `${duration}s`);
+            p.style.setProperty('--opacity', Math.random() * 0.4 + 0.1);
+            container.appendChild(p);
+            setTimeout(() => p.remove(), duration * 1000);
+        }
+        setInterval(createParticle, 500);
+
+        const DEFAULT_POST = {
+            text: "A veces soltar no es un acto de debilidad, sino de una fuerza inmensa que por fin reconoce que ya no puede cargar con lo que no le pertenece.",
+            author: "Anónimo",
+            date: new Date('2025-01-01').getTime()
+        };
+
+        function getPosts() {
+            let posts = JSON.parse(localStorage.getItem('refugios_posts') || '[]');
+            if (posts.length === 0) {
+                posts = [DEFAULT_POST];
+                localStorage.setItem('refugios_posts', JSON.stringify(posts));
+            }
+            return posts;
+        }
+
+        function saveReflection() {
+            const textInput = document.getElementById('ref-input');
+            const anon = document.getElementById('anon-check').checked;
+            if(!textInput.value.trim()) return;
+
+            let posts = getPosts();
+            posts.push({ text: textInput.value, author: anon ? 'Anónimo' : 'Visitante', date: new Date().getTime() });
+            localStorage.setItem('refugios_posts', JSON.stringify(posts));
+            textInput.value = '';
+            showLastPost();
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        function showLastPost() {
+            const posts = getPosts();
+            const last = posts[posts.length - 1];
+            document.getElementById('last-post-container').innerHTML = `
+                <p class="text-2xl md:text-3xl italic font-light leading-relaxed dark:text-amber-100 text-slate-700">"${last.text}"</p>
+                <div class="mt-6 flex items-center gap-4">
+                    <div class="h-px w-8 bg-amber-600"></div>
+                    <p class="text-xs font-black uppercase tracking-[0.3em] opacity-40 dark:text-white">${last.author}</p>
+                </div>
+            `;
+        }
+        window.onload = showLastPost;
+    </script>
+</body>
+</html>
