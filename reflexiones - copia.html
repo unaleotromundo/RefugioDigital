@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galería de Reflexiones | Inmersión</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <style>
+        .swiper { width: 100%; height: 100vh; }
+        .swiper-slide { position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .bg-image { position: absolute; inset: 0; background-size: cover; background-position: center; filter: brightness(0.3) blur(2px); transform: scale(1.1); transition: 8s ease-out; }
+        .swiper-slide-active .bg-image { transform: scale(1); }
+        .content { position: relative; z-index: 10; max-width: 900px; text-align: center; color: white; padding: 3rem; }
+        .quote-line { height: 2px; width: 60px; background: #f59e0b; margin: 2rem auto; }
+    </style>
+</head>
+<body class="bg-black">
+    <a href="refugio.html" class="fixed top-10 left-10 z-50 text-white font-bold bg-white/10 px-8 py-3 rounded-full backdrop-blur-xl border border-white/10 text-xs uppercase tracking-widest hover:bg-amber-600 transition-all">← Volver al Hub</a>
+
+    <div class="swiper mySwiper">
+        <div class="swiper-wrapper" id="wrapper"></div>
+        <div class="swiper-pagination"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        const DEFAULT_POST = {
+            text: "A veces soltar no es un acto de debilidad, sino de una fuerza inmensa que por fin reconoce que ya no puede cargar con lo que no le pertenece.",
+            author: "Anónimo",
+            date: new Date('2025-01-01').getTime()
+        };
+
+        function getPosts() {
+            let posts = JSON.parse(localStorage.getItem('refugios_posts') || '[]');
+            if (posts.length === 0) {
+                posts = [DEFAULT_POST];
+                localStorage.setItem('refugios_posts', JSON.stringify(posts));
+            }
+            return posts;
+        }
+
+        const bgImages = [
+            'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1600',
+            'https://images.unsplash.com/photo-1501854140801-50d01674aa3e?q=80&w=1600',
+            'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=1600',
+            'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1600'
+        ];
+
+        const posts = getPosts();
+        const wrapper = document.getElementById('wrapper');
+
+        // Los mostramos en orden inverso (más nuevos primero)
+        [...posts].reverse().forEach((post, i) => {
+            const img = bgImages[i % bgImages.length];
+            wrapper.innerHTML += `
+            <div class="swiper-slide">
+                <div class="bg-image" style="background-image: url('${img}')"></div>
+                <div class="content">
+                    <p class="text-3xl md:text-5xl font-light italic leading-tight mb-4">"${post.text}"</p>
+                    <div class="quote-line"></div>
+                    <p class="text-[10px] md:text-xs uppercase tracking-[0.6em] font-black opacity-50">${post.author}</p>
+                </div>
+            </div>`;
+        });
+
+        new Swiper(".mySwiper", {
+            direction: 'vertical',
+            pagination: { el: ".swiper-pagination", clickable: true },
+            mousewheel: true,
+            speed: 1500,
+            effect: 'fade',
+            fadeEffect: { crossFade: true }
+        });
+    </script>
+</body>
+</html>

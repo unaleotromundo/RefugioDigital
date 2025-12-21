@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Galería de Reflexiones | Inmersión</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <style>
         .swiper { width: 100%; height: 100vh; }
@@ -13,9 +14,12 @@
         .swiper-slide-active .bg-image { transform: scale(1); }
         .content { position: relative; z-index: 10; max-width: 900px; text-align: center; color: white; padding: 3rem; }
         .quote-line { height: 2px; width: 60px; background: #f59e0b; margin: 2rem auto; }
+        .loader { position: fixed; inset: 0; background: black; z-index: 100; display: flex; align-items: center; justify-content: center; color: white; transition: 0.5s; }
     </style>
 </head>
 <body class="bg-black">
+    <div id="loader" class="loader font-bold uppercase tracking-widest text-xs">Conectando con el Refugio...</div>
+
     <a href="refugio.html" class="fixed top-10 left-10 z-50 text-white font-bold bg-white/10 px-8 py-3 rounded-full backdrop-blur-xl border border-white/10 text-xs uppercase tracking-widest hover:bg-amber-600 transition-all">← Volver al Hub</a>
 
     <div class="swiper mySwiper">
@@ -25,20 +29,9 @@
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
-        const DEFAULT_POST = {
-            text: "A veces soltar no es un acto de debilidad, sino de una fuerza inmensa que por fin reconoce que ya no puede cargar con lo que no le pertenece.",
-            author: "Anónimo",
-            date: new Date('2025-01-01').getTime()
-        };
-
-        function getPosts() {
-            let posts = JSON.parse(localStorage.getItem('refugios_posts') || '[]');
-            if (posts.length === 0) {
-                posts = [DEFAULT_POST];
-                localStorage.setItem('refugios_posts', JSON.stringify(posts));
-            }
-            return posts;
-        }
+        const SUPABASE_URL = 'https://jkhrpbpdewhkzgqqrwmp.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_xj9waE1quyimP47S4gmtLg_lKs5eszo';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         const bgImages = [
             'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1600',
@@ -47,31 +40,45 @@
             'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1600'
         ];
 
-        const posts = getPosts();
-        const wrapper = document.getElementById('wrapper');
+        async function initGallery() {
+            const wrapper = document.getElementById('wrapper');
+            const { data: posts, error } = await supabaseClient
+                .from('reflexiones')
+                .select('*')
+                .order('created_at', { ascending: false });
 
-        // Los mostramos en orden inverso (más nuevos primero)
-        [...posts].reverse().forEach((post, i) => {
-            const img = bgImages[i % bgImages.length];
-            wrapper.innerHTML += `
-            <div class="swiper-slide">
-                <div class="bg-image" style="background-image: url('${img}')"></div>
-                <div class="content">
-                    <p class="text-3xl md:text-5xl font-light italic leading-tight mb-4">"${post.text}"</p>
-                    <div class="quote-line"></div>
-                    <p class="text-[10px] md:text-xs uppercase tracking-[0.6em] font-black opacity-50">${post.author}</p>
-                </div>
-            </div>`;
-        });
+            if (error) {
+                console.error("Error:", error);
+                return;
+            }
 
-        new Swiper(".mySwiper", {
-            direction: 'vertical',
-            pagination: { el: ".swiper-pagination", clickable: true },
-            mousewheel: true,
-            speed: 1500,
-            effect: 'fade',
-            fadeEffect: { crossFade: true }
-        });
+            posts.forEach((post, i) => {
+                const img = bgImages[i % bgImages.length];
+                wrapper.innerHTML += `
+                <div class="swiper-slide">
+                    <div class="bg-image" style="background-image: url('${img}')"></div>
+                    <div class="content">
+                        <p class="text-3xl md:text-5xl font-light italic leading-tight mb-4">"${post.text}"</p>
+                        <div class="quote-line"></div>
+                        <p class="text-[10px] md:text-xs uppercase tracking-[0.6em] font-black opacity-50">${post.author}</p>
+                    </div>
+                </div>`;
+            });
+
+            document.getElementById('loader').style.opacity = '0';
+            setTimeout(() => document.getElementById('loader').remove(), 500);
+
+            new Swiper(".mySwiper", {
+                direction: 'vertical',
+                pagination: { el: ".swiper-pagination", clickable: true },
+                mousewheel: true,
+                speed: 1500,
+                effect: 'fade',
+                fadeEffect: { crossFade: true }
+            });
+        }
+
+        initGallery();
     </script>
 </body>
 </html>
