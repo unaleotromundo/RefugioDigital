@@ -8,43 +8,46 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <style>
+        body, html { margin: 0; padding: 0; background: black; overflow: hidden; }
         .swiper { width: 100%; height: 100vh; }
         .swiper-slide { position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         
-        /* Efecto de zoom suave en la imagen de fondo */
+        /* Zoom suave infinito */
         .bg-image { 
             position: absolute; inset: 0; 
             background-size: cover; 
             background-position: center; 
-            filter: brightness(0.3) blur(2px); 
+            filter: brightness(0.4) blur(1px); 
             transform: scale(1.1); 
-            transition: transform 9s linear; /* Sincronizado con el autoplay */
+            transition: transform 10s linear;
         }
         .swiper-slide-active .bg-image { transform: scale(1); }
 
-        .content { position: relative; z-index: 10; max-width: 900px; text-align: center; color: white; padding: 3rem; }
+        .content { 
+            position: relative; z-index: 10; 
+            max-width: 900px; text-align: center; 
+            color: white; padding: 2rem; 
+        }
         .quote-line { height: 2px; width: 60px; background: #f59e0b; margin: 2rem auto; }
         
-        /* Pantalla de carga */
         .loader { 
             position: fixed; inset: 0; background: black; z-index: 100; 
             display: flex; align-items: center; justify-content: center; 
-            color: white; transition: 0.8s ease-in-out; 
+            color: white; transition: 1s; 
         }
 
-        /* Estilo de la paginación de Swiper */
-        .swiper-pagination-bullet { background: white !important; opacity: 0.3; }
+        .swiper-pagination-bullet { background: white !important; opacity: 0.2; }
         .swiper-pagination-bullet-active { background: #f59e0b !important; opacity: 1; }
     </style>
 </head>
-<body class="bg-black">
+<body>
 
     <div id="loader" class="loader font-bold uppercase tracking-widest text-xs italic">
         Sincronizando con el consciente colectivo...
     </div>
 
-    <a href="refugio.html" class="fixed top-10 left-10 z-50 text-white font-bold bg-white/10 px-8 py-3 rounded-full backdrop-blur-xl border border-white/10 text-xs uppercase tracking-widest hover:bg-amber-600 transition-all">
-        ← Volver al Hub
+    <a href="refugio.html" class="fixed top-6 left-6 md:top-10 md:left-10 z-50 text-white font-bold bg-white/10 px-6 py-3 rounded-full backdrop-blur-xl border border-white/10 text-[10px] md:text-xs uppercase tracking-widest hover:bg-amber-600 transition-all">
+        ← Volver al Refugio
     </a>
 
     <div class="swiper mySwiper">
@@ -54,13 +57,12 @@
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
-        const SUPABASE_URL = 'https://jkhrpbpdewhkzgqqrwmp.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_xj9waE1quyimP47S4gmtLg_lKs5eszo';
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const SB_URL = 'https://jkhrpbpdewhkzgqqrwmp.supabase.co';
+        const SB_KEY = 'sb_publishable_xj9waE1quyimP47S4gmtLg_lKs5eszo';
+        const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
 
-        const bgImages = [
+        const defaultImages = [
             'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1600',
-            'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=1600',
             'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=1600',
             'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1600',
             'https://images.unsplash.com/photo-1518495973542-4542c06a5843?q=80&w=1600'
@@ -69,64 +71,61 @@
         async function initGallery() {
             const wrapper = document.getElementById('wrapper');
             
-            // Traer datos de Supabase
-            const { data: allPosts, error } = await supabaseClient
-                .from('reflexiones')
-                .select('*')
-                .order('created_at', { ascending: false });
+            try {
+                const { data: allPosts, error } = await supabaseClient
+                    .from('reflexiones')
+                    .select('*')
+                    .order('created_at', { ascending: false });
 
-            if (error) {
-                console.error("Error cargando reflexiones:", error);
-                return;
+                if (error) throw error;
+
+                // --- Lógica para que el ejemplo sea el primero siempre ---
+                const exampleText = "A veces soltar";
+                const examplePost = allPosts.find(p => p.text.includes(exampleText));
+                const otherPosts = allPosts.filter(p => p.id !== examplePost?.id);
+                const finalPosts = examplePost ? [examplePost, ...otherPosts] : otherPosts;
+
+                finalPosts.forEach((post, i) => {
+                    const bgImg = post.image_url ? post.image_url : defaultImages[i % defaultImages.length];
+                    
+                    wrapper.innerHTML += `
+                    <div class="swiper-slide">
+                        <div class="bg-image" style="background-image: url('${bgImg}')"></div>
+                        <div class="content">
+                            <p class="text-3xl md:text-5xl lg:text-6xl font-light italic leading-tight mb-6 px-4">"${post.text}"</p>
+                            <div class="quote-line"></div>
+                            <p class="text-[10px] md:text-xs uppercase tracking-[0.6em] font-black opacity-40">${post.author}</p>
+                        </div>
+                    </div>`;
+                });
+
+                document.getElementById('loader').style.opacity = '0';
+                setTimeout(() => document.getElementById('loader').remove(), 1000);
+
+                // INICIALIZAR CARRUSEL (Swiper)
+                new Swiper(".mySwiper", {
+                    direction: 'vertical', // Carrusel vertical como pediste
+                    loop: finalPosts.length > 1,
+                    speed: 2000,
+                    effect: 'fade',
+                    fadeEffect: { crossFade: true },
+                    autoplay: {
+                        delay: 8000,
+                        disableOnInteraction: false,
+                    },
+                    pagination: { el: ".swiper-pagination", clickable: true },
+                    mousewheel: true,
+                    keyboard: { enabled: true }
+                });
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('loader').innerText = "Error de conexión.";
             }
-
-            // Lógica de reordenamiento (Ejemplo primero)
-            const exampleText = "A veces soltar no es un acto de debilidad";
-            const examplePost = allPosts.find(p => p.text.includes(exampleText));
-            const otherPosts = allPosts.filter(p => p.id !== examplePost?.id);
-            const finalPosts = examplePost ? [examplePost, ...otherPosts] : otherPosts;
-
-            // Inyectar slides
-            finalPosts.forEach((post, i) => {
-                const img = bgImages[i % bgImages.length];
-                wrapper.innerHTML += `
-                <div class="swiper-slide">
-                    <div class="bg-image" style="background-image: url('${img}')"></div>
-                    <div class="content">
-                        <p class="text-3xl md:text-5xl lg:text-6xl font-light italic leading-tight mb-6">"${post.text}"</p>
-                        <div class="quote-line"></div>
-                        <p class="text-[10px] md:text-xs uppercase tracking-[0.6em] font-black opacity-40">${post.author}</p>
-                    </div>
-                </div>`;
-            });
-
-            // Ocultar cargador
-            const loader = document.getElementById('loader');
-            loader.style.opacity = '0';
-            setTimeout(() => loader.remove(), 800);
-
-            // Inicializar Swiper con Autoplay de 9 segundos
-            new Swiper(".mySwiper", {
-                direction: 'vertical',
-                loop: true, // El carrusel se repite infinitamente
-                speed: 2000, // Tiempo que dura la transición (2 segundos para suavidad)
-                effect: 'fade',
-                fadeEffect: { crossFade: true },
-                autoplay: {
-                    delay: 9000, // 9 Segundos por slide
-                    disableOnInteraction: false, // No se detiene al tocar
-                },
-                pagination: { 
-                    el: ".swiper-pagination", 
-                    clickable: true 
-                },
-                mousewheel: true,
-                keyboard: { enabled: true }
-            });
         }
 
-        initGallery();
+        document.addEventListener('DOMContentLoaded', initGallery);
     </script>
-<script src="music-player.js"></script>
+    <script src="music-player.js"></script>
 </body>
 </html>
