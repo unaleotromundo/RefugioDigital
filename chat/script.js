@@ -1,4 +1,4 @@
-// script.js - Versión segura con API en servidor
+// script.js - Versión con Historial Local Privado y Respaldo en Supabase
 const chatBox = document.getElementById('chat-box');
 const chatInput = document.getElementById('chat-input');
 const sendBtn = document.getElementById('send-btn');
@@ -16,57 +16,68 @@ let currentUser = null;
 // --- INICIALIZACIÓN ---
 async function init() {
     try {
+        // Login anónimo para que Supabase sepa que es un usuario único
         const { data: authData, error: authError } = await supabaseClient.auth.signInAnonymously();
         if (authError) throw authError;
         currentUser = authData.user;
 
-        await refreshHistoryUI();
+        // Cargar chats SOLO del LocalStorage (Privacidad local)
+        const localChats = getLocalChats();
         
-        const chats = await getSavedChats();
-        if (chats.length > 0) {
-            await loadChat(chats[0].id);
+        if (localChats.length > 0) {
+            await loadChat(localChats[0].id);
         } else {
             await createNewChat();
         }
+        
+        await refreshHistoryUI();
     } catch (err) {
         console.error("Error en inicialización:", err);
-        createNewChat();
+        // Si falla Supabase, igual permitimos uso local
+        if (!currentChatId) createNewChat();
     }
 }
 
-// --- GESTIÓN DE DATOS ---
-async function getSavedChats() {
-    if (currentUser) {
-        const { data, error } = await supabaseClient
-            .from('chats')
-            .select('*')
-            .order('updated_at', { ascending: false });
-        if (!error) return data;
-    }
+// --- GESTIÓN DE DATOS (LOCAL STORAGE) ---
+function getLocalChats() {
     return JSON.parse(localStorage.getItem('refugio_chats') || '[]');
 }
 
+function saveLocalChat(chatData) {
+    let localChats = getLocalChats();
+    const index = localChats.findIndex(c => c.id === chatData.id);
+    if (index > -1) {
+        localChats[index] = chatData;
+    } else {
+        localChats.unshift(chatData);
+    }
+    localStorage.setItem('refugio_chats', JSON.stringify(localChats));
+}
+
+// --- ACCIONES DE CHAT ---
 async function saveCurrentChat() {
+    if (!currentChatId) return;
+
     const firstMsg = chatHistory.find(m => m.role === "user")?.parts[0].text || "Nueva reflexión";
     const title = firstMsg.substring(0, 35) + (firstMsg.length > 35 ? "..." : "");
 
     const chatData = {
         id: currentChatId,
-        user_id: currentUser.id,
+        user_id: currentUser?.id,
         title: title,
         history: chatHistory,
         updated_at: new Date().toISOString()
     };
 
+    // 1. Guardar en LocalStorage (Para que el usuario lo vea en su historial)
+    saveLocalChat(chatData);
+
+    // 2. Respaldar en Supabase (Para tu base de datos)
     if (currentUser) {
         await supabaseClient.from('chats').upsert(chatData);
     }
-
-    let localChats = JSON.parse(localStorage.getItem('refugio_chats') || '[]');
-    const index = localChats.findIndex(c => c.id === currentChatId);
-    if (index > -1) localChats[index] = chatData;
-    else localChats.unshift(chatData);
-    localStorage.setItem('refugio_chats', JSON.stringify(localChats));
+    
+    await refreshHistoryUI();
 }
 
 async function createNewChat() {
@@ -74,20 +85,19 @@ async function createNewChat() {
     chatHistory = [];
     renderMessages();
     appendBubble("Hola. Soy tu espejo digital. En este espacio no existen los juicios, solo la comprensión. ¿Qué necesitas soltar o entender hoy?", false, false);
-    await saveCurrentChat();
-    await refreshHistoryUI();
+    // No guardamos hasta que el usuario escriba algo para no llenar el historial de chats vacíos
     toggleHistory(false);
 }
 
 async function loadChat(id) {
-    const chats = await getSavedChats();
-    const chat = chats.find(c => c.id == id);
+    const localChats = getLocalChats();
+    const chat = localChats.find(c => c.id == id);
     if (chat) {
         currentChatId = chat.id;
         chatHistory = chat.history;
         renderMessages();
-        await refreshHistoryUI();
         toggleHistory(false);
+        refreshHistoryUI();
     }
 }
 
@@ -95,11 +105,13 @@ async function deleteChat(id, event) {
     event.stopPropagation();
     if (!confirm("¿Deseas borrar esta reflexión para siempre?")) return;
 
+    // Borrar de Supabase
     if (currentUser) {
         await supabaseClient.from('chats').delete().eq('id', id);
     }
 
-    let localChats = JSON.parse(localStorage.getItem('refugio_chats') || '[]').filter(c => c.id != id);
+    // Borrar de LocalStorage
+    let localChats = getLocalChats().filter(c => c.id != id);
     localStorage.setItem('refugio_chats', JSON.stringify(localChats));
 
     if (currentChatId == id) {
@@ -110,8 +122,8 @@ async function deleteChat(id, event) {
 }
 
 // --- INTERFAZ DE USUARIO ---
-async function refreshHistoryUI() {
-    const chats = await getSavedChats();
+function refreshHistoryUI() {
+    const chats = getLocalChats();
     historyList.innerHTML = chats.map(chat => `
         <div class="history-item ${chat.id === currentChatId ? 'active' : ''}" onclick="loadChat(${chat.id})">
             <div class="title">${chat.title}</div>
@@ -160,7 +172,7 @@ function appendBubble(text, isUser, shouldSave = true) {
     else chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// --- COMUNICACIÓN CON GEMINI (AHORA A TRAVÉS DE VERCEL) ---
+// --- COMUNICACIÓN CON GEMINI ---
 async function send() {
     const userText = chatInput.value.trim();
     if (!userText) return;
@@ -177,12 +189,9 @@ async function send() {
     chatBox.scrollTop = chatBox.scrollHeight;
 
     try {
-        // Llamar a la función serverless de Vercel
         const response = await fetch('/api/gemini', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [
                     { role: "user", parts: [{ text: SYSTEM_PROMPT }] },
@@ -192,23 +201,16 @@ async function send() {
         });
 
         const data = await response.json();
-
-        if (document.getElementById(typingId)) {
-            document.getElementById(typingId).remove();
-        }
+        if (document.getElementById(typingId)) document.getElementById(typingId).remove();
 
         if (data.success) {
             appendBubble(data.text, false);
-            await saveCurrentChat();
         } else {
-            appendBubble("El espejo se siente pesado hoy. Las claves de acceso parecen estar agotadas. Por favor, contacta al administrador.", false);
+            appendBubble("El espejo está nublado ahora mismo. Intenta en un momento.", false);
         }
     } catch (error) {
-        if (document.getElementById(typingId)) {
-            document.getElementById(typingId).remove();
-        }
-        console.error("Error al conectar con el servidor:", error);
-        appendBubble("No pude conectar con el servidor. Verifica tu conexión a internet.", false);
+        if (document.getElementById(typingId)) document.getElementById(typingId).remove();
+        appendBubble("No pude conectar con el servidor.", false);
     }
 }
 
