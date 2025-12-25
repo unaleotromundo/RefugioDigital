@@ -8,146 +8,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: #f8fafc;
-            transition: background-color 0.3s ease;
-        }
-        body.dark-mode { background-color: #0f172a; }
-        
-        .chat-scroll { 
-            flex: 1;
-            overflow-y: auto; 
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-        
-        .user-bubble { 
-            background: #fef3c7; 
-            border: 1px solid #fde68a;
-            padding: 1.25rem;
-            border-radius: 1.25rem;
-            max-width: 75%;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        
-        .ai-bubble { 
-            background: #ffffff; 
-            border: 1px solid #e2e8f0; 
-            font-style: italic;
-            padding: 1.25rem;
-            border-radius: 1.25rem;
-            max-width: 75%;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+        .chat-scroll { max-height: calc(100vh - 200px); overflow-y: auto; }
+        .user-bubble { background: #fef3c7; border: 1px solid #fde68a; }
+        .ai-bubble { background: #ffffff; border: 1px solid #e2e8f0; font-style: italic; }
         .selected-item { border-left: 4px solid #d97706 !important; background: #fffbeb; }
-        
-        /* Modo oscuro */
-        body.dark-mode .user-bubble {
-            background: #451a03;
-            border-color: #78350f;
-            color: #fef3c7;
-        }
-        
-        body.dark-mode .ai-bubble {
-            background: #1e293b;
-            border-color: #334155;
-            color: #e2e8f0;
-        }
-        
-        body.dark-mode .selected-item {
-            background: #1e293b !important;
-            border-left-color: #f59e0b !important;
-        }
-        
-        body.dark-mode header {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-        
-        body.dark-mode aside {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-        
-        body.dark-mode #chats-list > div {
-            border-color: #334155 !important;
-        }
-        
-        body.dark-mode #chats-list > div:hover {
-            background: #334155 !important;
-        }
-        
-        body.dark-mode main {
-            background: #0f172a !important;
-        }
-        
-        body.dark-mode #chat-header {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-        
-        body.dark-mode .text-slate-800 {
-            color: #e2e8f0 !important;
-        }
-        
-        body.dark-mode .text-slate-400 {
-            color: #94a3b8 !important;
-        }
-        
-        body.dark-mode .text-slate-500 {
-            color: #64748b !important;
-        }
-        
-        body.dark-mode .bg-slate-100 {
-            background: #334155 !important;
-            color: #e2e8f0;
-        }
-        
-        body.dark-mode .bg-slate-50 {
-            background: #1e293b !important;
-        }
-        
-        body.dark-mode .bg-white {
-            background: #1e293b !important;
-        }
-        
-        /* Toggle de modo oscuro */
-        .dark-mode-toggle {
-            width: 60px;
-            height: 30px;
-            background: #cbd5e1;
-            border-radius: 30px;
-            position: relative;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-        
-        .dark-mode-toggle.active {
-            background: #f59e0b;
-        }
-        
-        .dark-mode-toggle-circle {
-            width: 24px;
-            height: 24px;
-            background: white;
-            border-radius: 50%;
-            position: absolute;
-            top: 3px;
-            left: 3px;
-            transition: transform 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-        }
-        
-        .dark-mode-toggle.active .dark-mode-toggle-circle {
-            transform: translateX(30px);
-        }
         
         /* Estilos del chat analista */
         .chat-modal { 
@@ -253,7 +118,7 @@
     <div id="login-overlay" class="login-overlay">
         <div class="login-box">
             <div class="text-center mb-8">
-                <h1 class="text-3xl font-black text-amber-700 mb-2">🔒 Acceso Restringido</h1>
+                <h1 class="text-3xl font-black text-amber-700 mb-2">🔐 Acceso Restringido</h1>
                 <p class="text-sm text-slate-600 font-semibold uppercase tracking-wider">Panel de Estudio</p>
             </div>
             
@@ -289,10 +154,7 @@
                 <h1 class="text-xl font-extrabold text-slate-800 uppercase tracking-tighter">Archivo del Espejo</h1>
                 <p class="text-xs text-slate-500 font-bold uppercase tracking-widest">Panel de análisis y estudio · <span id="logged-user"></span></p>
             </div>
-            <div class="flex gap-4 items-center">
-                <div class="dark-mode-toggle" onclick="toggleDarkMode()" id="dark-mode-toggle">
-                    <div class="dark-mode-toggle-circle">☀️</div>
-                </div>
+            <div class="flex gap-4">
                 <button onclick="fetchChats()" class="bg-amber-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-amber-700 transition">
                     🔄 Actualizar
                 </button>
@@ -317,8 +179,8 @@
             </aside>
 
             <!-- AREA PRINCIPAL: VISOR DE CONVERSACIÓN -->
-            <main class="flex-1 bg-slate-50 flex flex-col overflow-hidden">
-                <div id="chat-header" class="p-6 bg-white border-b border-slate-200 hidden flex-shrink-0">
+            <main class="flex-1 bg-slate-50 flex flex-col">
+                <div id="chat-header" class="p-6 bg-white border-b border-slate-200 hidden">
                     <h2 id="view-title" class="text-lg font-bold text-slate-800"></h2>
                     <div class="flex gap-4 mt-1">
                         <span id="view-date" class="text-xs font-bold text-amber-600 uppercase"></span>
@@ -326,7 +188,7 @@
                     </div>
                 </div>
 
-                <div id="chat-content" class="chat-scroll">
+                <div id="chat-content" class="chat-scroll p-6 space-y-4">
                     <div class="h-full flex items-center justify-center text-slate-400 italic">
                         Selecciona una conversación de la izquierda para analizarla
                     </div>
@@ -492,16 +354,13 @@
                 const isUser = msg.role === 'user';
                 return `
                     <div class="flex ${isUser ? 'justify-end' : 'justify-start'}">
-                        <div class="${isUser ? 'user-bubble' : 'ai-bubble'}">
-                            <div class="text-[9px] uppercase font-black mb-2 opacity-50">${isUser ? 'Pregunta' : 'Espejo'}</div>
-                            <div class="text-sm leading-relaxed">${msg.parts[0].text.replace(/\n/g, '<br>')}</div>
+                        <div class="max-w-[80%] p-4 rounded-2xl shadow-sm ${isUser ? 'user-bubble' : 'ai-bubble'}">
+                            <div class="text-[9px] uppercase font-black mb-1 opacity-50">${isUser ? 'Pregunta' : 'Espejo'}</div>
+                            <div class="text-slate-800 leading-relaxed">${msg.parts[0].text.replace(/\n/g, '<br>')}</div>
                         </div>
                     </div>
                 `;
             }).join('');
-            
-            // Scroll al final del chat
-            content.scrollTop = content.scrollHeight;
         }
 
         function filterChats() {
@@ -511,34 +370,6 @@
                 JSON.stringify(chat.history).toLowerCase().includes(term)
             );
             renderList(filtered);
-        }
-        
-        // ========== MODO OSCURO ==========
-        function toggleDarkMode() {
-            document.body.classList.toggle('dark-mode');
-            const toggle = document.getElementById('dark-mode-toggle');
-            const circle = toggle.querySelector('.dark-mode-toggle-circle');
-            
-            if (document.body.classList.contains('dark-mode')) {
-                toggle.classList.add('active');
-                circle.textContent = '🌙';
-                localStorage.setItem('dark-mode', 'enabled');
-            } else {
-                toggle.classList.remove('active');
-                circle.textContent = '☀️';
-                localStorage.setItem('dark-mode', 'disabled');
-            }
-        }
-        
-        function loadDarkMode() {
-            const darkMode = localStorage.getItem('dark-mode');
-            if (darkMode === 'enabled') {
-                document.body.classList.add('dark-mode');
-                const toggle = document.getElementById('dark-mode-toggle');
-                const circle = toggle.querySelector('.dark-mode-toggle-circle');
-                toggle.classList.add('active');
-                circle.textContent = '🌙';
-            }
         }
 
         // ========== FUNCIONES DEL CHAT ANALISTA ==========
@@ -636,11 +467,6 @@
 
         // Inicializar - verificar sesión
         checkSession();
-        
-        // Cargar preferencia de modo oscuro después de verificar sesión
-        window.addEventListener('load', () => {
-            setTimeout(loadDarkMode, 100);
-        });
     </script>
 </body>
 </html>
