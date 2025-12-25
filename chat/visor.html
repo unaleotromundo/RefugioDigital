@@ -197,7 +197,7 @@
         </div>
 
         <!-- BOTÓN FLOTANTE PARA ABRIR CHAT ANALISTA -->
-        <button class="fab-button" onclick="toggleChatAnalista()" title="Consultar con el Analista">
+        <button class="fab-button" onclick="toggleChatAnalista()" title="Maestro Shalom">
             💬
         </button>
 
@@ -205,7 +205,7 @@
         <div id="chat-analista-modal" class="chat-modal">
             <div class="p-4 bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-t-2xl flex justify-between items-center">
                 <div>
-                    <h3 class="font-bold text-sm uppercase tracking-wide">Chat Analista</h3>
+                    <h3 class="font-bold text-sm uppercase tracking-wide">MAESTRO SHALOM</h3>
                     <p class="text-xs opacity-80">Consulta sobre las conversaciones</p>
                 </div>
                 <button onclick="toggleChatAnalista()" class="text-2xl hover:scale-110 transition">&times;</button>
@@ -213,7 +213,7 @@
             
             <div id="chat-analista-messages" class="chat-messages">
                 <div class="analista-ai">
-                    Hola. Soy el analista del archivo. Puedo ayudarte a comprender patrones, identificar temas recurrentes o reflexionar sobre las conversaciones guardadas. ¿Qué te gustaría explorar?
+                    Hola. 
                 </div>
             </div>
             
@@ -294,7 +294,12 @@
         }
 
         // ========== PROMPT DEL ANALISTA ==========
-        const PROMPT_ANALISTA = `Actúa como un licenciado en Derecho por la Universidad de Buenos Aires, doctor en Filosofía (Universidad Complutense de Madrid), en Antropología (Universitat Rovira i Virgili de Tarragona), en Psicología (Universidad Ramon Llull), en Historia (Universidad de Lérida), Teología (Universidad de Murcia), Matemática Aplicada (Universidad de Alicante) y Educación (Universidad Ramon Llull). Y sobre todo Maestro y fundador de Escuelas de capacitación de cábala hebrea. Conocedor de muchos secretos y estudioso infinito de la cábala en profundidad. Igual hablame siempre como un argentino.`;
+        const PROMPT_ANALISTA = `Eres un analista empático especializado en reflexión y síntesis de conversaciones. 
+Tu rol es ayudar a quien consulta el archivo a comprender patrones, identificar temas recurrentes y ofrecer 
+perspectivas integradoras sobre las conversaciones guardadas. Hablas de forma clara, profesional pero cálida, 
+como un uruguayo reflexivo. No juzgas, sino que iluminas conexiones y ayudas a la persona a ver lo que quizás 
+no había notado. Sos conciso pero profundo. Terminas tus respuestas con una pregunta que invite a seguir 
+explorando el tema si es relevante.`;
 
         // ========== FUNCIONES DEL VISOR PRINCIPAL ==========
         async function fetchChats() {
