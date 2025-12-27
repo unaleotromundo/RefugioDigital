@@ -61,21 +61,27 @@
         .warm-card { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(20px); border: 1px solid rgba(251, 191, 36, 0.1); }
         .dark .warm-card { background: rgba(15, 23, 42, 0.4); border-color: rgba(251, 191, 36, 0.05); }
 
-        /* MOBILE MENU ANIMATION */
-        #mobile-nav-container { transition: all 0.3s ease-in-out; max-height: 0; overflow: hidden; }
-        #mobile-nav-container.open { max-height: 400px; padding-bottom: 1.5rem; }
+        /* MENU MOBILE */
+        #mobile-nav { 
+            max-height: 0; 
+            overflow: hidden; 
+            transition: all 0.4s ease-in-out; 
+            background: rgba(255, 255, 255, 0.95);
+        }
+        .dark #mobile-nav { background: rgba(8, 10, 15, 0.95); }
+        #mobile-nav.open { max-height: 500px; border-bottom: 1px solid rgba(245, 158, 11, 0.2); padding-bottom: 2rem; }
     </style>
 </head>
 <body class="bg-warmLight text-slate-800 dark:bg-warmDark dark:text-slate-100 transition-colors duration-1000">
 
     <div id="particle-container"></div>
 
-    <!-- HEADER CORREGIDO -->
+    <!-- HEADER -->
     <nav class="bg-white/20 dark:bg-black/10 backdrop-blur-xl border-b border-amber-500/5 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-6">
             <div class="h-20 flex items-center justify-between">
                 <!-- LOGO -->
-                <button onclick="showHome()" class="flex items-center gap-3 group">
+                <button onclick="showHome()" class="flex items-center gap-3 group shrink-0">
                     <img src="https://jkhrpbpdewhkzgqqrwmp.supabase.co/storage/v1/object/public/imagenes/logo.png" alt="Logo" class="w-10 h-10 object-contain group-hover:rotate-12 transition">
                     <span class="text-xl md:text-2xl font-black tracking-tighter text-amber-600 uppercase">
                         TU REFUGIO <span class="text-slate-900 dark:text-white italic">DIGITAL</span>
@@ -84,35 +90,28 @@
                 
                 <!-- MENU DESKTOP -->
                 <div class="hidden lg:flex items-center gap-4">
-                    <a href="crisis.html" class="px-7 py-3 rounded-full border-2 border-red-500 text-red-600 font-bold text-sm hover:bg-red-500 hover:text-white transition-all uppercase tracking-widest">
-                        🆘 Ayuda Ahora
-                    </a>
-                    <a href="chat/index.html" class="px-7 py-3 rounded-full border border-amber-600 text-amber-600 font-bold text-sm hover:bg-amber-600 hover:text-white transition-all uppercase tracking-widest">
-                        Chat Privado
-                    </a>
-                    <a href="refugio.html" class="px-7 py-3 rounded-full bg-amber-600 text-white font-bold text-sm hover:bg-amber-500 hover:scale-105 transition-all shadow-lg uppercase tracking-widest">
-                        Entrar al Refugio
-                    </a>
+                    <a href="crisis.html" class="px-7 py-3 rounded-full border-2 border-red-500 text-red-600 font-bold text-sm hover:bg-red-500 hover:text-white transition-all uppercase tracking-widest">🆘 Ayuda Ahora</a>
+                    <a href="chat/index.html" class="px-7 py-3 rounded-full border border-amber-600 text-amber-600 font-bold text-sm hover:bg-amber-600 hover:text-white transition-all uppercase tracking-widest">Chat Privado</a>
+                    <a href="refugio.html" class="px-7 py-3 rounded-full bg-amber-600 text-white font-bold text-sm hover:bg-amber-500 hover:scale-105 transition-all shadow-lg uppercase tracking-widest">Entrar al Refugio</a>
                 </div>
 
-                <!-- CONTROLES (SIEMPRE VISIBLES) -->
-                <div class="flex items-center gap-2 md:gap-3">
-                    <button onclick="toggleMusic()" id="music-btn" class="p-2 md:p-3 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 transition">
+                <!-- CONTROLES -->
+                <div class="flex items-center gap-2">
+                    <button onclick="toggleMusic()" id="music-btn" class="p-2 md:p-3 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400">
                         <svg id="speaker-icon" class="w-5 h-5 md:w-6 md:h-6" fill="currentColor" viewBox="0 0 24 24"></svg>
                     </button>
-                    <button onclick="toggleDarkMode()" class="p-2 md:p-3 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 transition">
+                    <button onclick="toggleDarkMode()" class="p-2 md:p-3 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400">
                         <svg class="w-5 h-5 md:w-6 md:h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"></path></svg>
                     </button>
-                    
-                    <!-- BOTÓN HAMBURGUESA MOBILE -->
-                    <button onclick="toggleMobileNav()" class="lg:hidden p-2 md:p-3 rounded-full bg-amber-600 text-white">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    <!-- BOTÓN HAMBURGUESA -->
+                    <button onclick="toggleMenu()" class="lg:hidden p-2 md:p-3 rounded-full bg-amber-600 text-white">
+                        <svg id="menu-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                     </button>
                 </div>
             </div>
 
             <!-- MENU DESPLEGABLE MOBILE -->
-            <div id="mobile-nav-container" class="lg:hidden flex flex-col gap-3">
+            <div id="mobile-nav" class="lg:hidden flex flex-col gap-4">
                 <a href="crisis.html" class="w-full text-center py-4 rounded-2xl border-2 border-red-500 text-red-600 font-bold uppercase text-xs tracking-widest">🆘 Ayuda Ahora</a>
                 <a href="chat/index.html" class="w-full text-center py-4 rounded-2xl border border-amber-600 text-amber-600 font-bold uppercase text-xs tracking-widest">Chat Privado</a>
                 <a href="refugio.html" class="w-full text-center py-4 rounded-2xl bg-amber-600 text-white font-bold uppercase text-xs tracking-widest">Entrar al Refugio</a>
@@ -151,31 +150,27 @@
         <p class="text-xs font-bold uppercase tracking-[0.6em]">Tu Refugio Digital • 2025</p>
     </footer>
 
-    <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="music-player.js"></script> 
     
     <script>
         const _supabase = supabase.createClient('https://jkhrpbpdewhkzgqqrwmp.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpraHJwYnBkZXdoa3pncXFyd21wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwOTI2NDEsImV4cCI6MjA4MTY2ODY0MX0.BHLSQr9HNu8xwSX-Q3smsNvmosHJMKrfLbYRmfOyUhE');
 
-        function toggleMobileNav() {
-            document.getElementById('mobile-nav-container').classList.toggle('open');
-        }
+        function toggleMenu() { document.getElementById('mobile-nav').classList.toggle('open'); }
 
         // --- PARTICLE ENGINE ---
         const particleContainer = document.getElementById('particle-container');
         function createParticle() {
             const p = document.createElement('div');
-            const sizeBase = Math.random();
-            const size = sizeBase > 0.9 ? Math.random() * 45 + 15 : Math.random() * 12 + 4;
+            const size = Math.random() * 12 + 4;
             const duration = Math.random() * 18 + 12;
             p.className = 'particle';
             p.style.width = `${size}px`; p.style.height = `${size}px`;
             p.style.left = `${Math.random() * 100}%`;
             p.style.setProperty('--duration', `${duration}s`);
             p.style.setProperty('--drift', `${(Math.random() - 0.5) * 350}px`);
-            p.style.setProperty('--opacity', size > 20 ? 0.12 : Math.random() * 0.5 + 0.1);
-            p.style.setProperty('--blur', size > 20 ? '10px' : '2px');
+            p.style.setProperty('--opacity', Math.random() * 0.5 + 0.1);
+            p.style.setProperty('--blur', '2px');
             particleContainer.appendChild(p);
             setTimeout(() => p.remove(), duration * 1000);
         }
@@ -190,7 +185,7 @@
         function showHome() {
             document.getElementById('home-view').classList.remove('hidden-view');
             document.getElementById('post-view').classList.add('hidden-view');
-            document.getElementById('mobile-nav-container').classList.remove('open');
+            document.getElementById('mobile-nav').classList.remove('open');
             window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
@@ -198,9 +193,7 @@
             const container = document.getElementById('comments-list');
             const { data, error } = await _supabase.from('comments').select('*').eq('post_id', postId).order('created_at', { ascending: false });
             if (error || !container) return;
-            container.innerHTML = data.length === 0 
-                ? '<p class="text-center opacity-30 italic py-10">Aún no hay reflexiones. Sé el primero en compartir.</p>' 
-                : data.map(c => `<div class="mb-6 p-8 rounded-[3rem] bg-amber-500/5 border border-amber-500/10 italic text-slate-700 dark:text-slate-300">"${c.content}"</div>`).join('');
+            container.innerHTML = data.length === 0 ? '<p class="text-center opacity-30 italic py-10">Aún no hay reflexiones. Sé el primero en compartir.</p>' : data.map(c => `<div class="mb-6 p-8 rounded-[3rem] bg-amber-500/5 border border-amber-500/10 italic text-slate-700 dark:text-slate-300">"${c.content}"</div>`).join('');
         }
 
         async function sendComment(btn, postId) {
@@ -208,51 +201,22 @@
             if (area.value.trim().length < 3) return;
             btn.disabled = true; btn.innerHTML = "Guardando...";
             const { error } = await _supabase.from('comments').insert([{ post_id: postId, content: area.value.trim() }]);
-            if (!error) {
-                area.value = ""; loadComments(postId);
-                btn.innerHTML = "Reflexión Enviada";
-                setTimeout(() => { btn.disabled = false; btn.innerHTML = "Enviar Reflexión Anónima"; }, 2000);
-            }
+            if (!error) { area.value = ""; loadComments(postId); btn.innerHTML = "Enviado"; setTimeout(() => { btn.disabled = false; btn.innerHTML = "Enviar Reflexión Anónima"; }, 2000); }
         }
 
         let allPosts = [];
         function openPost(index) {
             const post = allPosts[index];
             const content = document.getElementById('full-article-content');
-            
-            content.innerHTML = `
-                <header class="mb-16 text-center">
-                    <h1 class="text-5xl md:text-7xl font-black mb-8 tracking-tighter leading-tight">${post.title.$t}</h1>
-                    <div class="h-1.5 w-32 bg-amber-500 mx-auto rounded-full"></div>
-                </header>
-                
-                <div class="article-body">
-                    ${post.content.$t}
-                </div>
-
-                <!-- ESPACIO DE REFLEXIÓN -->
+            content.innerHTML = `<header class="mb-16 text-center"><h1 class="text-5xl md:text-7xl font-black mb-8 tracking-tighter leading-tight">${post.title.$t}</h1><div class="h-1.5 w-32 bg-amber-500 mx-auto rounded-full"></div></header><div class="article-body">${post.content.$t}</div>
                 <div class="mt-20 pt-16 border-t border-amber-500/20">
                     <div class="warm-card p-8 md:p-12 rounded-[4rem] shadow-2xl border border-amber-500/10">
                         <h3 class="text-3xl font-black mb-4 tracking-tighter italic text-amber-600">Espacio de <span class="text-amber-600">Reflexión</span></h3>
-                        <p class="text-base text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">
-                            Este es un lugar seguro. Te invitamos a compartir una experiencia, una duda o simplemente lo que esta lectura ha despertado en ti. 
-                            <span class="block mt-2 font-bold text-amber-600/80 uppercase text-[10px] tracking-[0.2em]">🛡️ Tu comentario será publicado de forma totalmente anónima.</span>
-                        </p>
-                        
+                        <p class="text-base text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">Este es un lugar seguro. Te invitamos a compartir una experiencia, una duda o simplemente lo que esta lectura ha despertado en ti. <span class="block mt-2 font-bold text-amber-600/80 uppercase text-[10px] tracking-[0.2em]">🛡️ Tu comentario será publicado de forma totalmente anónima.</span></p>
                         <textarea id="user-comment" rows="5" class="w-full bg-white/50 dark:bg-black/20 border-2 border-amber-500/10 rounded-3xl p-6 focus:border-amber-500 outline-none transition-all text-lg resize-none placeholder:italic" placeholder="Escribe aquí tu pensamiento..."></textarea>
-                        
-                        <div class="flex flex-col md:flex-row items-center justify-between gap-6 mt-6">
-                            <p class="text-xs text-slate-400 italic">"Las palabras son puentes entre almas."</p>
-                            <button onclick="sendComment(this, '${post.id.$t}')" class="w-full md:w-auto px-10 py-4 bg-amber-600 text-white font-bold rounded-full hover:bg-amber-500 hover:scale-105 transition-all shadow-lg shadow-amber-600/20 uppercase text-xs tracking-widest">
-                                Enviar Reflexión Anónima
-                            </button>
-                        </div>
+                        <div class="flex flex-col md:flex-row items-center justify-between gap-6 mt-6"><p class="text-xs text-slate-400 italic">"Las palabras son puentes entre almas."</p><button onclick="sendComment(this, '${post.id.$t}')" class="w-full md:w-auto px-10 py-4 bg-amber-600 text-white font-bold rounded-full hover:bg-amber-500 transition-all shadow-lg uppercase text-xs tracking-widest">Enviar Reflexión Anónima</button></div>
                     </div>
-                </div>
-                
-                <div id="comments-list" class="mt-12 space-y-6"></div>
-            `;
-            
+                </div><div id="comments-list" class="mt-12 space-y-6"></div>`;
             document.getElementById('home-view').classList.add('hidden-view');
             document.getElementById('post-view').classList.remove('hidden-view');
             window.scrollTo({top: 0, behavior: 'instant'});
@@ -261,28 +225,19 @@
 
         function renderBlog(json) {
             allPosts = json.feed.entry;
-            const carouselWrapper = document.getElementById('carousel-wrapper');
-            const postsGrid = document.getElementById('posts-grid');
-            const welcomeSection = document.getElementById('welcome-section');
-            const welcomeContent = document.getElementById('welcome-content');
-
+            const carousel = document.getElementById('carousel-wrapper');
+            const grid = document.getElementById('posts-grid');
+            const welcome = document.getElementById('welcome-section');
             allPosts.forEach((entry, index) => {
                 const title = entry.title.$t;
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = entry.content.$t;
+                const tempDiv = document.createElement('div'); tempDiv.innerHTML = entry.content.$t;
                 const img = tempDiv.querySelector('img') ? tempDiv.querySelector('img').src.replace('/s72-c/', '/s1600/') : 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1600';
                 const snippet = tempDiv.textContent.trim().substring(0, 160) + "...";
-
-                if (title.includes("La Conexión, tu refugio")) {
-                    welcomeSection.classList.remove('hidden');
-                    welcomeContent.innerHTML = `<span class="text-amber-600 block mb-10 text-xs font-bold uppercase tracking-[0.5em]">Te damos la Bienvenida</span>${entry.content.$t}`;
-                }
-
-                carouselWrapper.innerHTML += `<div class="swiper-slide relative cursor-pointer" onclick="openPost(${index})"><img src="${img}" class="absolute inset-0 w-full h-full object-cover"><div class="slide-overlay"></div><div class="relative z-10 p-12 h-full flex flex-col justify-center items-center text-center text-white"><h3 class="text-4xl md:text-7xl font-black mb-10 tracking-tighter leading-none">${title}</h3><p class="text-amber-50/80 mb-12 max-w-2xl text-xl font-light leading-relaxed">${snippet}</p><button class="bg-amber-600 px-14 py-6 rounded-full font-bold uppercase tracking-[0.2em] text-xs hover:bg-white hover:text-amber-600 transition-all shadow-2xl scale-110">Entrar al Saber</button></div></div>`;
-                postsGrid.innerHTML += `<article class="warm-card rounded-[4rem] overflow-hidden group cursor-pointer shadow-xl hover:shadow-[0_40px_80px_-20px_rgba(217,119,6,0.15)] transition-all duration-700" onclick="openPost(${index})"><div class="h-72 overflow-hidden relative"><img src="${img}" class="w-full h-full object-cover group-hover:scale-110 transition duration-1000"></div><div class="p-12"><h3 class="font-black text-2xl mb-6 group-hover:text-amber-600 transition-colors duration-500 leading-tight">${title}</h3><p class="text-slate-500 dark:text-slate-400 text-sm mb-10 line-clamp-3 font-medium leading-relaxed">${snippet}</p><span class="text-amber-600 font-bold text-xs uppercase tracking-widest flex items-center gap-3">Explorar <span class="group-hover:translate-x-3 transition-transform duration-500">→</span></span></div></article>`;
+                if (title.includes("La Conexión, tu refugio")) { welcome.classList.remove('hidden'); document.getElementById('welcome-content').innerHTML = entry.content.$t; }
+                carousel.innerHTML += `<div class="swiper-slide cursor-pointer" onclick="openPost(${index})"><img src="${img}" class="absolute inset-0 w-full h-full object-cover"><div class="slide-overlay"></div><div class="relative z-10 p-12 h-full flex flex-col justify-center items-center text-center text-white"><h3 class="text-4xl md:text-7xl font-black mb-10 leading-none">${title}</h3><p class="mb-12 max-w-2xl text-xl font-light">${snippet}</p><button class="bg-amber-600 px-14 py-6 rounded-full font-bold uppercase tracking-widest text-xs">Entrar al Saber</button></div></div>`;
+                grid.innerHTML += `<article class="warm-card rounded-[4rem] overflow-hidden group cursor-pointer shadow-xl transition-all duration-700" onclick="openPost(${index})"><div class="h-72 overflow-hidden relative"><img src="${img}" class="w-full h-full object-cover group-hover:scale-110 transition duration-1000"></div><div class="p-12"><h3 class="font-black text-2xl mb-6 group-hover:text-amber-600 transition-colors duration-500">${title}</h3><p class="text-slate-500 dark:text-slate-400 text-sm mb-10 line-clamp-3">${snippet}</p><span class="text-amber-600 font-bold text-xs uppercase tracking-widest">Explorar →</span></div></article>`;
             });
-
-            new Swiper(".mySwiper", { loop: true, speed: 1200, autoplay: { delay: 7000 }, pagination: { el: ".swiper-pagination", clickable: true }, effect: "fade", fadeEffect: { crossFade: true } });
+            new Swiper(".mySwiper", { loop: true, speed: 1200, autoplay: { delay: 7000 }, pagination: { el: ".swiper-pagination", clickable: true }, effect: "fade" });
         }
     </script>
     <script src="https://turefugiodigital.blogspot.com/feeds/posts/default?alt=json-in-script&max-results=500&callback=renderBlog"></script>
