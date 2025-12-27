@@ -9,7 +9,7 @@
     <meta name="description" content="En un mundo a veces caótico, es fácil perderse. Aquí encontrarás un faro que te guiará en tu búsqueda de significado y propósito. Compartamos nuestras experiencias y aprendamos unos de otros.">
     <link rel="icon" type="image/png" href="https://jkhrpbpdewhkzgqqrwmp.supabase.co/storage/v1/object/public/imagenes/logo.png">
 
-    <!-- SEO PARA COMPARTIR -->
+    <!-- SEO PARA COMPARTIR (Open Graph / Facebook / WhatsApp) -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://refugiodigital.vercel.app">
     <meta property="og:title" content="Tu Refugio Digital | Faro de Significado y Propósito">
@@ -53,6 +53,7 @@
             100% { transform: translateY(-120vh) translateX(var(--drift)) scale(1.3); opacity: 0; }
         }
 
+        /* COMPONENTES VISUALES */
         .swiper { width: 100%; height: 75vh; border-radius: 3.5rem; }
         .slide-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(8, 10, 15, 0.9) 0%, rgba(8, 10, 15, 0.3) 100%); }
         .prose { max-width: 850px !important; }
@@ -61,28 +62,38 @@
         .warm-card { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(20px); border: 1px solid rgba(251, 191, 36, 0.1); }
         .dark .warm-card { background: rgba(15, 23, 42, 0.4); border-color: rgba(251, 191, 36, 0.05); }
 
-        /* MOBILE MENU ANIMATION */
-        #mobile-nav-container { transition: all 0.3s ease-in-out; max-height: 0; overflow: hidden; }
-        #mobile-nav-container.open { max-height: 400px; padding-bottom: 1.5rem; }
+        /* MENU MOBILE */
+        #mobile-menu {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(-100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+        #mobile-menu.active {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
     </style>
 </head>
 <body class="bg-warmLight text-slate-800 dark:bg-warmDark dark:text-slate-100 transition-colors duration-1000">
 
     <div id="particle-container"></div>
 
-    <!-- HEADER CORREGIDO -->
+    <!-- HEADER -->
     <nav class="bg-white/20 dark:bg-black/10 backdrop-blur-xl border-b border-amber-500/5 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="h-20 flex items-center justify-between">
-                <!-- LOGO -->
-                <button onclick="showHome()" class="flex items-center gap-3 group">
-                    <img src="https://jkhrpbpdewhkzgqqrwmp.supabase.co/storage/v1/object/public/imagenes/logo.png" alt="Logo" class="w-10 h-10 object-contain group-hover:rotate-12 transition">
-                    <span class="text-xl md:text-2xl font-black tracking-tighter text-amber-600 uppercase">
-                        TU REFUGIO <span class="text-slate-900 dark:text-white italic">DIGITAL</span>
-                    </span>
-                </button>
-                
-                <!-- MENU DESKTOP -->
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <!-- LOGO -->
+            <button onclick="showHome()" class="flex items-center gap-3 group z-[60]">
+                <img src="https://jkhrpbpdewhkzgqqrwmp.supabase.co/storage/v1/object/public/imagenes/logo.png" alt="Logo" class="w-10 h-10 object-contain group-hover:rotate-12 transition">
+                <span class="text-xl md:text-2xl font-black tracking-tighter text-amber-600 uppercase">
+                    TU REFUGIO <span class="text-slate-900 dark:text-white italic">DIGITAL</span>
+                </span>
+            </button>
+            
+            <!-- CONTROLES DERECHA -->
+            <div class="flex items-center gap-2 md:gap-4 z-[60]">
+                <!-- BOTONES DESKTOP -->
                 <div class="hidden lg:flex items-center gap-4">
                     <a href="crisis.html" class="px-7 py-3 rounded-full border-2 border-red-500 text-red-600 font-bold text-sm hover:bg-red-500 hover:text-white transition-all uppercase tracking-widest">
                         🆘 Ayuda Ahora
@@ -95,27 +106,28 @@
                     </a>
                 </div>
 
-                <!-- CONTROLES (SIEMPRE VISIBLES) -->
-                <div class="flex items-center gap-2 md:gap-3">
-                    <button onclick="toggleMusic()" id="music-btn" class="p-2 md:p-3 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 transition">
+                <!-- ICONOS PERSISTENTES (MÚSICA Y DARK MODE) -->
+                <div class="flex items-center gap-1 md:gap-3 border-l border-amber-500/10 pl-2 md:pl-4">
+                    <button onclick="toggleMusic()" id="music-btn" class="p-2 md:p-3 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:scale-110 transition shadow-inner">
                         <svg id="speaker-icon" class="w-5 h-5 md:w-6 md:h-6" fill="currentColor" viewBox="0 0 24 24"></svg>
                     </button>
-                    <button onclick="toggleDarkMode()" class="p-2 md:p-3 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 transition">
+                    <button onclick="toggleDarkMode()" class="p-2 md:p-3 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:scale-110 transition shadow-inner">
                         <svg class="w-5 h-5 md:w-6 md:h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"></path></svg>
                     </button>
-                    
-                    <!-- BOTÓN HAMBURGUESA MOBILE -->
-                    <button onclick="toggleMobileNav()" class="lg:hidden p-2 md:p-3 rounded-full bg-amber-600 text-white">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    <!-- BOTÓN HAMBURGUESA (SÓLO MOBILE) -->
+                    <button onclick="toggleMenu()" class="lg:hidden p-2 md:p-3 rounded-full bg-amber-600 text-white hover:bg-amber-500 transition shadow-lg">
+                        <svg id="menu-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                     </button>
                 </div>
             </div>
+        </div>
 
-            <!-- MENU DESPLEGABLE MOBILE -->
-            <div id="mobile-nav-container" class="lg:hidden flex flex-col gap-3">
-                <a href="crisis.html" class="w-full text-center py-4 rounded-2xl border-2 border-red-500 text-red-600 font-bold uppercase text-xs tracking-widest">🆘 Ayuda Ahora</a>
-                <a href="chat/index.html" class="w-full text-center py-4 rounded-2xl border border-amber-600 text-amber-600 font-bold uppercase text-xs tracking-widest">Chat Privado</a>
-                <a href="refugio.html" class="w-full text-center py-4 rounded-2xl bg-amber-600 text-white font-bold uppercase text-xs tracking-widest">Entrar al Refugio</a>
+        <!-- MENU MOBILE OVERLAY -->
+        <div id="mobile-menu" class="lg:hidden fixed inset-x-0 top-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border-b border-amber-500/20 pt-24 pb-10 px-6 z-[55] shadow-2xl">
+            <div class="flex flex-col gap-5">
+                <a href="crisis.html" class="w-full text-center py-5 rounded-3xl border-2 border-red-500 text-red-600 font-bold uppercase tracking-[0.2em] text-sm">🆘 Ayuda Ahora</a>
+                <a href="chat/index.html" class="w-full text-center py-5 rounded-3xl border border-amber-600 text-amber-600 font-bold uppercase tracking-[0.2em] text-sm">Chat Privado</a>
+                <a href="refugio.html" class="w-full text-center py-5 rounded-3xl bg-amber-600 text-white font-bold uppercase tracking-[0.2em] text-sm shadow-xl shadow-amber-600/20">Entrar al Refugio</a>
             </div>
         </div>
     </nav>
@@ -143,7 +155,7 @@
 
     <!-- LECTURA -->
     <main id="post-view" class="max-w-5xl mx-auto px-6 py-16 hidden-view relative z-10">
-        <button onclick="showHome()" class="mb-12 flex items-center text-amber-700 dark:text-amber-300 font-bold bg-amber-500/10 px-8 py-4 rounded-full hover:bg-amber-600 hover:text-white transition-all shadow-xl uppercase text-xs tracking-widest">← Regresar al Inicio</button>
+        <button onclick="showHome()" class="mb-12 flex items-center text-amber-700 dark:text-amber-300 font-bold bg-amber-500/10 px-8 py-4 rounded-full hover:bg-amber-600 hover:text-white transition-all shadow-xl uppercase text-xs tracking-widest">← Volver al Inicio</button>
         <article id="full-article-content" class="prose prose-slate dark:prose-invert lg:prose-2xl mx-auto"></article>
     </main>
 
@@ -158,8 +170,17 @@
     <script>
         const _supabase = supabase.createClient('https://jkhrpbpdewhkzgqqrwmp.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpraHJwYnBkZXdoa3pncXFyd21wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwOTI2NDEsImV4cCI6MjA4MTY2ODY0MX0.BHLSQr9HNu8xwSX-Q3smsNvmosHJMKrfLbYRmfOyUhE');
 
-        function toggleMobileNav() {
-            document.getElementById('mobile-nav-container').classList.toggle('open');
+        // --- MENU TOGGLE ---
+        function toggleMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const icon = document.getElementById('menu-icon');
+            menu.classList.toggle('active');
+            
+            if (menu.classList.contains('active')) {
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>';
+            } else {
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>';
+            }
         }
 
         // --- PARTICLE ENGINE ---
@@ -190,14 +211,16 @@
         function showHome() {
             document.getElementById('home-view').classList.remove('hidden-view');
             document.getElementById('post-view').classList.add('hidden-view');
-            document.getElementById('mobile-nav-container').classList.remove('open');
+            document.getElementById('mobile-menu').classList.remove('active');
             window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
+        // COMENTARIOS SUPABASE
         async function loadComments(postId) {
             const container = document.getElementById('comments-list');
             const { data, error } = await _supabase.from('comments').select('*').eq('post_id', postId).order('created_at', { ascending: false });
             if (error || !container) return;
+            
             container.innerHTML = data.length === 0 
                 ? '<p class="text-center opacity-30 italic py-10">Aún no hay reflexiones. Sé el primero en compartir.</p>' 
                 : data.map(c => `<div class="mb-6 p-8 rounded-[3rem] bg-amber-500/5 border border-amber-500/10 italic text-slate-700 dark:text-slate-300">"${c.content}"</div>`).join('');
@@ -230,7 +253,6 @@
                     ${post.content.$t}
                 </div>
 
-                <!-- ESPACIO DE REFLEXIÓN -->
                 <div class="mt-20 pt-16 border-t border-amber-500/20">
                     <div class="warm-card p-8 md:p-12 rounded-[4rem] shadow-2xl border border-amber-500/10">
                         <h3 class="text-3xl font-black mb-4 tracking-tighter italic text-amber-600">Espacio de <span class="text-amber-600">Reflexión</span></h3>
@@ -255,6 +277,7 @@
             
             document.getElementById('home-view').classList.add('hidden-view');
             document.getElementById('post-view').classList.remove('hidden-view');
+            document.getElementById('mobile-menu').classList.remove('active');
             window.scrollTo({top: 0, behavior: 'instant'});
             loadComments(post.id.$t);
         }
