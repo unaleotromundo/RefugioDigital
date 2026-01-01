@@ -22,7 +22,6 @@
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; scroll-behavior: smooth; overflow-x: hidden; }
 
-        /* SIDEBAR */
         .sidebar {
             position: fixed;
             top: 0;
@@ -92,7 +91,6 @@
             min-height: 100vh;
         }
 
-        /* MOBILE */
         @media (max-width: 1023px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -156,11 +154,78 @@
             height: 100%;
             object-fit: cover;
         }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 2rem;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2rem;
+            position: relative;
+        }
+        .dark .modal-content {
+            background: #1a1f2e;
+        }
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .modal-close:hover {
+            background: #f59e0b;
+            color: white;
+            transform: rotate(90deg);
+        }
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 1rem;
+            border: 2px solid rgba(245, 158, 11, 0.2);
+            background: rgba(255, 255, 255, 0.5);
+            transition: all 0.3s;
+        }
+        .dark .form-input {
+            background: rgba(15, 23, 42, 0.5);
+            color: white;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+        }
     </style>
 </head>
 <body class="bg-warmLight text-slate-800 dark:bg-warmDark dark:text-slate-100 transition-colors duration-1000">
 
-    <!-- SIDEBAR DESKTOP -->
     <aside id="sidebar" class="sidebar">
         <div class="sidebar-logo">
             <a href="index.html" class="flex items-center gap-3 group">
@@ -186,7 +251,7 @@
                 <span>Chat Privado</span>
             </a>
             <a href="refugio.html" class="sidebar-link text-slate-700 dark:text-slate-300">
-                <span class="text-xl">🛖</span>
+                <span class="text-xl">🛡️</span>
                 <span>El Refugio</span>
             </a>
             <a href="reflexiones.html" class="sidebar-link text-slate-700 dark:text-slate-300">
@@ -196,20 +261,14 @@
         </nav>
         
         <div class="sidebar-controls">
-            <button id="music-btn-sidebar" onclick="toggleMusic()" class="flex-1 p-3 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 transition">
-                <svg id="speaker-icon-sidebar" class="w-6 h-6 mx-auto" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
-                </svg>
-            </button>
             <button onclick="toggleDarkMode()" class="flex-1 p-3 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 transition">
                 <svg class="w-6 h-6 mx-auto" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+                    <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/>
                 </svg>
             </button>
         </div>
     </aside>
 
-    <!-- HEADER MOBILE -->
     <div class="mobile-header">
         <a href="index.html" class="flex items-center gap-2">
             <img src="https://jkhrpbpdewhkzgqqrwmp.supabase.co/storage/v1/object/public/imagenes/logo.png" alt="Logo" class="w-8 h-8 object-contain">
@@ -217,14 +276,9 @@
         </a>
         
         <div class="flex items-center gap-2">
-            <button id="music-btn-mobile" onclick="toggleMusic()" class="p-2 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400">
-                <svg id="speaker-icon-mobile" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
-                </svg>
-            </button>
             <button onclick="toggleDarkMode()" class="p-2 rounded-full bg-amber-500/10 text-amber-600">
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+                    <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/>
                 </svg>
             </button>
             <button onclick="toggleSidebar()" class="p-2 rounded-full bg-amber-600 text-white">
@@ -235,10 +289,8 @@
         </div>
     </div>
 
-    <!-- MAIN CONTENT -->
     <div class="main-content">
         <div class="max-w-7xl mx-auto px-6 py-16">
-            <!-- HEADER -->
             <header class="text-center mb-20">
                 <h1 class="text-5xl md:text-7xl font-black mb-6 tracking-tighter leading-tight">
                     Tesoros <span class="text-amber-600">Compartidos</span>
@@ -250,7 +302,6 @@
                 </p>
             </header>
 
-            <!-- FILTROS DE CATEGORÍA -->
             <div class="flex flex-wrap justify-center gap-4 mb-16">
                 <button onclick="filterCategory('todos')" class="category-pill active px-8 py-3 rounded-full font-bold text-sm uppercase tracking-widest bg-amber-500/10 text-amber-600 hover:bg-amber-600 hover:text-white">
                     Todos
@@ -269,9 +320,36 @@
                 </button>
             </div>
 
-            <!-- GRID DE RECOMENDACIONES -->
             <div id="recommendations-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                <!-- Las recomendaciones se generarán aquí -->
+            </div>
+
+            <div class="mt-10">
+                <article class="warm-card rounded-[3rem] overflow-hidden shadow-xl p-8 border-2 border-amber-500/30">
+                    <div class="text-center mb-8">
+                        <h3 class="font-black text-2xl mb-3 text-amber-600">¿Tienes algo que compartir?</h3>
+                        <p class="text-slate-600 dark:text-slate-400 text-sm">Comparte tu tesoro o agrega uno nuevo</p>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="warm-card rounded-2xl p-6 text-center hover:shadow-lg transition-all cursor-pointer" onclick="openUserSuggestion()">
+                            <div class="text-5xl mb-4">💡</div>
+                            <h4 class="font-bold text-lg mb-2">Sugiere una Recomendación</h4>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">Comparte contenido que te haya inspirado</p>
+                            <button class="px-6 py-2 bg-amber-500/20 text-amber-600 rounded-full font-bold text-sm hover:bg-amber-600 hover:text-white transition">
+                                Sugerir
+                            </button>
+                        </div>
+
+                        <div class="warm-card rounded-2xl p-6 text-center hover:shadow-lg transition-all cursor-pointer" onclick="openAdminAdd()">
+                            <div class="text-5xl mb-4">📝</div>
+                            <h4 class="font-bold text-lg mb-2">Agregar Recomendación</h4>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">Acceso de administrador</p>
+                            <button class="px-6 py-2 bg-amber-600 text-white rounded-full font-bold text-sm hover:bg-amber-700 transition">
+                                Administrar
+                            </button>
+                        </div>
+                    </div>
+                </article>
             </div>
         </div>
 
@@ -280,109 +358,128 @@
         </footer>
     </div>
 
+    <div id="userSuggestionModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-close" onclick="closeUserSuggestion()">✕</div>
+            <h3 class="font-black text-2xl mb-2 text-amber-600">Sugiere una Recomendación</h3>
+            <p class="text-sm text-slate-600 dark:text-slate-400 mb-6">Comparte algo que te haya inspirado</p>
+            
+            <form id="userSuggestionForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-bold mb-2">Tu Nombre (opcional)</label>
+                    <input type="text" id="userNameInput" class="form-input" placeholder="Anónimo">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold mb-2">Enlace *</label>
+                    <input type="url" id="userLinkInput" class="form-input" placeholder="https://..." required>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold mb-2">¿Por qué lo recomiendas? *</label>
+                    <textarea id="userMessageInput" class="form-input min-h-[120px]" placeholder="Cuéntame qué te gustó..." required></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold mb-2">Categoría *</label>
+                    <select id="userCategoryInput" class="form-input" required>
+                        <option value="">Selecciona una categoría</option>
+                        <option value="youtube">📺 YouTube</option>
+                        <option value="audiolibros">🎧 Audiolibros</option>
+                        <option value="peliculas">🎬 Películas</option>
+                        <option value="musica">🎵 Música</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full py-4 bg-amber-600 text-white rounded-xl font-bold hover:bg-amber-700 transition">
+                    Enviar Sugerencia ✨
+                </button>
+            </form>
+            <div id="userSuccessMessage" class="hidden mt-4 p-4 bg-green-500/20 text-green-700 dark:text-green-400 rounded-xl text-center font-bold">
+                ¡Gracias! Tu sugerencia ha sido enviada 💛
+            </div>
+        </div>
+    </div>
+
+    <div id="adminModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-close" onclick="closeAdminModal()">✕</div>
+            
+            <div id="adminLoginForm">
+                <h3 class="font-black text-2xl mb-2 text-amber-600">Acceso de Administrador</h3>
+                <p class="text-sm text-slate-600 dark:text-slate-400 mb-6">Ingresa la contraseña</p>
+                
+                <form onsubmit="verifyAdminPassword(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-bold mb-2">Contraseña</label>
+                        <input type="password" id="adminPasswordInput" class="form-input" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="w-full py-4 bg-amber-600 text-white rounded-xl font-bold hover:bg-amber-700 transition">
+                        Acceder 🔓
+                    </button>
+                </form>
+                <div id="adminErrorMessage" class="hidden mt-4 p-4 bg-red-500/20 text-red-700 dark:text-red-400 rounded-xl text-center font-bold">
+                    Contraseña incorrecta
+                </div>
+            </div>
+
+            <div id="adminAddForm" class="hidden">
+                <h3 class="font-black text-2xl mb-2 text-amber-600">Agregar Recomendación</h3>
+                <p class="text-sm text-slate-600 dark:text-slate-400 mb-6">Completa los datos</p>
+                
+                <form onsubmit="addRecommendation(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-bold mb-2">Enlace *</label>
+                        <input type="url" id="adminLinkInput" class="form-input" placeholder="https://..." required>
+                        <button type="button" onclick="fetchMetadata()" class="mt-2 text-sm text-amber-600 hover:text-amber-700 font-bold">
+                            🔍 Detectar información
+                        </button>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold mb-2">Título *</label>
+                        <input type="text" id="adminTitleInput" class="form-input" placeholder="Título" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold mb-2">Descripción *</label>
+                        <textarea id="adminDescInput" class="form-input min-h-[100px]" placeholder="Descripción..." required></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold mb-2">URL Imagen *</label>
+                        <input type="url" id="adminImageInput" class="form-input" placeholder="https://..." required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold mb-2">Categoría *</label>
+                        <select id="adminCategoryInput" class="form-input" required>
+                            <option value="">Selecciona</option>
+                            <option value="youtube">📺 YouTube</option>
+                            <option value="audiolibros">🎧 Audiolibros</option>
+                            <option value="peliculas">🎬 Películas</option>
+                            <option value="musica">🎵 Música</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="w-full py-4 bg-amber-600 text-white rounded-xl font-bold hover:bg-amber-700 transition">
+                        Publicar ✨
+                    </button>
+                </form>
+                <div id="adminSuccessMessage" class="hidden mt-4 p-4 bg-green-500/20 text-green-700 dark:text-green-400 rounded-xl text-center font-bold">
+                    ¡Agregada! 🎉
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        const recommendations = [
-            // YOUTUBE
-            {
-                title: "Sabiduría Tolteca",
-                category: "youtube",
-                description: "Enseñanzas ancestrales de la tradición tolteca para encontrar la libertad personal y el despertar espiritual.",
-                image: "https://i.ytimg.com/vi/VY_72DUZXaw/maxresdefault.jpg",
-                link: "https://www.youtube.com/watch?v=VY_72DUZXaw"
-            },
-            {
-                title: "¿Ego o esencia? - El Sendero",
-                category: "youtube",
-                description: "Una profunda reflexión sobre la diferencia entre vivir desde el ego o desde nuestra verdadera esencia.",
-                image: "https://i.ytimg.com/vi/vM3WzLpnGso/maxresdefault.jpg",
-                link: "https://www.youtube.com/watch?v=vM3WzLpnGso"
-            },
-            {
-                title: "Mejora tu visión - Dr. La Rosa",
-                category: "youtube",
-                description: "Técnicas y ejercicios naturales para mejorar la salud visual y recuperar la visión de forma natural.",
-                image: "https://i.ytimg.com/vi/TtBOHvaw5pQ/maxresdefault.jpg",
-                link: "https://www.youtube.com/watch?v=TtBOHvaw5pQ"
-            },
-            {
-                title: "Cambia tu vida - César Lozano",
-                category: "youtube",
-                description: "Herramientas prácticas de desarrollo personal para transformar tu vida y alcanzar la felicidad.",
-                image: "https://i.ytimg.com/vi/hp9vSh0IY9U/maxresdefault.jpg",
-                link: "https://www.youtube.com/watch?v=hp9vSh0IY9U"
-            },
-            {
-                title: "Mejora tu energía - Javier Furman",
-                category: "youtube",
-                description: "Aprende a gestionar y elevar tu energía vital para vivir con más vitalidad y propósito.",
-                image: "https://i.ytimg.com/vi/TTBlZbyUVsA/maxresdefault.jpg",
-                link: "https://www.youtube.com/watch?v=TTBlZbyUVsA"
-            },
-            {
-                title: "11 pasos de la magia - J.L.Parise",
-                category: "youtube",
-                description: "Los pasos fundamentales para crear la vida que deseas mediante el poder de la intención consciente.",
-                image: "https://jkhrpbpdewhkzgqqrwmp.supabase.co/storage/v1/object/public/imagenes/11-pasos-magia.png",
-                link: "https://www.youtube.com/watch?v=wFWSJrrDG_Y"
-            },
-            {
-                title: "Cada uno a su ritmo - Natalia L.",
-                category: "youtube",
-                description: "Un mensaje hermoso sobre respetar los tiempos personales y el proceso único de cada ser.",
-                image: "https://i.ytimg.com/vi/JpMq92fS6Z8/maxresdefault.jpg",
-                link: "https://www.youtube.com/watch?v=JpMq92fS6Z8"
-            },
-
-            // AUDIOLIBROS
-            {
-                title: "El lobo estepario",
-                category: "audiolibros",
-                description: "La obra maestra de Hermann Hesse sobre la dualidad humana y la búsqueda de uno mismo.",
-                image: "https://i.ytimg.com/vi/bNaatMgkDeA/maxresdefault.jpg",
-                link: "https://www.youtube.com/watch?v=bNaatMgkDeA"
-            },
-            {
-                title: "Las enseñanzas de Don Juan",
-                category: "audiolibros",
-                description: "Carlos Castaneda nos lleva a un viaje chamánico de conocimiento y transformación personal.",
-                image: "https://jkhrpbpdewhkzgqqrwmp.supabase.co/storage/v1/object/public/imagenes/don-juan.png",
-                link: "https://www.youtube.com/watch?v=vR5Mjwan8DU"
-            },
-
-            // PELÍCULAS
-            {
-                title: "Vuelve al Origen",
-                category: "peliculas",
-                description: "Un viaje cinematográfico hacia el reencuentro con nuestra verdadera naturaleza y propósito.",
-                image: "https://i.ytimg.com/vi/RhzhbgaUnws/maxresdefault.jpg",
-                link: "https://www.youtube.com/watch?v=RhzhbgaUnws"
-            },
-            {
-                title: "Las 9 revelaciones",
-                category: "peliculas",
-                description: "Una aventura espiritual basada en el bestseller sobre las verdades universales de la existencia.",
-                image: "https://i.ytimg.com/vi/gTUToI6fnuU/maxresdefault.jpg",
-                link: "https://www.youtube.com/watch?v=gTUToI6fnuU"
-            },
-
-            // MÚSICA
-            {
-                title: "Corazón es lo único que tengo - Cantos al Corazón",
-                category: "musica",
-                description: "Música que toca el alma y nos conecta con la esencia más profunda del amor.",
-                image: "https://i.ytimg.com/vi/Y2Y7n4v2kAA/maxresdefault.jpg",
-                link: "https://www.youtube.com/watch?v=Y2Y7n4v2kAA"
-            },
-            {
-                title: "Deftones/Team Sleep/Crosses Mix",
-                category: "musica",
-                description: "Una mezcla hipnótica de sonidos alternativos para la introspección y el viaje interior.",
-                image: "https://i.ytimg.com/vi/pPV_wDCIA_E/maxresdefault.jpg",
-                link: "https://www.youtube.com/watch?v=pPV_wDCIA_E"
-            }
-        ];
-
+        const SUPABASE_URL = 'https://jkhrpbpdewhkzgqqrwmp.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpraHJwYnBkZXdoa3pncXFyd21wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwOTI2NDEsImV4cCI6MjA4MTY2ODY0MX0.BHLSQr9HNu8xwSX-Q3smsNvmosHJMKrfLbYRmfOyUhE';
+        
+        let supabaseClient = null;
+        let recommendations = [];
         let currentFilter = 'todos';
+        
+        try {
+            const { createClient } = supabase;
+            supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+            console.log('✅ Supabase inicializado');
+        } catch (error) {
+            console.error('❌ Error Supabase:', error);
+        }
 
         function renderRecommendations() {
             const grid = document.getElementById('recommendations-grid');
@@ -424,12 +521,10 @@
 
         function filterCategory(category) {
             currentFilter = category;
-            
             document.querySelectorAll('.category-pill').forEach(pill => {
                 pill.classList.remove('active');
             });
             event.target.classList.add('active');
-            
             renderRecommendations();
         }
 
@@ -439,19 +534,195 @@
 
         function toggleDarkMode() {
             document.documentElement.classList.toggle('dark');
-            localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+            localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark'
+: 'light';
         }
 
-        // Dark mode
         if (localStorage.theme === 'dark') {
             document.documentElement.classList.add('dark');
         }
 
-        // Initial render
-        renderRecommendations();
-    </script>
+        async function loadRecommendationsFromDB() {
+            if (!supabaseClient) {
+                console.log('📦 Supabase no configurado');
+                return;
+            }
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from('recommendations_admin')
+                    .select('*')
+                    .order('created_at', { ascending: false });
 
-    <!-- Reproductor de música global -->
-    <script src="music-player.js"></script>
+                if (error) throw error;
+
+                if (data && data.length > 0) {
+                    recommendations = data;
+                    console.log(`✅ ${data.length} recomendaciones cargadas`);
+                }
+                renderRecommendations();
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        loadRecommendationsFromDB();
+
+        function openUserSuggestion() {
+            document.getElementById('userSuggestionModal').classList.add('active');
+        }
+
+        function closeUserSuggestion() {
+            document.getElementById('userSuggestionModal').classList.remove('active');
+            document.getElementById('userSuggestionForm').reset();
+            document.getElementById('userSuccessMessage').classList.add('hidden');
+        }
+
+        function openAdminAdd() {
+            document.getElementById('adminModal').classList.add('active');
+        }
+
+        function closeAdminModal() {
+            document.getElementById('adminModal').classList.remove('active');
+            document.getElementById('adminLoginForm').classList.remove('hidden');
+            document.getElementById('adminAddForm').classList.add('hidden');
+            document.getElementById('adminPasswordInput').value = '';
+            document.getElementById('adminErrorMessage').classList.add('hidden');
+        }
+
+        function verifyAdminPassword(event) {
+            event.preventDefault();
+            const password = document.getElementById('adminPasswordInput').value;
+            
+            if (password === 'Maljut') {
+                document.getElementById('adminLoginForm').classList.add('hidden');
+                document.getElementById('adminAddForm').classList.remove('hidden');
+            } else {
+                document.getElementById('adminErrorMessage').classList.remove('hidden');
+                setTimeout(() => {
+                    document.getElementById('adminErrorMessage').classList.add('hidden');
+                }, 3000);
+            }
+        }
+
+        async function fetchMetadata() {
+            const link = document.getElementById('adminLinkInput').value;
+            if (!link) {
+                alert('Ingresa un enlace primero');
+                return;
+            }
+
+            const button = event.target;
+            button.innerHTML = '🔄 Detectando...';
+            button.disabled = true;
+
+            try {
+                const youtubeRegex = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/;
+                const match = link.match(youtubeRegex);
+                
+                if (match) {
+                    const videoId = match[1];
+                    const oEmbedUrl = `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`;
+                    const response = await fetch(oEmbedUrl);
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        document.getElementById('adminTitleInput').value = data.title || '';
+                        document.getElementById('adminDescInput').value = data.author_name ? `Video de ${data.author_name}` : '';
+                        document.getElementById('adminImageInput').value = `https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`;
+                        alert('✅ Información detectada');
+                    }
+                } else {
+                    alert('⚠️ Completa manualmente para enlaces no-YouTube');
+                }
+            } catch (error) {
+                alert('⚠️ Error al detectar. Completa manualmente.');
+            } finally {
+                button.innerHTML = '🔍 Detectar información';
+                button.disabled = false;
+            }
+        }
+
+        document.getElementById('userSuggestionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!supabaseClient) {
+                alert('⚠️ Supabase no configurado');
+                return;
+            }
+            
+            const suggestion = {
+                title: 'Sugerencia de ' + (document.getElementById('userNameInput').value || 'Anónimo'),
+                link: document.getElementById('userLinkInput').value,
+                description: document.getElementById('userMessageInput').value,
+                category: document.getElementById('userCategoryInput').value,
+                status: 'pending',
+                user_email: document.getElementById('userNameInput').value || 'Anónimo'
+            };
+
+            try {
+                const { error } = await supabaseClient
+                    .from('recommendations_suggestions')
+                    .insert([suggestion]);
+
+                if (error) throw error;
+
+                document.getElementById('userSuggestionForm').reset();
+                document.getElementById('userSuccessMessage').classList.remove('hidden');
+                
+                setTimeout(() => {
+                    closeUserSuggestion();
+                }, 2000);
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        });
+
+        async function addRecommendation(event) {
+            event.preventDefault();
+            
+            if (!supabaseClient) {
+                alert('⚠️ Supabase no configurado');
+                return;
+            }
+            
+            const newRec = {
+                title: document.getElementById('adminTitleInput').value,
+                category: document.getElementById('adminCategoryInput').value,
+                description: document.getElementById('adminDescInput').value,
+                image: document.getElementById('adminImageInput').value,
+                link: document.getElementById('adminLinkInput').value
+            };
+
+            try {
+                const { error } = await supabaseClient
+                    .from('recommendations_admin')
+                    .insert([newRec]);
+
+                if (error) throw error;
+
+                recommendations.push(newRec);
+                renderRecommendations();
+
+                document.getElementById('adminSuccessMessage').classList.remove('hidden');
+                
+                setTimeout(() => {
+                    closeAdminModal();
+                    document.getElementById('adminSuccessMessage').classList.add('hidden');
+                    event.target.reset();
+                }, 2000);
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        document.querySelectorAll('.modal-overlay').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+        });
+    </script>
 </body>
 </html>

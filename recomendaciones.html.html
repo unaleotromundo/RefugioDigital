@@ -156,6 +156,75 @@
             height: 100%;
             object-fit: cover;
         }
+
+        /* MODALES */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 2rem;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2rem;
+            position: relative;
+        }
+        .dark .modal-content {
+            background: #1a1f2e;
+        }
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .modal-close:hover {
+            background: #f59e0b;
+            color: white;
+            transform: rotate(90deg);
+        }
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 1rem;
+            border: 2px solid rgba(245, 158, 11, 0.2);
+            background: rgba(255, 255, 255, 0.5);
+            transition: all 0.3s;
+        }
+        .dark .form-input {
+            background: rgba(15, 23, 42, 0.5);
+            color: white;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+        }
     </style>
 </head>
 <body class="bg-warmLight text-slate-800 dark:bg-warmDark dark:text-slate-100 transition-colors duration-1000">
@@ -186,7 +255,7 @@
                 <span>Chat Privado</span>
             </a>
             <a href="refugio.html" class="sidebar-link text-slate-700 dark:text-slate-300">
-                <span class="text-xl">🛖</span>
+                <span class="text-xl">🛡️</span>
                 <span>El Refugio</span>
             </a>
             <a href="reflexiones.html" class="sidebar-link text-slate-700 dark:text-slate-300">
@@ -263,6 +332,38 @@
             <div id="recommendations-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                 <!-- Las recomendaciones se generarán aquí -->
             </div>
+
+            <!-- TARJETA ESPECIAL PARA AGREGAR RECOMENDACIONES -->
+            <div class="mt-10">
+                <article class="warm-card rounded-[3rem] overflow-hidden shadow-xl p-8 border-2 border-amber-500/30">
+                    <div class="text-center mb-8">
+                        <h3 class="font-black text-2xl mb-3 text-amber-600">¿Tienes algo que compartir?</h3>
+                        <p class="text-slate-600 dark:text-slate-400 text-sm">Comparte tu tesoro o agrega uno nuevo</p>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <!-- Botón para usuarios: Sugerir recomendación -->
+                        <div class="warm-card rounded-2xl p-6 text-center hover:shadow-lg transition-all cursor-pointer" onclick="openUserSuggestion()">
+                            <div class="text-5xl mb-4">💡</div>
+                            <h4 class="font-bold text-lg mb-2">Sugiere una Recomendación</h4>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">Comparte contenido que te haya inspirado</p>
+                            <button class="px-6 py-2 bg-amber-500/20 text-amber-600 rounded-full font-bold text-sm hover:bg-amber-600 hover:text-white transition">
+                                Sugerir
+                            </button>
+                        </div>
+
+                        <!-- Botón para admin: Agregar recomendación -->
+                        <div class="warm-card rounded-2xl p-6 text-center hover:shadow-lg transition-all cursor-pointer" onclick="openAdminAdd()">
+                            <div class="text-5xl mb-4">🔐</div>
+                            <h4 class="font-bold text-lg mb-2">Agregar Recomendación</h4>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">Acceso de administrador</p>
+                            <button class="px-6 py-2 bg-amber-600 text-white rounded-full font-bold text-sm hover:bg-amber-700 transition">
+                                Administrar
+                            </button>
+                        </div>
+                    </div>
+                </article>
+            </div>
         </div>
 
         <footer class="py-32 text-center opacity-40">
@@ -270,108 +371,134 @@
         </footer>
     </div>
 
+    <!-- MODAL PARA SUGERENCIAS DE USUARIOS -->
+    <div id="userSuggestionModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-close" onclick="closeUserSuggestion()">✕</div>
+            <h3 class="font-black text-2xl mb-2 text-amber-600">Sugiere una Recomendación</h3>
+            <p class="text-sm text-slate-600 dark:text-slate-400 mb-6">Comparte algo que te haya inspirado y lo revisaré personalmente</p>
+            
+            <form id="userSuggestionForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-bold mb-2">Tu Nombre (opcional)</label>
+                    <input type="text" id="userNameInput" class="form-input" placeholder="Anónimo">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold mb-2">Enlace de tu recomendación *</label>
+                    <input type="url" id="userLinkInput" class="form-input" placeholder="https://..." required>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold mb-2">¿Por qué lo recomiendas? *</label>
+                    <textarea id="userMessageInput" class="form-input min-h-[120px]" placeholder="Cuéntame qué te gustó de esto..." required></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold mb-2">Categoría *</label>
+                    <select id="userCategoryInput" class="form-input" required>
+                        <option value="">Selecciona una categoría</option>
+                        <option value="youtube">📺 YouTube</option>
+                        <option value="audiolibros">🎧 Audiolibros</option>
+                        <option value="peliculas">🎬 Películas</option>
+                        <option value="musica">🎵 Música</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full py-4 bg-amber-600 text-white rounded-xl font-bold hover:bg-amber-700 transition">
+                    Enviar Sugerencia ✨
+                </button>
+            </form>
+            <div id="userSuccessMessage" class="hidden mt-4 p-4 bg-green-500/20 text-green-700 dark:text-green-400 rounded-xl text-center font-bold">
+                ¡Gracias! Tu sugerencia ha sido enviada 💛
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PARA ADMINISTRADOR -->
+    <div id="adminModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-close" onclick="closeAdminModal()">✕</div>
+            
+            <div id="adminLoginForm">
+                <h3 class="font-black text-2xl mb-2 text-amber-600">Acceso de Administrador</h3>
+                <p class="text-sm text-slate-600 dark:text-slate-400 mb-6">Ingresa la contraseña para continuar</p>
+                
+                <form onsubmit="verifyAdminPassword(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-bold mb-2">Contraseña</label>
+                        <input type="password" id="adminPasswordInput" class="form-input" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="w-full py-4 bg-amber-600 text-white rounded-xl font-bold hover:bg-amber-700 transition">
+                        Acceder 🔐
+                    </button>
+                </form>
+                <div id="adminErrorMessage" class="hidden mt-4 p-4 bg-red-500/20 text-red-700 dark:text-red-400 rounded-xl text-center font-bold">
+                    Contraseña incorrecta
+                </div>
+            </div>
+
+            <div id="adminAddForm" class="hidden">
+                <h3 class="font-black text-2xl mb-2 text-amber-600">Agregar Recomendación</h3>
+                <p class="text-sm text-slate-600 dark:text-slate-400 mb-6">Completa los datos de la nueva recomendación</p>
+                
+                <form onsubmit="addRecommendation(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-bold mb-2">Enlace *</label>
+                        <input type="url" id="adminLinkInput" class="form-input" placeholder="https://..." required>
+                        <button type="button" onclick="fetchMetadata()" class="mt-2 text-sm text-amber-600 hover:text-amber-700 font-bold">
+                            🔍 Detectar información del enlace
+                        </button>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold mb-2">Título *</label>
+                        <input type="text" id="adminTitleInput" class="form-input" placeholder="Título de la recomendación" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold mb-2">Descripción *</label>
+                        <textarea id="adminDescInput" class="form-input min-h-[100px]" placeholder="Breve descripción..." required></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold mb-2">URL de la Imagen *</label>
+                        <input type="url" id="adminImageInput" class="form-input" placeholder="https://..." required>
+                        <p class="text-xs text-slate-500 mt-1">Se detectará automáticamente si es un enlace de YouTube</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold mb-2">Categoría *</label>
+                        <select id="adminCategoryInput" class="form-input" required>
+                            <option value="">Selecciona una categoría</option>
+                            <option value="youtube">📺 YouTube</option>
+                            <option value="audiolibros">🎧 Audiolibros</option>
+                            <option value="peliculas">🎬 Películas</option>
+                            <option value="musica">🎵 Música</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="w-full py-4 bg-amber-600 text-white rounded-xl font-bold hover:bg-amber-700 transition">
+                        Publicar Recomendación ✨
+                    </button>
+                </form>
+                <div id="adminSuccessMessage" class="hidden mt-4 p-4 bg-green-500/20 text-green-700 dark:text-green-400 rounded-xl text-center font-bold">
+                    ¡Recomendación agregada exitosamente! 🎉
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        const recommendations = [
-            // YOUTUBE
-            {
-                title: "Sabiduría Tolteca",
-                category: "youtube",
-                description: "Enseñanzas ancestrales de la tradición tolteca para encontrar la libertad personal y el despertar espiritual.",
-                image: "https://i.ytimg.com/vi/VY_72DUZXaw/maxresdefault.jpg",
-                link: "https://www.youtube.com/watch?v=VY_72DUZXaw"
-            },
-            {
-                title: "¿Ego o esencia? - El Sendero",
-                category: "youtube",
-                description: "Una profunda reflexión sobre la diferencia entre vivir desde el ego o desde nuestra verdadera esencia.",
-                image: "https://i.ytimg.com/vi/vM3WzLpnGso/maxresdefault.jpg",
-                link: "https://www.youtube.com/watch?v=vM3WzLpnGso"
-            },
-            {
-                title: "Mejora tu visión - Dr. La Rosa",
-                category: "youtube",
-                description: "Técnicas y ejercicios naturales para mejorar la salud visual y recuperar la visión de forma natural.",
-                image: "https://i.ytimg.com/vi/TtBOHvaw5pQ/maxresdefault.jpg",
-                link: "https://www.youtube.com/watch?v=TtBOHvaw5pQ"
-            },
-            {
-                title: "Cambia tu vida - César Lozano",
-                category: "youtube",
-                description: "Herramientas prácticas de desarrollo personal para transformar tu vida y alcanzar la felicidad.",
-                image: "https://i.ytimg.com/vi/hp9vSh0IY9U/maxresdefault.jpg",
-                link: "https://www.youtube.com/watch?v=hp9vSh0IY9U"
-            },
-            {
-                title: "Mejora tu energía - Javier Furman",
-                category: "youtube",
-                description: "Aprende a gestionar y elevar tu energía vital para vivir con más vitalidad y propósito.",
-                image: "https://i.ytimg.com/vi/TTBlZbyUVsA/maxresdefault.jpg",
-                link: "https://www.youtube.com/watch?v=TTBlZbyUVsA"
-            },
-            {
-                title: "11 pasos de la magia - J.L.Parise",
-                category: "youtube",
-                description: "Los pasos fundamentales para crear la vida que deseas mediante el poder de la intención consciente.",
-                image: "https://jkhrpbpdewhkzgqqrwmp.supabase.co/storage/v1/object/public/imagenes/11-pasos-magia.png",
-                link: "https://www.youtube.com/watch?v=wFWSJrrDG_Y"
-            },
-            {
-                title: "Cada uno a su ritmo - Natalia L.",
-                category: "youtube",
-                description: "Un mensaje hermoso sobre respetar los tiempos personales y el proceso único de cada ser.",
-                image: "https://i.ytimg.com/vi/JpMq92fS6Z8/maxresdefault.jpg",
-                link: "https://www.youtube.com/watch?v=JpMq92fS6Z8"
-            },
+        // Configuración de Supabase
+        const SUPABASE_URL = 'https://jkhrpbpdewhkzgqqrwmp.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpraHJwYnBkZXdoa3pncXFyd21wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwOTI2NDEsImV4cCI6MjA4MTY2ODY0MX0.BHLSQr9HNu8xwSX-Q3smsNvmosHJMKrfLbYRmfOyUhE';
+        
+        let supabaseClient = null;
+        
+        // Inicializar Supabase
+        try {
+            const { createClient } = supabase;
+            supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+            console.log('✅ Supabase inicializado correctamente');
+        } catch (error) {
+            console.error('❌ Error al inicializar Supabase:', error);
+        }
 
-            // AUDIOLIBROS
-            {
-                title: "El lobo estepario",
-                category: "audiolibros",
-                description: "La obra maestra de Hermann Hesse sobre la dualidad humana y la búsqueda de uno mismo.",
-                image: "https://i.ytimg.com/vi/bNaatMgkDeA/maxresdefault.jpg",
-                link: "https://www.youtube.com/watch?v=bNaatMgkDeA"
-            },
-            {
-                title: "Las enseñanzas de Don Juan",
-                category: "audiolibros",
-                description: "Carlos Castaneda nos lleva a un viaje chamánico de conocimiento y transformación personal.",
-                image: "https://jkhrpbpdewhkzgqqrwmp.supabase.co/storage/v1/object/public/imagenes/don-juan.png",
-                link: "https://www.youtube.com/watch?v=vR5Mjwan8DU"
-            },
-
-            // PELÍCULAS
-            {
-                title: "Vuelve al Origen",
-                category: "peliculas",
-                description: "Un viaje cinematográfico hacia el reencuentro con nuestra verdadera naturaleza y propósito.",
-                image: "https://i.ytimg.com/vi/RhzhbgaUnws/maxresdefault.jpg",
-                link: "https://www.youtube.com/watch?v=RhzhbgaUnws"
-            },
-            {
-                title: "Las 9 revelaciones",
-                category: "peliculas",
-                description: "Una aventura espiritual basada en el bestseller sobre las verdades universales de la existencia.",
-                image: "https://i.ytimg.com/vi/gTUToI6fnuU/maxresdefault.jpg",
-                link: "https://www.youtube.com/watch?v=gTUToI6fnuU"
-            },
-
-            // MÚSICA
-            {
-                title: "Corazón es lo único que tengo - Cantos al Corazón",
-                category: "musica",
-                description: "Música que toca el alma y nos conecta con la esencia más profunda del amor.",
-                image: "https://i.ytimg.com/vi/Y2Y7n4v2kAA/maxresdefault.jpg",
-                link: "https://www.youtube.com/watch?v=Y2Y7n4v2kAA"
-            },
-            {
-                title: "Deftones/Team Sleep/Crosses Mix",
-                category: "musica",
-                description: "Una mezcla hipnótica de sonidos alternativos para la introspección y el viaje interior.",
-                image: "https://i.ytimg.com/vi/pPV_wDCIA_E/maxresdefault.jpg",
-                link: "https://www.youtube.com/watch?v=pPV_wDCIA_E"
-            }
-        ];
-
+        // Array de recomendaciones (se llenará desde Supabase)
+        const recommendations = [];
         let currentFilter = 'todos';
 
         function renderRecommendations() {
@@ -393,52 +520,4 @@
                         <div class="thumbnail-container">
                             <img src="${rec.image}" alt="${rec.title}" class="group-hover:scale-110 transition duration-1000" onerror="this.src='https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800'">
                             <div class="absolute top-4 right-4 bg-amber-600 text-white px-4 py-2 rounded-full text-xs font-bold uppercase shadow-lg">
-                                ${categoryLabels[rec.category]}
-                            </div>
-                        </div>
-                        <div class="p-8">
-                            <h3 class="font-black text-xl mb-4 group-hover:text-amber-600 transition-colors duration-500 leading-tight">
-                                ${rec.title}
-                            </h3>
-                            <p class="text-slate-600 dark:text-slate-400 text-sm mb-6 leading-relaxed">
-                                ${rec.description}
-                            </p>
-                            <span class="inline-flex items-center gap-2 text-amber-600 font-bold text-xs uppercase tracking-widest group-hover:gap-4 transition-all">
-                                Ver ahora → 
-                            </span>
-                        </div>
-                    </a>
-                </article>
-            `).join('');
-        }
-
-        function filterCategory(category) {
-            currentFilter = category;
-            
-            document.querySelectorAll('.category-pill').forEach(pill => {
-                pill.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            
-            renderRecommendations();
-        }
-
-        function toggleSidebar() { 
-            document.getElementById('sidebar').classList.toggle('open'); 
-        }
-
-        function toggleDarkMode() {
-            document.documentElement.classList.toggle('dark');
-            localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
-        }
-
-        // Dark mode
-        if (localStorage.theme === 'dark') {
-            document.documentElement.classList.add('dark');
-        }
-
-        // Initial render
-        renderRecommendations();
-    </script>
-</body>
-</html>
+                                

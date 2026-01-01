@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recomendaciones | Tu Refugio Digital</title>
+    <link rel="icon" type="image/png" href="https://jkhrpbpdewhkzgqqrwmp.supabase.co/storage/v1/object/public/imagenes/logo.png">
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     
@@ -19,7 +20,110 @@
     </script>
 
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; scroll-behavior: smooth; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; scroll-behavior: smooth; overflow-x: hidden; }
+
+        /* SIDEBAR */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 280px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(245, 158, 11, 0.1);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem 1.5rem;
+            transition: transform 0.3s ease;
+        }
+        .dark .sidebar {
+            background: rgba(8, 10, 15, 0.95);
+            border-right-color: rgba(245, 158, 11, 0.05);
+        }
+        
+        .sidebar-logo {
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid rgba(245, 158, 11, 0.1);
+        }
+        
+        .sidebar-nav {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .sidebar-link {
+            padding: 1rem 1.25rem;
+            border-radius: 1rem;
+            font-weight: 700;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .sidebar-link:hover {
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+            transform: translateX(5px);
+        }
+        
+        .sidebar-link.active {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .sidebar-controls {
+            padding-top: 2rem;
+            border-top: 1px solid rgba(245, 158, 11, 0.1);
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .main-content {
+            margin-left: 280px;
+            min-height: 100vh;
+        }
+
+        /* MOBILE */
+        @media (max-width: 1023px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .mobile-header {
+                display: flex !important;
+            }
+        }
+        
+        .mobile-header {
+            display: none;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(245, 158, 11, 0.1);
+            padding: 1rem 1.5rem;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .dark .mobile-header {
+            background: rgba(8, 10, 15, 0.95);
+        }
+
         .warm-card { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(20px); border: 1px solid rgba(251, 191, 36, 0.1); }
         .dark .warm-card { background: rgba(15, 23, 42, 0.4); border-color: rgba(251, 191, 36, 0.05); }
         
@@ -56,42 +160,124 @@
 </head>
 <body class="bg-warmLight text-slate-800 dark:bg-warmDark dark:text-slate-100 transition-colors duration-1000">
 
-    <div class="max-w-7xl mx-auto px-6 py-16">
-        <!-- HEADER -->
-        <header class="text-center mb-20">
-            <h1 class="text-5xl md:text-7xl font-black mb-6 tracking-tighter leading-tight">
-                Tesoros <span class="text-amber-600">Compartidos</span>
-            </h1>
-            <div class="h-1.5 w-32 bg-amber-500 mx-auto rounded-full mb-8"></div>
-            <p class="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto font-light italic">
-                Una colección curada de contenido que ha iluminado mi camino. 
-                Espero que también ilumine el tuyo.
-            </p>
-        </header>
-
-        <!-- FILTROS DE CATEGORÍA -->
-        <div class="flex flex-wrap justify-center gap-4 mb-16">
-            <button onclick="filterCategory('todos')" class="category-pill active px-8 py-3 rounded-full font-bold text-sm uppercase tracking-widest bg-amber-500/10 text-amber-600 hover:bg-amber-600 hover:text-white">
-                Todos
+    <!-- SIDEBAR DESKTOP -->
+    <aside id="sidebar" class="sidebar">
+        <div class="sidebar-logo">
+            <a href="index.html" class="flex items-center gap-3 group">
+                <img src="https://jkhrpbpdewhkzgqqrwmp.supabase.co/storage/v1/object/public/imagenes/logo.png" alt="Logo" class="w-12 h-12 object-contain group-hover:rotate-12 transition">
+                <div class="flex flex-col items-start">
+                    <span class="text-lg font-black tracking-tighter text-amber-600 uppercase leading-tight">TU REFUGIO</span>
+                    <span class="text-lg font-black tracking-tighter text-slate-900 dark:text-white italic leading-tight">DIGITAL</span>
+                </div>
+            </a>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="crisis.html" class="sidebar-link text-red-600 hover:text-red-600">
+                <span class="text-xl">🆘</span>
+                <span>Ayuda Ahora</span>
+            </a>
+            <a href="recomendaciones.html" class="sidebar-link active">
+                <span class="text-xl">✨</span>
+                <span>Recomendaciones</span>
+            </a>
+            <a href="chat/index.html" class="sidebar-link text-slate-700 dark:text-slate-300">
+                <span class="text-xl">💬</span>
+                <span>Chat Privado</span>
+            </a>
+            <a href="refugio.html" class="sidebar-link text-slate-700 dark:text-slate-300">
+                <span class="text-xl">🛖</span>
+                <span>El Refugio</span>
+            </a>
+            <a href="reflexiones.html" class="sidebar-link text-slate-700 dark:text-slate-300">
+                <span class="text-xl">📝</span>
+                <span>Reflexiones</span>
+            </a>
+        </nav>
+        
+        <div class="sidebar-controls">
+            <button id="music-btn-sidebar" onclick="toggleMusic()" class="flex-1 p-3 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 transition">
+                <svg id="speaker-icon-sidebar" class="w-6 h-6 mx-auto" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                </svg>
             </button>
-            <button onclick="filterCategory('youtube')" class="category-pill px-8 py-3 rounded-full font-bold text-sm uppercase tracking-widest bg-amber-500/10 text-amber-600 hover:bg-amber-600 hover:text-white">
-                📺 YouTube
-            </button>
-            <button onclick="filterCategory('audiolibros')" class="category-pill px-8 py-3 rounded-full font-bold text-sm uppercase tracking-widest bg-amber-500/10 text-amber-600 hover:bg-amber-600 hover:text-white">
-                🎧 Audiolibros
-            </button>
-            <button onclick="filterCategory('peliculas')" class="category-pill px-8 py-3 rounded-full font-bold text-sm uppercase tracking-widest bg-amber-500/10 text-amber-600 hover:bg-amber-600 hover:text-white">
-                🎬 Películas
-            </button>
-            <button onclick="filterCategory('musica')" class="category-pill px-8 py-3 rounded-full font-bold text-sm uppercase tracking-widest bg-amber-500/10 text-amber-600 hover:bg-amber-600 hover:text-white">
-                🎵 Música
+            <button onclick="toggleDarkMode()" class="flex-1 p-3 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 transition">
+                <svg class="w-6 h-6 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+                </svg>
             </button>
         </div>
+    </aside>
 
-        <!-- GRID DE RECOMENDACIONES -->
-        <div id="recommendations-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-            <!-- Las recomendaciones se generarán aquí -->
+    <!-- HEADER MOBILE -->
+    <div class="mobile-header">
+        <a href="index.html" class="flex items-center gap-2">
+            <img src="https://jkhrpbpdewhkzgqqrwmp.supabase.co/storage/v1/object/public/imagenes/logo.png" alt="Logo" class="w-8 h-8 object-contain">
+            <span class="text-lg font-black tracking-tighter text-amber-600 uppercase">TU REFUGIO</span>
+        </a>
+        
+        <div class="flex items-center gap-2">
+            <button id="music-btn-mobile" onclick="toggleMusic()" class="p-2 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                <svg id="speaker-icon-mobile" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                </svg>
+            </button>
+            <button onclick="toggleDarkMode()" class="p-2 rounded-full bg-amber-500/10 text-amber-600">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+                </svg>
+            </button>
+            <button onclick="toggleSidebar()" class="p-2 rounded-full bg-amber-600 text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
         </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <div class="max-w-7xl mx-auto px-6 py-16">
+            <!-- HEADER -->
+            <header class="text-center mb-20">
+                <h1 class="text-5xl md:text-7xl font-black mb-6 tracking-tighter leading-tight">
+                    Tesoros <span class="text-amber-600">Compartidos</span>
+                </h1>
+                <div class="h-1.5 w-32 bg-amber-500 mx-auto rounded-full mb-8"></div>
+                <p class="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto font-light italic">
+                    Una colección curada de contenido que ha iluminado mi camino. 
+                    Espero que también ilumine el tuyo.
+                </p>
+            </header>
+
+            <!-- FILTROS DE CATEGORÍA -->
+            <div class="flex flex-wrap justify-center gap-4 mb-16">
+                <button onclick="filterCategory('todos')" class="category-pill active px-8 py-3 rounded-full font-bold text-sm uppercase tracking-widest bg-amber-500/10 text-amber-600 hover:bg-amber-600 hover:text-white">
+                    Todos
+                </button>
+                <button onclick="filterCategory('youtube')" class="category-pill px-8 py-3 rounded-full font-bold text-sm uppercase tracking-widest bg-amber-500/10 text-amber-600 hover:bg-amber-600 hover:text-white">
+                    📺 YouTube
+                </button>
+                <button onclick="filterCategory('audiolibros')" class="category-pill px-8 py-3 rounded-full font-bold text-sm uppercase tracking-widest bg-amber-500/10 text-amber-600 hover:bg-amber-600 hover:text-white">
+                    🎧 Audiolibros
+                </button>
+                <button onclick="filterCategory('peliculas')" class="category-pill px-8 py-3 rounded-full font-bold text-sm uppercase tracking-widest bg-amber-500/10 text-amber-600 hover:bg-amber-600 hover:text-white">
+                    🎬 Películas
+                </button>
+                <button onclick="filterCategory('musica')" class="category-pill px-8 py-3 rounded-full font-bold text-sm uppercase tracking-widest bg-amber-500/10 text-amber-600 hover:bg-amber-600 hover:text-white">
+                    🎵 Música
+                </button>
+            </div>
+
+            <!-- GRID DE RECOMENDACIONES -->
+            <div id="recommendations-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                <!-- Las recomendaciones se generarán aquí -->
+            </div>
+        </div>
+
+        <footer class="py-32 text-center opacity-40">
+            <p class="text-xs font-bold uppercase tracking-[0.6em]">Tu Refugio Digital • 2025</p>
+        </footer>
     </div>
 
     <script>
@@ -146,6 +332,7 @@
                 image: "https://i.ytimg.com/vi/JpMq92fS6Z8/maxresdefault.jpg",
                 link: "https://www.youtube.com/watch?v=JpMq92fS6Z8"
             },
+
             // AUDIOLIBROS
             {
                 title: "El lobo estepario",
@@ -246,6 +433,15 @@
             renderRecommendations();
         }
 
+        function toggleSidebar() { 
+            document.getElementById('sidebar').classList.toggle('open'); 
+        }
+
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+        }
+
         // Dark mode
         if (localStorage.theme === 'dark') {
             document.documentElement.classList.add('dark');
@@ -254,5 +450,8 @@
         // Initial render
         renderRecommendations();
     </script>
+
+    <!-- Reproductor de música global -->
+    <script src="music-player.js"></script>
 </body>
 </html>
