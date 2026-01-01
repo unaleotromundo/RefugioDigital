@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recomendaciones | Tu Refugio Digital</title>
+    <link rel="icon" type="image/png" href="https://jkhrpbpdewhkzgqqrwmp.supabase.co/storage/v1/object/public/imagenes/logo.png">
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: { 
+                extend: { 
+                    colors: { warmLight: '#fffcf7', warmDark: '#080a0f', amberGold: '#f59e0b' } 
+                } 
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; scroll-behavior: smooth; overflow-x: hidden; }
+
+        /* SIDEBAR */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 280px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(245, 158, 11, 0.1);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem 1.5rem;
+            transition: transform 0.3s ease;
+        }
+        .dark .sidebar {
+            background: rgba(8, 10, 15, 0.95);
+            border-right-color: rgba(245, 158, 11, 0.05);
+        }
+        
+        .sidebar-logo {
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid rgba(245, 158, 11, 0.1);
+        }
+        
+        .sidebar-nav {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .sidebar-link {
+            padding: 1rem 1.25rem;
+            border-radius: 1rem;
+            font-weight: 700;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .sidebar-link:hover {
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+            transform: translateX(5px);
+        }
+        
+        .sidebar-link.active {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .sidebar-controls {
+            padding-top: 2rem;
+            border-top: 1px solid rgba(245, 158, 11, 0.1);
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .main-content {
+            margin-left: 280px;
+            min-height: 100vh;
+        }
+
+        /* MOBILE */
+        @media (max-width: 1023px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .mobile-header {
+                display: flex !important;
+            }
+        }
+        
+        .mobile-header {
+            display: none;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(245, 158, 11, 0.1);
+            padding: 1rem 1.5rem;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .dark .mobile-header {
+            background: rgba(8, 10, 15, 0.95);
+        }
+
+        .warm-card { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(20px); border: 1px solid rgba(251, 191, 36, 0.1); }
+        .dark .warm-card { background: rgba(15, 23, 42, 0.4); border-color: rgba(251, 191, 36, 0.05); }
+        
+        .recommendation-card {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .recommendation-card:hover {
+            transform: translateY(-8px);
+        }
+        
+        .category-pill {
+            transition: all 0.3s ease;
+        }
+        .category-pill.active {
+            background: #f59e0b;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .thumbnail-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            overflow: hidden;
+        }
+        .thumbnail-container img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body class="bg-warmLight text-slate-800 dark:bg-warmDark dark:text-slate-100 transition-colors duration-1000">
+
+    <!-- SIDEBAR DESKTOP -->
+    <aside id="sidebar" class="sidebar">
+        <div class="sidebar-logo">
+            <a href="index.html" class="flex items-center gap-3 group">
+                <img src="https://jkhrpbpdewhkzgqqrwmp.supabase.co/storage/v1/object/public/imagenes/logo.png" alt="Logo" class="w-12 h-12 object-contain group-hover:rotate-12 transition">
+                <div class="flex flex-col items-start">
+                    <span class="text-lg font-black tracking-tighter text-amber-600 uppercase leading-tight">TU REFUGIO</span>
+                    <span class="text-lg font-black tracking-tighter text-slate-900 dark:text-white italic leading-tight">DIGITAL</span>
+                </div>
+            </a>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="crisis.html" class="sidebar-link text-red-600 hover:text-red-600">
+                <span class="text-xl">🆘</span>
+                <span>Ayuda Ahora</span>
+            </a>
+            <a href="recomendaciones.html" class="sidebar-link active">
+                <span class="text-xl">✨</span>
+                <span>Recomendaciones</span>
+            </a>
+            <a href="chat/index.html" class="sidebar-link text-slate-700 dark:text-slate-300">
+                <span class="text-xl">💬</span>
+                <span>Chat Privado</span>
+            </a>
+            <a href="refugio.html" class="sidebar-link text-slate-700 dark:text-slate-300">
+                <span class="text-xl">🛖</span>
+                <span>El Refugio</span>
+            </a>
+            <a href="reflexiones.html" class="sidebar-link text-slate-700 dark:text-slate-300">
+                <span class="text-xl">📝</span>
+                <span>Reflexiones</span>
+            </a>
+        </nav>
+        
+        <div class="sidebar-controls">
+            <button onclick="toggleDarkMode()" class="flex-1 p-3 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 transition">
+                <svg class="w-6 h-6 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/>
+                </svg>
+            </button>
+        </div>
+    </aside>
+
+    <!-- HEADER MOBILE -->
+    <div class="mobile-header">
+        <a href="index.html" class="flex items-center gap-2">
+            <img src="https://jkhrpbpdewhkzgqqrwmp.supabase.co/storage/v1/object/public/imagenes/logo.png" alt="Logo" class="w-8 h-8 object-contain">
+            <span class="text-lg font-black tracking-tighter text-amber-600 uppercase">TU REFUGIO</span>
+        </a>
+        
+        <div class="flex items-center gap-2">
+            <button onclick="toggleDarkMode()" class="p-2 rounded-full bg-amber-500/10 text-amber-600">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/>
+                </svg>
+            </button>
+            <button onclick="toggleSidebar()" class="p-2 rounded-full bg-amber-600 text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <div class="max-w-7xl mx-auto px-6 py-16">
+            <!-- HEADER -->
+            <header class="text-center mb-20">
+                <h1 class="text-5xl md:text-7xl font-black mb-6 tracking-tighter leading-tight">
+                    Tesoros <span class="text-amber-600">Compartidos</span>
+                </h1>
+                <div class="h-1.5 w-32 bg-amber-500 mx-auto rounded-full mb-8"></div>
+                <p class="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto font-light italic">
+                    Una colección curada de contenido que ha iluminado mi camino. 
+                    Espero que también ilumine el tuyo.
+                </p>
+            </header>
+
+            <!-- FILTROS DE CATEGORÍA -->
+            <div class="flex flex-wrap justify-center gap-4 mb-16">
+                <button onclick="filterCategory('todos')" class="category-pill active px-8 py-3 rounded-full font-bold text-sm uppercase tracking-widest bg-amber-500/10 text-amber-600 hover:bg-amber-600 hover:text-white">
+                    Todos
+                </button>
+                <button onclick="filterCategory('youtube')" class="category-pill px-8 py-3 rounded-full font-bold text-sm uppercase tracking-widest bg-amber-500/10 text-amber-600 hover:bg-amber-600 hover:text-white">
+                    📺 YouTube
+                </button>
+                <button onclick="filterCategory('audiolibros')" class="category-pill px-8 py-3 rounded-full font-bold text-sm uppercase tracking-widest bg-amber-500/10 text-amber-600 hover:bg-amber-600 hover:text-white">
+                    🎧 Audiolibros
+                </button>
+                <button onclick="filterCategory('peliculas')" class="category-pill px-8 py-3 rounded-full font-bold text-sm uppercase tracking-widest bg-amber-500/10 text-amber-600 hover:bg-amber-600 hover:text-white">
+                    🎬 Películas
+                </button>
+                <button onclick="filterCategory('musica')" class="category-pill px-8 py-3 rounded-full font-bold text-sm uppercase tracking-widest bg-amber-500/10 text-amber-600 hover:bg-amber-600 hover:text-white">
+                    🎵 Música
+                </button>
+            </div>
+
+            <!-- GRID DE RECOMENDACIONES -->
+            <div id="recommendations-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                <!-- Las recomendaciones se generarán aquí -->
+            </div>
+        </div>
+
+        <footer class="py-32 text-center opacity-40">
+            <p class="text-xs font-bold uppercase tracking-[0.6em]">Tu Refugio Digital • 2025</p>
+        </footer>
+    </div>
+
+    <script>
+        const recommendations = [
+            // YOUTUBE
+            {
+                title: "Sabiduría Tolteca",
+                category: "youtube",
+                description: "Enseñanzas ancestrales de la tradición tolteca para encontrar la libertad personal y el despertar espiritual.",
+                image: "https://i.ytimg.com/vi/VY_72DUZXaw/maxresdefault.jpg",
+                link: "https://www.youtube.com/watch?v=VY_72DUZXaw"
+            },
+            {
+                title: "¿Ego o esencia? - El Sendero",
+                category: "youtube",
+                description: "Una profunda reflexión sobre la diferencia entre vivir desde el ego o desde nuestra verdadera esencia.",
+                image: "https://i.ytimg.com/vi/vM3WzLpnGso/maxresdefault.jpg",
+                link: "https://www.youtube.com/watch?v=vM3WzLpnGso"
+            },
+            {
+                title: "Mejora tu visión - Dr. La Rosa",
+                category: "youtube",
+                description: "Técnicas y ejercicios naturales para mejorar la salud visual y recuperar la visión de forma natural.",
+                image: "https://i.ytimg.com/vi/TtBOHvaw5pQ/maxresdefault.jpg",
+                link: "https://www.youtube.com/watch?v=TtBOHvaw5pQ"
+            },
+            {
+                title: "Cambia tu vida - César Lozano",
+                category: "youtube",
+                description: "Herramientas prácticas de desarrollo personal para transformar tu vida y alcanzar la felicidad.",
+                image: "https://i.ytimg.com/vi/hp9vSh0IY9U/maxresdefault.jpg",
+                link: "https://www.youtube.com/watch?v=hp9vSh0IY9U"
+            },
+            {
+                title: "Mejora tu energía - Javier Furman",
+                category: "youtube",
+                description: "Aprende a gestionar y elevar tu energía vital para vivir con más vitalidad y propósito.",
+                image: "https://i.ytimg.com/vi/TTBlZbyUVsA/maxresdefault.jpg",
+                link: "https://www.youtube.com/watch?v=TTBlZbyUVsA"
+            },
+            {
+                title: "11 pasos de la magia - J.L.Parise",
+                category: "youtube",
+                description: "Los pasos fundamentales para crear la vida que deseas mediante el poder de la intención consciente.",
+                image: "https://jkhrpbpdewhkzgqqrwmp.supabase.co/storage/v1/object/public/imagenes/11-pasos-magia.png",
+                link: "https://www.youtube.com/watch?v=wFWSJrrDG_Y"
+            },
+            {
+                title: "Cada uno a su ritmo - Natalia L.",
+                category: "youtube",
+                description: "Un mensaje hermoso sobre respetar los tiempos personales y el proceso único de cada ser.",
+                image: "https://i.ytimg.com/vi/JpMq92fS6Z8/maxresdefault.jpg",
+                link: "https://www.youtube.com/watch?v=JpMq92fS6Z8"
+            },
+
+            // AUDIOLIBROS
+            {
+                title: "El lobo estepario",
+                category: "audiolibros",
+                description: "La obra maestra de Hermann Hesse sobre la dualidad humana y la búsqueda de uno mismo.",
+                image: "https://i.ytimg.com/vi/bNaatMgkDeA/maxresdefault.jpg",
+                link: "https://www.youtube.com/watch?v=bNaatMgkDeA"
+            },
+            {
+                title: "Las enseñanzas de Don Juan",
+                category: "audiolibros",
+                description: "Carlos Castaneda nos lleva a un viaje chamánico de conocimiento y transformación personal.",
+                image: "https://jkhrpbpdewhkzgqqrwmp.supabase.co/storage/v1/object/public/imagenes/don-juan.png",
+                link: "https://www.youtube.com/watch?v=vR5Mjwan8DU"
+            },
+
+            // PELÍCULAS
+            {
+                title: "Vuelve al Origen",
+                category: "peliculas",
+                description: "Un viaje cinematográfico hacia el reencuentro con nuestra verdadera naturaleza y propósito.",
+                image: "https://i.ytimg.com/vi/RhzhbgaUnws/maxresdefault.jpg",
+                link: "https://www.youtube.com/watch?v=RhzhbgaUnws"
+            },
+            {
+                title: "Las 9 revelaciones",
+                category: "peliculas",
+                description: "Una aventura espiritual basada en el bestseller sobre las verdades universales de la existencia.",
+                image: "https://i.ytimg.com/vi/gTUToI6fnuU/maxresdefault.jpg",
+                link: "https://www.youtube.com/watch?v=gTUToI6fnuU"
+            },
+
+            // MÚSICA
+            {
+                title: "Corazón es lo único que tengo - Cantos al Corazón",
+                category: "musica",
+                description: "Música que toca el alma y nos conecta con la esencia más profunda del amor.",
+                image: "https://i.ytimg.com/vi/Y2Y7n4v2kAA/maxresdefault.jpg",
+                link: "https://www.youtube.com/watch?v=Y2Y7n4v2kAA"
+            },
+            {
+                title: "Deftones/Team Sleep/Crosses Mix",
+                category: "musica",
+                description: "Una mezcla hipnótica de sonidos alternativos para la introspección y el viaje interior.",
+                image: "https://i.ytimg.com/vi/pPV_wDCIA_E/maxresdefault.jpg",
+                link: "https://www.youtube.com/watch?v=pPV_wDCIA_E"
+            }
+        ];
+
+        let currentFilter = 'todos';
+
+        function renderRecommendations() {
+            const grid = document.getElementById('recommendations-grid');
+            const filtered = currentFilter === 'todos' 
+                ? recommendations 
+                : recommendations.filter(r => r.category === currentFilter);
+
+            const categoryLabels = {
+                youtube: '📺 YouTube',
+                audiolibros: '🎧 Audiolibro',
+                peliculas: '🎬 Película',
+                musica: '🎵 Música'
+            };
+
+            grid.innerHTML = filtered.map(rec => `
+                <article class="recommendation-card warm-card rounded-[3rem] overflow-hidden shadow-xl group cursor-pointer">
+                    <a href="${rec.link}" target="_blank" class="block">
+                        <div class="thumbnail-container">
+                            <img src="${rec.image}" alt="${rec.title}" class="group-hover:scale-110 transition duration-1000" onerror="this.src='https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800'">
+                            <div class="absolute top-4 right-4 bg-amber-600 text-white px-4 py-2 rounded-full text-xs font-bold uppercase shadow-lg">
+                                ${categoryLabels[rec.category]}
+                            </div>
+                        </div>
+                        <div class="p-8">
+                            <h3 class="font-black text-xl mb-4 group-hover:text-amber-600 transition-colors duration-500 leading-tight">
+                                ${rec.title}
+                            </h3>
+                            <p class="text-slate-600 dark:text-slate-400 text-sm mb-6 leading-relaxed">
+                                ${rec.description}
+                            </p>
+                            <span class="inline-flex items-center gap-2 text-amber-600 font-bold text-xs uppercase tracking-widest group-hover:gap-4 transition-all">
+                                Ver ahora → 
+                            </span>
+                        </div>
+                    </a>
+                </article>
+            `).join('');
+        }
+
+        function filterCategory(category) {
+            currentFilter = category;
+            
+            document.querySelectorAll('.category-pill').forEach(pill => {
+                pill.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            renderRecommendations();
+        }
+
+        function toggleSidebar() { 
+            document.getElementById('sidebar').classList.toggle('open'); 
+        }
+
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+        }
+
+        // Dark mode
+        if (localStorage.theme === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+
+        // Initial render
+        renderRecommendations();
+    </script>
+</body>
+</html>

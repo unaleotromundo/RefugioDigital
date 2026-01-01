@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recomendaciones | Tu Refugio Digital</title>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: { 
+                extend: { 
+                    colors: { warmLight: '#fffcf7', warmDark: '#080a0f', amberGold: '#f59e0b' } 
+                } 
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; scroll-behavior: smooth; }
+        .warm-card { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(20px); border: 1px solid rgba(251, 191, 36, 0.1); }
+        .dark .warm-card { background: rgba(15, 23, 42, 0.4); border-color: rgba(251, 191, 36, 0.05); }
+        
+        .recommendation-card {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .recommendation-card:hover {
+            transform: translateY(-8px);
+        }
+        
+        .category-pill {
+            transition: all 0.3s ease;
+        }
+        .category-pill.active {
+            background: #f59e0b;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .thumbnail-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            overflow: hidden;
+        }
+        .thumbnail-container img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body class="bg-warmLight text-slate-800 dark:bg-warmDark dark:text-slate-100 transition-colors duration-1000">
+
+    <div class="max-w-7xl mx-auto px-6 py-16">
+        <!-- HEADER -->
+        <header class="text-center mb-20">
+            <h1 class="text-5xl md:text-7xl font-black mb-6 tracking-tighter leading-tight">
+                Tesoros <span class="text-amber-600">Compartidos</span>
+            </h1>
+            <div class="h-1.5 w-32 bg-amber-500 mx-auto rounded-full mb-8"></div>
+            <p class="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto font-light italic">
+                Una colección curada de contenido que ha iluminado mi camino. 
+                Espero que también ilumine el tuyo.
+            </p>
+        </header>
+
+        <!-- FILTROS DE CATEGORÍA -->
+        <div class="flex flex-wrap justify-center gap-4 mb-16">
+            <button onclick="filterCategory('todos')" class="category-pill active px-8 py-3 rounded-full font-bold text-sm uppercase tracking-widest bg-amber-500/10 text-amber-600 hover:bg-amber-600 hover:text-white">
+                Todos
+            </button>
+            <button onclick="filterCategory('youtube')" class="category-pill px-8 py-3 rounded-full font-bold text-sm uppercase tracking-widest bg-amber-500/10 text-amber-600 hover:bg-amber-600 hover:text-white">
+                📺 YouTube
+            </button>
+            <button onclick="filterCategory('audiolibros')" class="category-pill px-8 py-3 rounded-full font-bold text-sm uppercase tracking-widest bg-amber-500/10 text-amber-600 hover:bg-amber-600 hover:text-white">
+                🎧 Audiolibros
+            </button>
+            <button onclick="filterCategory('peliculas')" class="category-pill px-8 py-3 rounded-full font-bold text-sm uppercase tracking-widest bg-amber-500/10 text-amber-600 hover:bg-amber-600 hover:text-white">
+                🎬 Películas
+            </button>
+            <button onclick="filterCategory('musica')" class="category-pill px-8 py-3 rounded-full font-bold text-sm uppercase tracking-widest bg-amber-500/10 text-amber-600 hover:bg-amber-600 hover:text-white">
+                🎵 Música
+            </button>
+        </div>
+
+        <!-- GRID DE RECOMENDACIONES -->
+        <div id="recommendations-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            <!-- Las recomendaciones se generarán aquí -->
+        </div>
+    </div>
+
+    <script>
+        const recommendations = [
+            // YOUTUBE
+            {
+                title: "Sabiduría Tolteca",
+                category: "youtube",
+                description: "Enseñanzas ancestrales de la tradición tolteca para encontrar la libertad personal y el despertar espiritual.",
+                image: "https://i.ytimg.com/vi/VY_72DUZXaw/maxresdefault.jpg",
+                link: "https://www.youtube.com/watch?v=VY_72DUZXaw"
+            },
+            {
+                title: "¿Ego o esencia? - El Sendero",
+                category: "youtube",
+                description: "Una profunda reflexión sobre la diferencia entre vivir desde el ego o desde nuestra verdadera esencia.",
+                image: "https://i.ytimg.com/vi/vM3WzLpnGso/maxresdefault.jpg",
+                link: "https://www.youtube.com/watch?v=vM3WzLpnGso"
+            },
+            {
+                title: "Mejora tu visión - Dr. La Rosa",
+                category: "youtube",
+                description: "Técnicas y ejercicios naturales para mejorar la salud visual y recuperar la visión de forma natural.",
+                image: "https://i.ytimg.com/vi/TtBOHvaw5pQ/maxresdefault.jpg",
+                link: "https://www.youtube.com/watch?v=TtBOHvaw5pQ"
+            },
+            {
+                title: "Cambia tu vida - César Lozano",
+                category: "youtube",
+                description: "Herramientas prácticas de desarrollo personal para transformar tu vida y alcanzar la felicidad.",
+                image: "https://i.ytimg.com/vi/hp9vSh0IY9U/maxresdefault.jpg",
+                link: "https://www.youtube.com/watch?v=hp9vSh0IY9U"
+            },
+            {
+                title: "Mejora tu energía - Javier Furman",
+                category: "youtube",
+                description: "Aprende a gestionar y elevar tu energía vital para vivir con más vitalidad y propósito.",
+                image: "https://i.ytimg.com/vi/TTBlZbyUVsA/maxresdefault.jpg",
+                link: "https://www.youtube.com/watch?v=TTBlZbyUVsA"
+            },
+            {
+                title: "11 pasos de la magia - J.L.Parise",
+                category: "youtube",
+                description: "Los pasos fundamentales para crear la vida que deseas mediante el poder de la intención consciente.",
+                image: "https://jkhrpbpdewhkzgqqrwmp.supabase.co/storage/v1/object/public/imagenes/11-pasos-magia.png",
+                link: "https://www.youtube.com/watch?v=wFWSJrrDG_Y"
+            },
+            {
+                title: "Cada uno a su ritmo - Natalia L.",
+                category: "youtube",
+                description: "Un mensaje hermoso sobre respetar los tiempos personales y el proceso único de cada ser.",
+                image: "https://i.ytimg.com/vi/JpMq92fS6Z8/maxresdefault.jpg",
+                link: "https://www.youtube.com/watch?v=JpMq92fS6Z8"
+            },
+            // AUDIOLIBROS
+            {
+                title: "El lobo estepario",
+                category: "audiolibros",
+                description: "La obra maestra de Hermann Hesse sobre la dualidad humana y la búsqueda de uno mismo.",
+                image: "https://i.ytimg.com/vi/bNaatMgkDeA/maxresdefault.jpg",
+                link: "https://www.youtube.com/watch?v=bNaatMgkDeA"
+            },
+            {
+                title: "Las enseñanzas de Don Juan",
+                category: "audiolibros",
+                description: "Carlos Castaneda nos lleva a un viaje chamánico de conocimiento y transformación personal.",
+                image: "https://jkhrpbpdewhkzgqqrwmp.supabase.co/storage/v1/object/public/imagenes/don-juan.png",
+                link: "https://www.youtube.com/watch?v=vR5Mjwan8DU"
+            },
+
+            // PELÍCULAS
+            {
+                title: "Vuelve al Origen",
+                category: "peliculas",
+                description: "Un viaje cinematográfico hacia el reencuentro con nuestra verdadera naturaleza y propósito.",
+                image: "https://i.ytimg.com/vi/RhzhbgaUnws/maxresdefault.jpg",
+                link: "https://www.youtube.com/watch?v=RhzhbgaUnws"
+            },
+            {
+                title: "Las 9 revelaciones",
+                category: "peliculas",
+                description: "Una aventura espiritual basada en el bestseller sobre las verdades universales de la existencia.",
+                image: "https://i.ytimg.com/vi/gTUToI6fnuU/maxresdefault.jpg",
+                link: "https://www.youtube.com/watch?v=gTUToI6fnuU"
+            },
+
+            // MÚSICA
+            {
+                title: "Corazón es lo único que tengo - Cantos al Corazón",
+                category: "musica",
+                description: "Música que toca el alma y nos conecta con la esencia más profunda del amor.",
+                image: "https://i.ytimg.com/vi/Y2Y7n4v2kAA/maxresdefault.jpg",
+                link: "https://www.youtube.com/watch?v=Y2Y7n4v2kAA"
+            },
+            {
+                title: "Deftones/Team Sleep/Crosses Mix",
+                category: "musica",
+                description: "Una mezcla hipnótica de sonidos alternativos para la introspección y el viaje interior.",
+                image: "https://i.ytimg.com/vi/pPV_wDCIA_E/maxresdefault.jpg",
+                link: "https://www.youtube.com/watch?v=pPV_wDCIA_E"
+            }
+        ];
+
+        let currentFilter = 'todos';
+
+        function renderRecommendations() {
+            const grid = document.getElementById('recommendations-grid');
+            const filtered = currentFilter === 'todos' 
+                ? recommendations 
+                : recommendations.filter(r => r.category === currentFilter);
+
+            const categoryLabels = {
+                youtube: '📺 YouTube',
+                audiolibros: '🎧 Audiolibro',
+                peliculas: '🎬 Película',
+                musica: '🎵 Música'
+            };
+
+            grid.innerHTML = filtered.map(rec => `
+                <article class="recommendation-card warm-card rounded-[3rem] overflow-hidden shadow-xl group cursor-pointer">
+                    <a href="${rec.link}" target="_blank" class="block">
+                        <div class="thumbnail-container">
+                            <img src="${rec.image}" alt="${rec.title}" class="group-hover:scale-110 transition duration-1000" onerror="this.src='https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800'">
+                            <div class="absolute top-4 right-4 bg-amber-600 text-white px-4 py-2 rounded-full text-xs font-bold uppercase shadow-lg">
+                                ${categoryLabels[rec.category]}
+                            </div>
+                        </div>
+                        <div class="p-8">
+                            <h3 class="font-black text-xl mb-4 group-hover:text-amber-600 transition-colors duration-500 leading-tight">
+                                ${rec.title}
+                            </h3>
+                            <p class="text-slate-600 dark:text-slate-400 text-sm mb-6 leading-relaxed">
+                                ${rec.description}
+                            </p>
+                            <span class="inline-flex items-center gap-2 text-amber-600 font-bold text-xs uppercase tracking-widest group-hover:gap-4 transition-all">
+                                Ver ahora → 
+                            </span>
+                        </div>
+                    </a>
+                </article>
+            `).join('');
+        }
+
+        function filterCategory(category) {
+            currentFilter = category;
+            
+            document.querySelectorAll('.category-pill').forEach(pill => {
+                pill.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            renderRecommendations();
+        }
+
+        // Dark mode
+        if (localStorage.theme === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+
+        // Initial render
+        renderRecommendations();
+    </script>
+</body>
+</html>

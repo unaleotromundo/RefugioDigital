@@ -76,7 +76,7 @@ main {
     line-height: 1.5;
     font-size: 1.05rem;
     font-weight: 600;
-    color: #000000 !important; /* Negro puro */
+    color: #000000 !important;
 }
 
 .bubble-ai {
@@ -87,7 +87,7 @@ main {
 }
 
 .bubble-user {
-    background-color: #fbbf24; /* Naranja más claro para leer negro */
+    background-color: #fbbf24;
     align-self: flex-end;
     border-bottom-right-radius: 0.2rem;
 }
@@ -105,19 +105,136 @@ main {
 }
 .dark #chat-input { background: #0f172a; color: #ffffff !important; border-color: rgba(245, 158, 11, 0.3); }
 
-/* HISTORIAL */
+/* HISTORIAL - SOLUCIÓN AGRESIVA PARA MÁXIMA LEGIBILIDAD */
+
+/* Items del historial - MODO CLARO */
 .history-item {
-    padding: 1rem;
+    padding: 1.2rem;
     border-radius: 1rem;
-    background: rgba(245, 158, 11, 0.05);
-    border: 1px solid transparent;
+    background: #fff3e0 !important; /* Fondo naranja muy claro */
+    border: 2px solid #ffb74d !important; /* Borde naranja visible */
     cursor: pointer;
-    transition: 0.3s;
+    transition: all 0.3s ease;
+    margin-bottom: 0.75rem;
 }
-.history-item:hover { background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.3); }
-.history-item.active { background: rgba(245, 158, 11, 0.15); border-color: #f59e0b; }
-.history-item .title { font-size: 0.85rem; font-weight: 800; color: #1e293b; margin-bottom: 2px; }
-.dark .history-item .title { color: #f1f5f9; }
+
+.history-item:hover { 
+    background: #ffe0b2 !important; /* Naranja más oscuro al hover */
+    border-color: #ff9800 !important;
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(255, 152, 0, 0.2);
+}
+
+.history-item.active { 
+    background: #ffcc80 !important; /* Naranja medio cuando activo */
+    border-color: #f57c00 !important;
+    box-shadow: 0 4px 16px rgba(245, 124, 0, 0.3);
+}
+
+/* TODO el texto dentro de history-item en MODO CLARO */
+.history-item,
+.history-item *,
+.history-item .title,
+.history-item .preview,
+.history-item .date,
+.history-item div,
+.history-item p,
+.history-item span {
+    color: #1a1a1a !important; /* Negro casi puro para máxima legibilidad */
+    font-weight: 700 !important;
+}
+
+.history-item .title { 
+    font-size: 0.9rem !important;
+    font-weight: 900 !important;
+    color: #000000 !important;
+    margin-bottom: 6px;
+    line-height: 1.3;
+}
+
+.history-item .preview {
+    font-size: 0.75rem !important;
+    color: #333333 !important;
+    font-weight: 600 !important;
+    line-height: 1.4;
+}
+
+.history-item .date {
+    font-size: 0.65rem !important;
+    color: #555555 !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 6px;
+}
+
+/* MODO OSCURO - Historial */
+.dark .history-item { 
+    background: rgba(245, 158, 11, 0.15) !important;
+    border: 2px solid rgba(245, 158, 11, 0.4) !important;
+}
+
+.dark .history-item:hover {
+    background: rgba(245, 158, 11, 0.25) !important;
+    border-color: rgba(245, 158, 11, 0.6) !important;
+}
+
+.dark .history-item.active {
+    background: rgba(245, 158, 11, 0.35) !important;
+    border-color: #f59e0b !important;
+}
+
+/* TODO el texto dentro de history-item en MODO OSCURO */
+.dark .history-item,
+.dark .history-item *,
+.dark .history-item .title,
+.dark .history-item .preview,
+.dark .history-item .date,
+.dark .history-item div,
+.dark .history-item p,
+.dark .history-item span {
+    color: #ffffff !important; /* Blanco puro para modo oscuro */
+    font-weight: 700 !important;
+}
+
+.dark .history-item .title { 
+    color: #ffffff !important;
+    font-weight: 900 !important;
+}
+
+.dark .history-item .preview {
+    color: #f5f5f5 !important;
+    font-weight: 600 !important;
+}
+
+.dark .history-item .date {
+    color: #e0e0e0 !important;
+    font-weight: 700 !important;
+}
+
+/* Botón de eliminar en historial */
+.history-item button {
+    background: rgba(239, 68, 68, 0.1) !important;
+    color: #dc2626 !important;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+}
+
+.history-item button:hover {
+    background: rgba(239, 68, 68, 0.2) !important;
+    color: #b91c1c !important;
+}
+
+.dark .history-item button {
+    background: rgba(239, 68, 68, 0.2) !important;
+    color: #fca5a5 !important;
+}
+
+.dark .history-item button:hover {
+    background: rgba(239, 68, 68, 0.3) !important;
+    color: #ef4444 !important;
+}
 
 /* PARTÍCULAS */
 #particle-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
