@@ -1,4 +1,4 @@
-const CACHE_NAME = 'refugio-digital-v1';
+const CACHE_NAME = 'refugio-digital-v2';
 const DYNAMIC_CACHE = 'refugio-dynamic-v1';
 
 // Archivos críticos para cachear en la instalación
