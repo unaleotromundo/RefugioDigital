@@ -8,24 +8,10 @@
     <title>Tu Refugio Digital | Faro de Significado y Propósito</title>
     <meta name="description" content="En un mundo a veces caótico, es fácil perderse. Aquí encontrarás un faro que te guiará en tu búsqueda de significado y propósito. Compartamos nuestras experiencias y aprendamos unos de otros.">
     <link rel="icon" type="image/png" href="https://jkhrpbpdewhkzgqqrwmp.supabase.co/storage/v1/object/public/imagenes/logo.png">
-
-    <!-- PWA MANIFEST -->
-    <link rel="manifest" href="/manifest.json">
-    
-    <!-- PWA: Theme color -->
-    <meta name="theme-color" content="#f59e0b">
-    <meta name="theme-color" content="#080a0f" media="(prefers-color-scheme: dark)">
-    
-    <!-- PWA: Para iOS -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Refugio Digital">
-    <link rel="apple-touch-icon" href="https://jkhrpbpdewhkzgqqrwmp.supabase.co/storage/v1/object/public/imagenes/logo.png">
-    
-    <!-- PWA: Para Windows -->
-    <meta name="msapplication-TileImage" content="https://jkhrpbpdewhkzgqqrwmp.supabase.co/storage/v1/object/public/imagenes/logo.png">
-    <meta name="msapplication-TileColor" content="#f59e0b">
-
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#f59e0b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="https://jkhrpbpdewhkzgqqrwmp.supabase.co/storage/v1/object/public/imagenes/logo.png">
     <!-- SEO PARA COMPARTIR -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://refugiodigital.vercel.app">
@@ -179,18 +165,6 @@
         .hidden-view { display: none; }
         .warm-card { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(20px); border: 1px solid rgba(251, 191, 36, 0.1); }
         .dark .warm-card { background: rgba(15, 23, 42, 0.4); border-color: rgba(251, 191, 36, 0.05); }
-
-        /* PWA Install Button Animation */
-        @keyframes slideInUp {
-            from {
-                transform: translateY(100px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
     </style>
 </head>
 <body class="bg-warmLight text-slate-800 dark:bg-warmDark dark:text-slate-100 transition-colors duration-1000">
@@ -227,7 +201,7 @@
                 <span>El Refugio</span>
             </a>
             <a href="reflexiones.html" class="sidebar-link text-slate-700 dark:text-slate-300">
-                <span class="text-xl">📖</span>
+                <span class="text-xl">📝</span>
                 <span>Reflexiones</span>
             </a>
         </nav>
@@ -398,91 +372,135 @@
             new Swiper(".mySwiper", { loop: true, speed: 1200, autoplay: { delay: 7000 }, pagination: { el: ".swiper-pagination", clickable: true }, effect: "fade" });
         }
     </script>
+    <script src="https://turefugiodigital.blogspot.com/feeds/posts/default?alt=json-in-script&max-results=500&callback=renderBlog">
+<!-- 
+  INSTRUCCIONES: Agrega este código en el <head> de tu index.html
+  justo después de la línea que dice <link rel="icon" ...>
+-->
 
-    <!-- PWA: SERVICE WORKER REGISTRATION -->
-    <script>
-        // Verificar si el navegador soporta Service Workers
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then(registration => {
-                        console.log('✅ Service Worker registrado correctamente:', registration.scope);
-                        
-                        // Verificar actualizaciones cada hora
-                        setInterval(() => {
-                            registration.update();
-                        }, 60 * 60 * 1000);
-                    })
-                    .catch(error => {
-                        console.log('❌ Error al registrar Service Worker:', error);
-                    });
-            });
-        }
+<!-- PWA: Link al manifest -->
+<link rel="manifest" href="/manifest.json">
 
-        // ============================================
-        // PROMPT DE INSTALACIÓN DE LA APP
-        // ============================================
+<!-- PWA: Theme color para Android -->
+<meta name="theme-color" content="#f59e0b">
+<meta name="theme-color" content="#080a0f" media="(prefers-color-scheme: dark)">
 
-        let deferredPrompt;
-        let installButton;
+<!-- PWA: Para iOS (Apple) -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Refugio Digital">
+<link rel="apple-touch-icon" href="https://jkhrpbpdewhkzgqqrwmp.supabase.co/storage/v1/object/public/imagenes/logo.png">
 
-        // Crear el botón de instalación
-        function createInstallButton() {
-            if (document.getElementById('pwa-install-btn')) return;
-            
-            const btn = document.createElement('button');
-            btn.id = 'pwa-install-btn';
-            btn.innerHTML = `
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                </svg>
-                Instalar App
-            `;
-            btn.className = 'fixed bottom-6 right-6 z-50 flex items-center px-6 py-4 bg-amber-600 text-white font-bold rounded-full shadow-2xl hover:bg-amber-500 transition-all transform hover:scale-105 text-sm uppercase tracking-wider';
-            btn.style.animation = 'slideInUp 0.5s ease-out';
-            
-            btn.onclick = async () => {
-                if (!deferredPrompt) return;
-                
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                
-                if (outcome === 'accepted') {
-                    console.log('✅ Usuario aceptó instalar la app');
-                } else {
-                    console.log('❌ Usuario rechazó instalar la app');
-                }
-                
-                deferredPrompt = null;
-                btn.remove();
-            };
-            
-            document.body.appendChild(btn);
-            installButton = btn;
-        }
+<!-- PWA: Para Windows -->
+<meta name="msapplication-TileImage" content="https://jkhrpbpdewhkzgqqrwmp.supabase.co/storage/v1/object/public/imagenes/logo.png">
+<meta name="msapplication-TileColor" content="#f59e0b">
 
-        // Escuchar el evento beforeinstallprompt
-        window.addEventListener('beforeinstallprompt', (e) => {
-            // Prevenir el mini-infobar en Chrome
-            e.preventDefault();
-            deferredPrompt = e;
-            
-            // Mostrar botón de instalación después de 3 segundos
-            setTimeout(() => {
-                createInstallButton();
-            }, 3000);
-        });
+<!-- 
+  INSTRUCCIONES: Agrega este código justo ANTES de la etiqueta </body>
+  (antes del último script de Blogger)
+-->
 
-        // Detectar cuando la app fue instalada
-        window.addEventListener('appinstalled', () => {
-            console.log('✅ PWA instalada correctamente');
-            if (installButton) {
-                installButton.remove();
-            }
-            deferredPrompt = null;
-        });
-    </script>
+<script>
+// ============================================
+// REGISTRO DEL SERVICE WORKER Y PWA
+// ============================================
+
+// Verificar si el navegador soporta Service Workers
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(registration => {
+        console.log('✅ Service Worker registrado:', registration.scope);
+        
+        // Verificar actualizaciones cada hora
+        setInterval(() => {
+          registration.update();
+        }, 60 * 60 * 1000);
+      })
+      .catch(error => {
+        console.log('❌ Error al registrar Service Worker:', error);
+      });
+  });
+}
+
+// ============================================
+// PROMPT DE INSTALACIÓN DE LA APP
+// ============================================
+
+let deferredPrompt;
+let installButton;
+
+// Crear el botón de instalación
+function createInstallButton() {
+  if (document.getElementById('pwa-install-btn')) return;
+  
+  const btn = document.createElement('button');
+  btn.id = 'pwa-install-btn';
+  btn.innerHTML = `
+    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+    </svg>
+    Instalar App
+  `;
+  btn.className = 'fixed bottom-6 right-6 z-50 flex items-center px-6 py-4 bg-amber-600 text-white font-bold rounded-full shadow-2xl hover:bg-amber-500 transition-all transform hover:scale-105 text-sm uppercase tracking-wider';
+  btn.style.animation = 'slideInUp 0.5s ease-out';
+  
+  btn.onclick = async () => {
+    if (!deferredPrompt) return;
     
-    <script src="https://turefugiodigital.blogspot.com/feeds/posts/default?alt=json-in-script&max-results=500&callback=renderBlog"></script>
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    
+    if (outcome === 'accepted') {
+      console.log('✅ Usuario aceptó instalar la app');
+    } else {
+      console.log('❌ Usuario rechazó instalar la app');
+    }
+    
+    deferredPrompt = null;
+    btn.remove();
+  };
+  
+  document.body.appendChild(btn);
+  installButton = btn;
+}
+
+// Escuchar el evento beforeinstallprompt
+window.addEventListener('beforeinstallprompt', (e) => {
+  // Prevenir el mini-infobar en Chrome
+  e.preventDefault();
+  deferredPrompt = e;
+  
+  // Mostrar botón de instalación después de 3 segundos
+  setTimeout(() => {
+    createInstallButton();
+  }, 3000);
+});
+
+// Detectar cuando la app fue instalada
+window.addEventListener('appinstalled', () => {
+  console.log('✅ PWA instalada correctamente');
+  if (installButton) {
+    installButton.remove();
+  }
+  deferredPrompt = null;
+});
+
+// Agregar animación CSS
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes slideInUp {
+    from {
+      transform: translateY(100px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+`;
+document.head.appendChild(style);
+</script>
 </body>
 </html>
