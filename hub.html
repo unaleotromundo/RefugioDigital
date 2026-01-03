@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>Hub de Conciencias | Espejo Digital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="style.css"> <style>
+        /* Ajustes específicos para esta vista dual */
+        .agent-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(245, 158, 11, 0.1);
+        }
+        .agent-card.active {
+            border-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.15);
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 transition-colors duration-500 overflow-hidden h-screen">
+    
+    <div id="particle-container"></div>
+
+    <div id="history-sidebar" class="fixed top-0 left-0 h-full w-80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl z-50 transform -translate-x-full transition-transform duration-300 border-r border-amber-500/20 shadow-2xl">
+        <div class="p-6 flex flex-col h-full">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-amber-600 font-black uppercase tracking-widest text-sm">Mis Reflexiones</h2>
+                <button onclick="toggleSidebar('history-sidebar', false)" class="text-slate-400 hover:text-amber-600 text-3xl">&times;</button>
+            </div>
+            <div id="history-list" class="flex-1 overflow-y-auto space-y-3"></div>
+        </div>
+    </div>
+
+    <div id="agents-sidebar" class="fixed top-0 right-0 h-full w-80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl z-50 transform translate-x-full transition-transform duration-300 border-l border-amber-500/20 shadow-2xl">
+        <div class="p-6 flex flex-col h-full">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-amber-600 font-black uppercase tracking-widest text-sm">Elegir Conciencia</h2>
+                <button onclick="toggleSidebar('agents-sidebar', false)" class="text-slate-400 hover:text-amber-600 text-3xl">&times;</button>
+            </div>
+            <a href="configurador.html" class="mb-6 block text-center py-3 rounded-xl border-2 border-dashed border-amber-500/30 text-amber-600 font-bold text-[10px] uppercase tracking-widest hover:bg-amber-500/10 transition-all">
+                + Crear Nueva "Gem"
+            </a>
+            <div id="agents-list" class="flex-1 overflow-y-auto space-y-3 pr-2">
+                </div>
+        </div>
+    </div>
+
+    <nav class="p-6 flex justify-between items-center max-w-7xl mx-auto w-full relative z-20">
+        <button onclick="toggleSidebar('history-sidebar', true)" class="p-3 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-500 border border-amber-500/20">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        </button>
+        
+        <div class="flex items-center gap-3">
+            <button onclick="toggleDarkMode()" class="p-3 rounded-full bg-slate-500/10 text-slate-700 dark:text-slate-400 border border-slate-500/20">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+            </button>
+            <button onclick="toggleSidebar('agents-sidebar', true)" class="p-3 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-500 border border-amber-500/20">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+            </button>
+        </div>
+    </nav>
+
+    <main class="relative z-10 flex flex-col h-[calc(100vh-140px)] max-w-4xl mx-auto px-4">
+        <div class="text-center mb-6">
+            <h1 id="active-agent-name" class="text-3xl font-black text-slate-800 dark:text-white uppercase tracking-tighter">Espejo Digital</h1>
+            <p id="active-agent-desc" class="text-[10px] text-amber-600 font-bold uppercase tracking-[0.4em] opacity-80">Conciencia Universal</p>
+        </div>
+
+        <div class="chat-frame flex-1 overflow-hidden flex flex-col shadow-2xl">
+            <div id="chat-box" class="chat-container flex-1 overflow-y-auto p-6 space-y-4">
+                </div>
+        </div>
+
+        <div class="mt-6 relative w-full mb-4">
+            <input type="text" id="chat-input" placeholder="Dime lo que piensas..." 
+                   class="w-full p-5 pr-16 rounded-2xl text-lg italic shadow-xl border-2 border-transparent focus:border-amber-500 dark:bg-slate-900 dark:text-white outline-none transition-all">
+            <button id="send-btn" onclick="handleSend()" class="absolute right-3 top-1/2 -translate-y-1/2 bg-amber-600 text-white p-3.5 rounded-xl hover:bg-amber-700 transition-all shadow-lg">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+            </button>
+        </div>
+    </main>
+
+    <script src="config.js"></script> <script>
+        const chatBox = document.getElementById('chat-box');
+        const chatInput = document.getElementById('chat-input');
+        const supabaseClient = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+
+        let currentAgent = {
+            id: 'default',
+            nombre: "Espejo Digital",
+            instrucciones: "Hablame siempre como un uruguayo. utiliza los conceptos pero no nombres nunca la cabala ni los judíos...",
+            conocimiento: ""
+        };
+
+        let chatHistory = [];
+
+        // --- INICIO ---
+        async function init() {
+            await cargarAgentes();
+            await createNewChat();
+            // Motor de partículas heredado
+            setInterval(createParticle, 600);
+        }
+
+        // --- GESTIÓN DE AGENTES (CONCIENCIAS) ---
+        async function cargarAgentes() {
+            const { data, error } = await supabaseClient.from('agentes').select('*');
+            if (error) return console.error(error);
+
+            const list = document.getElementById('agents-list');
+            list.innerHTML = `
+                <div onclick="setAgent('default')" class="agent-card p-4 rounded-2xl cursor-pointer bg-white/50 dark:bg-white/5 mb-2 active" id="agent-default">
+                    <div class="font-bold text-sm">🤖 Espejo Digital</div>
+                    <div class="text-[10px] opacity-60 uppercase">Base</div>
+                </div>
+            `;
+
+            data.forEach(agente => {
+                const div = document.createElement('div');
+                div.id = `agent-${agente.id}`;
+                div.className = "agent-card p-4 rounded-2xl cursor-pointer bg-white/50 dark:bg-white/5 mb-2";
+                div.onclick = () => setAgent(agente);
+                div.innerHTML = `
+                    <div class="font-bold text-sm">✨ ${agente.nombre}</div>
+                    <div class="text-[10px] opacity-60 uppercase">${agente.descripcion || 'Conciencia'}</div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        async function setAgent(agente) {
+            if(agente === 'default') {
+                currentAgent = { id: 'default', nombre: "Espejo Digital", instrucciones: "Hablame como uruguayo...", conocimiento: "" };
+            } else {
+                currentAgent = agente;
+                // Si tiene archivo, descargar conocimiento
+                if (agente.archivo_url) {
+                    const res = await fetch(agente.archivo_url);
+                    currentAgent.conocimiento = await res.text();
+                }
+            }
+
+            document.getElementById('active-agent-name').innerText = currentAgent.nombre;
+            document.querySelectorAll('.agent-card').forEach(c => c.classList.remove('active'));
+            document.getElementById(`agent-${currentAgent.id}`).classList.add('active');
+            
+            toggleSidebar('agents-sidebar', false);
+            createNewChat();
+        }
+
+        // --- LÓGICA DE CHAT ---
+        async function handleSend() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            appendBubble(text, true);
+            chatInput.value = '';
+
+            // Simular carga
+            const typing = showTyping();
+
+            try {
+                const fullPrompt = `${currentAgent.instrucciones}\n\nCONOCIMIENTO EXTRA:\n${currentAgent.conocimiento}`;
+                
+                const response = await fetch('/api/gemini', { // Tu endpoint de Gemini
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [
+                            { role: "user", parts: [{ text: fullPrompt }] },
+                            ...chatHistory
+                        ]
+                    })
+                });
+
+                const data = await response.json();
+                typing.remove();
+
+                if (data.success) {
+                    appendBubble(data.text, false);
+                }
+            } catch (err) {
+                typing.remove();
+                appendBubble("El espejo está empañado. Prueba de nuevo.", false);
+            }
+        }
+
+        function appendBubble(text, isUser) {
+            const div = document.createElement('div');
+            div.className = `flex w-full ${isUser ? 'justify-end' : 'justify-start'}`;
+            div.innerHTML = `
+                <div class="bubble ${isUser ? 'bubble-user' : 'bubble-ai'}">
+                    ${text.replace(/\n/g, '<br>')}
+                </div>
+            `;
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            chatHistory.push({ role: isUser ? "user" : "model", parts: [{ text }] });
+        }
+
+        function createNewChat() {
+            chatBox.innerHTML = '';
+            chatHistory = [];
+            appendBubble(`Soy ${currentAgent.nombre}. ¿Qué buscas reflejar hoy?`, false);
+        }
+
+        // --- UI HELPERS ---
+        function toggleSidebar(id, show) {
+            document.getElementById(id).classList.toggle(id === 'history-sidebar' ? '-translate-x-full' : 'translate-x-full', !show);
+        }
+
+        function showTyping() {
+            const div = document.createElement('div');
+            div.className = "flex w-full justify-start opacity-50 italic text-xs p-2";
+            div.innerText = `${currentAgent.nombre} está procesando...`;
+            chatBox.appendChild(div);
+            return div;
+        }
+
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+        }
+
+        function createParticle() {
+            const container = document.getElementById('particle-container');
+            if(!container) return;
+            const p = document.createElement('div');
+            const size = Math.random() * 4 + 2;
+            p.className = 'particle';
+            p.style.width = `${size}px`; p.style.height = `${size}px`;
+            p.style.left = `${Math.random() * 100}%`;
+            p.style.setProperty('--duration', `${Math.random() * 12 + 8}s`);
+            p.style.setProperty('--opacity', Math.random() * 0.3 + 0.2);
+            container.appendChild(p);
+            setTimeout(() => p.remove(), 12000);
+        }
+
+        init();
+    </script>
+</body>
+</html>

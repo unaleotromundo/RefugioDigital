@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurador de Conciencias | Espejo Digital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; overflow-y: auto !important; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            border-radius: 2rem;
+        }
+        .input-field {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1rem;
+            width: 100%;
+            color: white;
+            outline: none;
+            transition: 0.3s;
+        }
+        .input-field:focus { border-color: #f59e0b; background: rgba(0, 0, 0, 0.4); }
+    </style>
+</head>
+<body class="bg-slate-950 text-white p-6 flex justify-center items-start min-h-screen">
+    
+    <div id="particle-container"></div>
+
+    <div class="max-w-2xl w-full z-10">
+        <header class="mb-10">
+            <a href="hub.html" class="text-amber-500 text-[10px] font-black uppercase tracking-[0.3em] hover:opacity-70 transition">← Volver al Hub</a>
+            <h1 class="text-4xl font-black mt-4 uppercase tracking-tighter text-white">Constructor de Conciencias</h1>
+            <p class="text-slate-400 text-sm italic">Crea una nueva "Gem" para el Espejo Digital.</p>
+        </header>
+
+        <div class="glass-card p-8 shadow-2xl">
+            <div class="space-y-6">
+                <div>
+                    <label class="text-[10px] font-black text-amber-500 uppercase tracking-widest ml-1">Nombre de la Conciencia</label>
+                    <input type="text" id="nombre" placeholder="Ej: Carlitos o Mr. Robot" class="input-field mt-2">
+                </div>
+
+                <div>
+                    <label class="text-[10px] font-black text-amber-500 uppercase tracking-widest ml-1">Esencia (Descripción corta)</label>
+                    <input type="text" id="descripcion" placeholder="Ej: Un niño curioso y alegre" class="input-field mt-2">
+                </div>
+
+                <div>
+                    <label class="text-[10px] font-black text-amber-500 uppercase tracking-widest ml-1">Instrucciones Maestras (System Prompt)</label>
+                    <textarea id="instrucciones" rows="6" placeholder="Define aquí su personalidad y cómo debe hablar..." class="input-field mt-2"></textarea>
+                </div>
+
+                <div>
+                    <label class="text-[10px] font-black text-amber-500 uppercase tracking-widest ml-1">Conocimiento en Archivo (.txt)</label>
+                    <input type="file" id="archivo" accept=".txt" class="mt-2 block w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-amber-600 file:text-white cursor-pointer">
+                </div>
+
+                <button onclick="guardarAgente()" id="btnGuardar" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-black py-4 rounded-2xl transition-all shadow-lg uppercase tracking-widest text-xs mt-4">
+                    Inmortalizar Conciencia
+                </button>
+            </div>
+        </div>
+
+        <div id="status" class="mt-6 text-center text-[10px] font-bold uppercase tracking-widest text-slate-500"></div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        // Inicializamos Supabase usando las claves de tu config.js
+        const supabaseClient = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+
+        async function guardarAgente() {
+            const btn = document.getElementById('btnGuardar');
+            const status = document.getElementById('status');
+            const nombre = document.getElementById('nombre').value;
+            const instrucciones = document.getElementById('instrucciones').value;
+            const descripcion = document.getElementById('descripcion').value;
+            const fileInput = document.getElementById('archivo');
+            const file = fileInput.files[0];
+
+            if (!nombre || !instrucciones) {
+                alert("El nombre y las instrucciones son obligatorios.");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "PROCESANDO...";
+            status.innerText = "Subiendo datos al espejo...";
+
+            let archivoUrl = "";
+
+            try {
+                // 1. Si hay archivo, lo subimos al Storage
+                if (file) {
+                    const fileName = `${Date.now()}_${file.name}`;
+                    const { data: uploadData, error: uploadError } = await supabaseClient.storage
+                        .from('conocimiento')
+                        .upload(fileName, file);
+                    
+                    if (uploadError) throw uploadError;
+                    
+                    const { data: publicUrlData } = supabaseClient.storage
+                        .from('conocimiento')
+                        .getPublicUrl(fileName);
+                    
+                    archivoUrl = publicUrlData.publicUrl;
+                }
+
+                // 2. Guardamos en la tabla 'agentes'
+                const { error: dbError } = await supabaseClient
+                    .from('agentes')
+                    .insert([{ 
+                        nombre, 
+                        descripcion, 
+                        instrucciones, 
+                        archivo_url: archivoUrl 
+                    }]);
+
+                if (dbError) throw dbError;
+
+                status.innerText = "¡CONCIENCIA INMORTALIZADA!";
+                setTimeout(() => window.location.href = 'hub.html', 1500);
+
+            } catch (err) {
+                console.error(err);
+                alert("Error: " + err.message);
+                btn.disabled = false;
+                btn.innerText = "INMORTALIZAR CONCIENCIA";
+            }
+        }
+
+        // Reutilizamos tu motor de partículas para coherencia visual
+        const container = document.getElementById('particle-container');
+        function createParticle() {
+            if(!container) return;
+            const p = document.createElement('div');
+            const size = Math.random() * 4 + 2;
+            p.className = 'particle';
+            p.style.width = `${size}px`; p.style.height = `${size}px`;
+            p.style.left = `${Math.random() * 100}%`;
+            p.style.setProperty('--duration', `${Math.random() * 12 + 8}s`);
+            container.appendChild(p);
+            setTimeout(() => p.remove(), 12000);
+        }
+        setInterval(createParticle, 600);
+    </script>
+</body>
+</html>
