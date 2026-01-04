@@ -27,79 +27,106 @@
             transition: 0.3s;
         }
         .input-field:focus { border-color: #f59e0b; background: rgba(0, 0, 0, 0.4); }
+        
+        /* Estilo para el input de archivo */
+        input[type="file"]::file-selector-button {
+            background: #d97706;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            margin-right: 15px;
+            transition: 0.3s;
+        }
+        input[type="file"]::file-selector-button:hover {
+            background: #b45309;
+        }
     </style>
 </head>
 <body class="bg-slate-950 text-white p-6 flex justify-center items-start min-h-screen">
     
     <div id="particle-container"></div>
 
-    <div class="max-w-2xl w-full z-10">
+    <div class="max-w-2xl w-full z-10 py-10">
         <header class="mb-10">
             <a href="hub.html" class="text-amber-500 text-[10px] font-black uppercase tracking-[0.3em] hover:opacity-70 transition">← Volver al Hub</a>
-            <h1 class="text-4xl font-black mt-4 uppercase tracking-tighter text-white">Constructor de Conciencias</h1>
-            <p class="text-slate-400 text-sm italic">Crea una nueva "Gem" para el Espejo Digital.</p>
+            <h1 class="text-5xl font-black mt-4 uppercase tracking-tighter text-white">Constructor de Conciencias</h1>
+            <p class="text-slate-400 text-sm italic mt-2">Dale vida a una nueva inteligencia en el Espejo.</p>
         </header>
 
         <div class="glass-card p-8 shadow-2xl">
             <div class="space-y-6">
+                <!-- NOMBRE -->
                 <div>
                     <label class="text-[10px] font-black text-amber-500 uppercase tracking-widest ml-1">Nombre de la Conciencia</label>
-                    <input type="text" id="nombre" placeholder="Ej: Carlitos o Mr. Robot" class="input-field mt-2">
+                    <input type="text" id="nombre" placeholder="Ej: Maestro Zen o Analista Tech" class="input-field mt-2">
                 </div>
 
+                <!-- DESCRIPCIÓN -->
                 <div>
                     <label class="text-[10px] font-black text-amber-500 uppercase tracking-widest ml-1">Esencia (Descripción corta)</label>
-                    <input type="text" id="descripcion" placeholder="Ej: Un niño curioso y alegre" class="input-field mt-2">
+                    <input type="text" id="descripcion" placeholder="Ej: Un guía para tiempos difíciles" class="input-field mt-2">
                 </div>
 
+                <!-- SYSTEM PROMPT -->
                 <div>
-                    <label class="text-[10px] font-black text-amber-500 uppercase tracking-widest ml-1">Instrucciones Maestras (System Prompt)</label>
-                    <textarea id="instrucciones" rows="6" placeholder="Define aquí su personalidad y cómo debe hablar..." class="input-field mt-2"></textarea>
+                    <label class="text-[10px] font-black text-amber-500 uppercase tracking-widest ml-1">Instrucciones Maestras (Personalidad)</label>
+                    <textarea id="instrucciones" rows="6" placeholder="Define cómo habla, qué palabras usa y cuál es su tono..." class="input-field mt-2"></textarea>
+                    <p class="text-[9px] text-slate-500 mt-2 px-1 italic">Estas instrucciones definen el comportamiento base de la conciencia.</p>
                 </div>
 
-                <div>
-                    <label class="text-[10px] font-black text-amber-500 uppercase tracking-widest ml-1">Conocimiento en Archivo (.txt)</label>
-                    <input type="file" id="archivo" accept=".txt" class="mt-2 block w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-amber-600 file:text-white cursor-pointer">
+                <!-- ARCHIVO DE CONOCIMIENTO -->
+                <div class="bg-amber-500/5 p-6 rounded-2xl border border-amber-500/10">
+                    <label class="text-[10px] font-black text-amber-500 uppercase tracking-widest block mb-3">Conocimiento Adicional (Archivo)</label>
+                    <input type="file" id="archivo" accept=".txt,.json,.pdf,.docx" class="block w-full text-xs text-slate-400">
+                    <p class="text-[9px] text-amber-600/60 mt-3 font-bold uppercase tracking-tighter">Soportados: PDF, DOCX, TXT, JSON</p>
                 </div>
 
-                <button onclick="guardarAgente()" id="btnGuardar" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-black py-4 rounded-2xl transition-all shadow-lg uppercase tracking-widest text-xs mt-4">
+                <!-- BOTÓN GUARDAR -->
+                <button onclick="guardarAgente()" id="btnGuardar" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-black py-5 rounded-2xl transition-all shadow-lg uppercase tracking-widest text-xs mt-4">
                     Inmortalizar Conciencia
                 </button>
             </div>
         </div>
 
-        <div id="status" class="mt-6 text-center text-[10px] font-bold uppercase tracking-widest text-slate-500"></div>
+        <div id="status" class="mt-8 text-center text-[10px] font-bold uppercase tracking-[0.3em] text-slate-500">
+            Asegúrate de configurar los permisos en Supabase
+        </div>
     </div>
 
     <script src="config.js"></script>
     <script>
-        // Inicializamos Supabase usando las claves de tu config.js
         const supabaseClient = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
 
         async function guardarAgente() {
             const btn = document.getElementById('btnGuardar');
             const status = document.getElementById('status');
             const nombre = document.getElementById('nombre').value;
-            const instrucciones = document.getElementById('instrucciones').value;
             const descripcion = document.getElementById('descripcion').value;
+            const instrucciones = document.getElementById('instrucciones').value;
             const fileInput = document.getElementById('archivo');
             const file = fileInput.files[0];
 
             if (!nombre || !instrucciones) {
-                alert("El nombre y las instrucciones son obligatorios.");
+                alert("El nombre y las instrucciones son obligatorios para crear la conciencia.");
                 return;
             }
 
             btn.disabled = true;
             btn.innerText = "PROCESANDO...";
-            status.innerText = "Subiendo datos al espejo...";
+            status.innerText = "Subiendo datos al espejo digital...";
 
             let archivoUrl = "";
 
             try {
-                // 1. Si hay archivo, lo subimos al Storage
+                // 1. Subir archivo al bucket 'conocimiento' si existe
                 if (file) {
-                    const fileName = `${Date.now()}_${file.name}`;
+                    const fileName = `${Date.now()}_${file.name.replace(/\s/g, '_')}`;
                     const { data: uploadData, error: uploadError } = await supabaseClient.storage
                         .from('conocimiento')
                         .upload(fileName, file);
@@ -113,7 +140,7 @@
                     archivoUrl = publicUrlData.publicUrl;
                 }
 
-                // 2. Guardamos en la tabla 'agentes'
+                // 2. Guardar en la tabla 'agentes'
                 const { error: dbError } = await supabaseClient
                     .from('agentes')
                     .insert([{ 
@@ -125,27 +152,33 @@
 
                 if (dbError) throw dbError;
 
-                status.innerText = "¡CONCIENCIA INMORTALIZADA!";
+                status.innerHTML = "<span class='text-amber-500'>¡CONCIENCIA INMORTALIZADA CON ÉXITO!</span>";
+                btn.style.background = "#10b981"; // Cambiar a verde
+                btn.innerText = "¡LISTO!";
+                
                 setTimeout(() => window.location.href = 'hub.html', 1500);
 
             } catch (err) {
                 console.error(err);
-                alert("Error: " + err.message);
+                alert("Error durante la creación: " + err.message);
                 btn.disabled = false;
-                btn.innerText = "INMORTALIZAR CONCIENCIA";
+                btn.innerText = "REINTENTAR INMORTALIZACIÓN";
+                status.innerText = "Ocurrió un error en la conexión.";
             }
         }
 
-        // Reutilizamos tu motor de partículas para coherencia visual
-        const container = document.getElementById('particle-container');
+        // Motor de partículas para el fondo
         function createParticle() {
+            const container = document.getElementById('particle-container');
             if(!container) return;
             const p = document.createElement('div');
-            const size = Math.random() * 4 + 2;
+            const size = Math.random() * 3 + 1;
             p.className = 'particle';
-            p.style.width = `${size}px`; p.style.height = `${size}px`;
+            p.style.width = `${size}px`; 
+            p.style.height = `${size}px`;
             p.style.left = `${Math.random() * 100}%`;
-            p.style.setProperty('--duration', `${Math.random() * 12 + 8}s`);
+            p.style.setProperty('--duration', `${Math.random() * 10 + 7}s`);
+            p.style.setProperty('--opacity', Math.random() * 0.2 + 0.1);
             container.appendChild(p);
             setTimeout(() => p.remove(), 12000);
         }
