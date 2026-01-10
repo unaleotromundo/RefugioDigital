@@ -1,12 +1,11 @@
 // api/gemini.js
-// Esta función se ejecuta en el servidor de Vercel, NO en el navegador
 
 const GEMINI_API_KEYS = [
     process.env.GEMINI_KEY_1,
     process.env.GEMINI_KEY_2,
     process.env.GEMINI_KEY_3,
     process.env.GEMINI_KEY_4
-].filter(Boolean); // Elimina undefined
+].filter(Boolean);
 
 const MODELS = [
     "gemini-3-flash-preview",
@@ -17,47 +16,50 @@ const MODELS = [
 ];
 
 export default async function handler(req, res) {
-    // Solo permitir POST
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Método no permitido' });
     }
 
-    // Recogemos contents, systemInstruction e image del body
+    // Recogemos los nuevos campos: systemInstruction e image
     const { contents, systemInstruction, image } = req.body;
 
     if (!contents || !Array.isArray(contents)) {
         return res.status(400).json({ error: 'Formato inválido' });
     }
 
-    // --- PREPARACIÓN DE LA ESTRUCTURA MULTIMODAL ---
-    let finalContents = JSON.parse(JSON.stringify(contents)); // Clonamos el historial
+    // --- PREPARACIÓN DEL CUERPO DE LA PETICIÓN ---
+    let finalContents = JSON.parse(JSON.stringify(contents)); 
     
-    // Si hay una imagen, se la adjuntamos al ÚLTIMO mensaje del usuario
+    // Si hay una imagen, la insertamos en el último mensaje del historial (el del usuario)
     if (image) {
         const lastMessage = finalContents[finalContents.length - 1];
         if (lastMessage && lastMessage.role === 'user') {
-            lastMessage.parts.push({
-                inline_data: {
-                    mime_type: "image/jpeg",
-                    data: image
+            // Reestructuramos las partes para que incluyan texto e imagen
+            const originalText = lastMessage.parts[0].text;
+            lastMessage.parts = [
+                { text: originalText },
+                {
+                    inline_data: {
+                        mime_type: "image/jpeg",
+                        data: image
+                    }
                 }
-            });
+            ];
         }
     }
 
-    // Preparamos el cuerpo de la petición según la API de Google
-    const requestBody = {
+    // Construimos el objeto que Gemini espera
+    const requestPayload = {
         contents: finalContents
     };
 
-    // Si viene una instrucción de sistema (la personalidad de la conciencia), la añadimos
+    // Añadimos la instrucción de sistema si existe
     if (systemInstruction) {
-        requestBody.system_instruction = {
+        requestPayload.system_instruction = {
             parts: [{ text: systemInstruction }]
         };
     }
 
-    // Intentar con cada modelo y cada clave
     for (let modelName of MODELS) {
         let keys = [...GEMINI_API_KEYS].sort(() => Math.random() - 0.5);
         
@@ -71,7 +73,7 @@ export default async function handler(req, res) {
                         {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(requestBody) // Enviamos el cuerpo procesado
+                            body: JSON.stringify(requestPayload) // Enviamos el payload completo
                         }
                     );
 
@@ -84,8 +86,7 @@ export default async function handler(req, res) {
                             model: modelName
                         });
                     } else if (data.error?.message.includes("leaked")) {
-                        console.error(`🔒 Clave bloqueada: ${key.slice(0, 10)}...`);
-                        break; // Saltar a la siguiente clave
+                        break; 
                     }
                 } catch (error) {
                     console.error(`Error con ${modelName}:`, error.message);
@@ -94,9 +95,5 @@ export default async function handler(req, res) {
         }
     }
 
-    // Si llegamos aquí, todas las claves fallaron
-    return res.status(500).json({ 
-        success: false, 
-        error: 'Todas las claves API están agotadas o bloqueadas' 
-    });
+    return res.status(500).json({ success: false, error: 'Error de conexión' });
 }
