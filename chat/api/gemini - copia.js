@@ -22,39 +22,10 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Método no permitido' });
     }
 
-    // Recogemos contents, systemInstruction e image del body
-    const { contents, systemInstruction, image } = req.body;
+    const { contents } = req.body;
 
     if (!contents || !Array.isArray(contents)) {
         return res.status(400).json({ error: 'Formato inválido' });
-    }
-
-    // --- PREPARACIÓN DE LA ESTRUCTURA MULTIMODAL ---
-    let finalContents = JSON.parse(JSON.stringify(contents)); // Clonamos el historial
-    
-    // Si hay una imagen, se la adjuntamos al ÚLTIMO mensaje del usuario
-    if (image) {
-        const lastMessage = finalContents[finalContents.length - 1];
-        if (lastMessage && lastMessage.role === 'user') {
-            lastMessage.parts.push({
-                inline_data: {
-                    mime_type: "image/jpeg",
-                    data: image
-                }
-            });
-        }
-    }
-
-    // Preparamos el cuerpo de la petición según la API de Google
-    const requestBody = {
-        contents: finalContents
-    };
-
-    // Si viene una instrucción de sistema (la personalidad de la conciencia), la añadimos
-    if (systemInstruction) {
-        requestBody.system_instruction = {
-            parts: [{ text: systemInstruction }]
-        };
     }
 
     // Intentar con cada modelo y cada clave
@@ -71,7 +42,7 @@ export default async function handler(req, res) {
                         {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(requestBody) // Enviamos el cuerpo procesado
+                            body: JSON.stringify({ contents })
                         }
                     );
 
