@@ -42,6 +42,7 @@
                 <button onclick="toggleSidebar('agents-sidebar', false)" class="text-slate-400 hover:text-amber-500 text-3xl">&times;</button>
             </div>
             
+            <!-- Botón con contraseña -->
             <button onclick="checkAdminPassword()" class="mb-6 w-full block text-center py-3 rounded-xl border-2 border-dashed border-amber-500/50 text-amber-500 font-bold text-[10px] uppercase tracking-widest hover:bg-amber-500/20 transition-all">
                 + Crear Nueva Conciencia
             </button>
@@ -70,10 +71,9 @@
     </nav>
 
     <main class="relative z-10 flex flex-col h-[calc(100vh-140px)] max-w-4xl mx-auto px-4 w-full">
-        <!-- TÍTULOS CORREGIDOS PARA MODO OSCURO -->
         <div class="text-center mb-6">
-            <h1 id="active-agent-name" class="text-4xl font-black uppercase tracking-tighter dark:text-white">Cargando...</h1>
-            <p id="active-agent-desc" class="text-[10px] uppercase tracking-[0.4em] font-bold dark:text-white/60">Selecciona una conciencia</p>
+            <h1 id="active-agent-name" class="text-4xl font-black uppercase tracking-tighter">Cargando...</h1>
+            <p id="active-agent-desc" class="text-[10px] uppercase tracking-[0.4em] font-bold">Selecciona una conciencia</p>
         </div>
 
         <div class="chat-frame flex-1 overflow-hidden flex flex-col shadow-2xl">
@@ -82,6 +82,7 @@
 
         <!-- INPUT Y ANALIZADOR DE IMAGEN -->
         <div class="mt-6 relative w-full mb-4">
+            <!-- Vista previa de imagen seleccionada -->
             <div id="image-preview-container" class="hidden absolute bottom-full mb-3 left-0 p-2 bg-white dark:bg-slate-800 rounded-xl border-2 border-black shadow-lg flex items-center gap-2">
                 <img id="image-preview" src="" class="h-16 w-16 object-cover rounded-lg border border-slate-300">
                 <button onclick="clearImage()" class="bg-red-500 text-white rounded-full p-1 hover:bg-red-600 text-xs">✕</button>
@@ -92,6 +93,7 @@
                     <input type="text" id="chat-input" placeholder="Dime lo que piensas o sube una imagen..." 
                            class="w-full p-5 pr-16 rounded-2xl text-lg italic shadow-xl border-2 border-transparent focus:border-amber-500 outline-none dark:bg-slate-900 dark:text-white">
                     
+                    <!-- Botón Clip para Imagen -->
                     <label for="image-upload" class="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer hover:scale-110 transition-transform text-2xl">
                         📎
                         <input type="file" id="image-upload" accept="image/*" class="hidden" onchange="handleImageSelect(event)">
@@ -120,8 +122,10 @@
         async function init() {
             const { data: authData } = await supabaseClient.auth.signInAnonymously();
             currentUser = authData.user;
+
             await cargarAgentes();
             await refreshHistorySidebar();
+            
             setInterval(createParticle, 600);
             chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleSend(); });
         }
@@ -130,6 +134,7 @@
         function handleImageSelect(event) {
             const file = event.target.files[0];
             if (!file) return;
+
             const reader = new FileReader();
             reader.onload = function(e) {
                 selectedImageBase64 = e.target.result.split(',')[1];
@@ -145,9 +150,21 @@
             document.getElementById('image-preview-container').classList.add('hidden');
         }
 
+        // --- SEGURIDAD ---
+        function checkAdminPassword() {
+            const password = prompt("Introduce la contraseña de administrador:");
+            if (password === "admin123") {
+                window.location.href = "configurador.html";
+            } else {
+                alert("Acceso denegado.");
+            }
+        }
+
+        // --- GESTIÓN DE AGENTES ---
         async function cargarAgentes() {
             const { data, error } = await supabaseClient.from('agentes').select('*').order('created_at', { ascending: false });
             if (error) return;
+
             const list = document.getElementById('agents-list');
             list.innerHTML = '';
             data.forEach((agente, index) => {
@@ -191,24 +208,22 @@
             createNewChat();
         }
 
-        // --- LÓGICA DE ENVÍO CORREGIDA ---
+        // --- LÓGICA DE ENVÍO ---
         async function handleSend() {
             const text = chatInput.value.trim();
             if (!text && !selectedImageBase64) return;
 
-            const imageToSend = selectedImageBase64;
-            const userText = text;
-
-            // Mostrar visualmente en el chat
-            let displayContent = userText;
-            if (imageToSend) {
+            let displayContent = text;
+            if (selectedImageBase64) {
                 const imgUrl = document.getElementById('image-preview').src;
-                displayContent = `<div><img src="${imgUrl}" class="max-w-[200px] rounded-lg mb-2 shadow-md border-2 border-white"><br>${userText}</div>`;
+                displayContent = `<div><img src="${imgUrl}" class="max-w-[200px] rounded-lg mb-2 shadow-md border-2 border-white"><br>${text}</div>`;
             }
 
-            appendBubble(displayContent, true, userText, imageToSend);
+            appendBubble(displayContent, true);
             chatInput.value = '';
             const typing = showTyping();
+            
+            const imageToSend = selectedImageBase64;
             clearImage();
 
             try {
@@ -218,7 +233,8 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         systemInstruction: systemPrompt, 
-                        contents: chatHistory 
+                        contents: chatHistory,
+                        image: imageToSend 
                     })
                 });
 
@@ -234,42 +250,19 @@
             }
         }
 
-        function appendBubble(displayHtml, isUser, rawText = null, base64Image = null) {
+        function appendBubble(text, isUser) {
             const div = document.createElement('div');
             div.className = `flex w-full ${isUser ? 'justify-end' : 'justify-start'}`;
-            
-            // Si displayHtml contiene el div de la imagen, lo usamos tal cual, si no, aplicamos saltos de línea
-            const finalHtml = displayHtml.includes('<div') ? displayHtml : displayHtml.replace(/\n/g, '<br>');
-            
-            div.innerHTML = `<div class="bubble ${isUser ? 'bubble-user' : 'bubble-ai'}">${finalHtml}</div>`;
+            div.innerHTML = `<div class="bubble ${isUser ? 'bubble-user' : 'bubble-ai'}">${text.includes('<div') ? text : text.replace(/\n/g, '<br>')}</div>`;
             chatBox.appendChild(div);
             chatBox.scrollTop = chatBox.scrollHeight;
-
-            // Guardar en el historial de forma que la IA lo entienda
-            if (isUser) {
-                let userMsg = { role: "user", parts: [] };
-                if (rawText || (!base64Image && displayHtml)) {
-                    userMsg.parts.push({ text: rawText || displayHtml });
-                }
-                if (base64Image) {
-                    userMsg.parts.push({
-                        inline_data: {
-                            mime_type: "image/jpeg",
-                            data: base64Image
-                        }
-                    });
-                }
-                chatHistory.push(userMsg);
-            } else {
-                chatHistory.push({ role: "model", parts: [{ text: displayHtml }] });
-            }
+            chatHistory.push({ role: isUser ? "user" : "model", parts: [{ text: text.includes('<div') ? "Imagen adjunta y texto" : text }] });
         }
 
+        // --- PERSISTENCIA Y UI ---
         async function saveToHubHistory() {
             if (!currentUser || chatHistory.length < 2) return;
-            const userMsg = chatHistory.find(m => m.role === "user");
-            const firstMsg = userMsg?.parts.find(p => p.text)?.text || "Reflexión";
-            
+            const firstMsg = chatHistory.find(m => m.role === "user")?.parts[0].text || "Reflexión";
             await supabaseClient.from('reflexiones_hub').upsert({
                 id: currentChatId,
                 user_id: currentUser.id,
@@ -301,17 +294,9 @@
                 chatHistory = data.history;
                 chatBox.innerHTML = '';
                 chatHistory.forEach(msg => {
-                    const textPart = msg.parts.find(p => p.text);
-                    const imagePart = msg.parts.find(p => p.inline_data);
-                    
-                    let content = textPart ? textPart.text.replace(/\n/g, '<br>') : '';
-                    if (imagePart) {
-                        content = `<div>[Imagen enviada]<br>${content}</div>`;
-                    }
-
                     const div = document.createElement('div');
                     div.className = `flex w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`;
-                    div.innerHTML = `<div class="bubble ${msg.role === 'user' ? 'bubble-user' : 'bubble-ai'}">${content}</div>`;
+                    div.innerHTML = `<div class="bubble ${msg.role === 'user' ? 'bubble-user' : 'bubble-ai'}">${msg.parts[0].text.replace(/\n/g, '<br>')}</div>`;
                     chatBox.appendChild(div);
                 });
                 chatBox.scrollTop = chatBox.scrollHeight;
@@ -340,12 +325,6 @@
         }
 
         function toggleDarkMode() { document.documentElement.classList.toggle('dark'); }
-
-        function checkAdminPassword() {
-            const password = prompt("Introduce la contraseña de administrador:");
-            if (password === "admin123") window.location.href = "configurador.html";
-            else alert("Acceso denegado.");
-        }
 
         function createParticle() {
             const container = document.getElementById('particle-container');
