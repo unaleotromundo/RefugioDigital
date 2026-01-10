@@ -126,3 +126,12 @@ main {
 
 .chat-container::-webkit-scrollbar { width: 5px; }
 .chat-container::-webkit-scrollbar-thumb { background: #f59e0b66; border-radius: 10px; }
+
+/* Color para el título y descripción en modo oscuro */
+.dark #active-agent-name {
+    color: #ffffff;
+}
+
+.dark #active-agent-desc {
+    color: rgba(255, 255, 255, 0.7); /* Blanco un poco más suave para la descripción */
+}
