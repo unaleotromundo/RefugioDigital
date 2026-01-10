@@ -1,27 +1,27 @@
-// --- CONFIGURACIÓN Y VARIABLES GLOBALES ---
+// --- CONFIGURACIÓN Y CLIENTE ---
 const chatBox = document.getElementById('chat-box');
 const chatInput = document.getElementById('chat-input');
 const supabaseClient = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
 
-let currentAgent = null;         // Agente/Conciencia seleccionada
-let currentChatId = null;        // ID de la sesión de chat actual
-let chatHistory = [];            // Historial en formato Gemini {role, parts}
-let currentUser = null;          // Usuario de Supabase
-let selectedImageBase64 = null;  // Imagen para enviar a la IA
+let currentAgent = null;         // Conciencia activa
+let currentChatId = null;        // ID de la sesión actual
+let chatHistory = [];            // Memoria de la conversación (Formato Gemini)
+let currentUser = null;          // Usuario autenticado
+let selectedImageBase64 = null;  // Imagen en espera de envío
 
 // --- 1. INICIALIZACIÓN ---
 async function init() {
-    // Autenticación anónima para que cada usuario tenga su historial
+    // Autenticación para persistencia individual
     const { data: authData } = await supabaseClient.auth.signInAnonymously();
     currentUser = authData.user;
 
-    await cargarAgentes();           // Carga la lista de conciencias
-    await refreshHistorySidebar();   // Carga el historial de reflexiones
+    await cargarAgentes();           // Traer conciencias de la DB
+    await refreshHistorySidebar();   // Traer historial de reflexiones
     
-    // Motor de partículas visuales
+    // Iniciar efectos visuales
     setInterval(createParticle, 600);
 
-    // Eventos de teclado
+    // Atajo de teclado para enviar
     chatInput.addEventListener('keydown', (e) => { 
         if (e.key === 'Enter') handleSend(); 
     });
@@ -29,30 +29,28 @@ async function init() {
 
 // --- 2. SEGURIDAD (ADMIN) ---
 function checkAdminPassword() {
-    const password = prompt("Introduce la contraseña de administrador para crear una conciencia:");
+    const password = prompt("Introduce la contraseña de administrador:");
     if (password === "admin123") {
         window.location.href = "configurador.html";
     } else {
-        alert("Contraseña incorrecta. Acceso denegado.");
+        alert("Acceso denegado.");
     }
 }
 
-// --- 3. MANEJO DE IMÁGENES (MULTIMODAL) ---
+// --- 3. MANEJO MULTIMODAL (IMÁGENES) ---
 function handleImageSelect(event) {
     const file = event.target.files[0];
     if (!file) return;
 
-    // Validación de tamaño (Max 4MB)
+    // Validación de peso (Max 4MB)
     if (file.size > 4 * 1024 * 1024) {
-        alert("La imagen es demasiado grande. Máximo 4MB.");
+        alert("Imagen muy pesada. Máximo 4MB.");
         return;
     }
 
     const reader = new FileReader();
     reader.onload = function(e) {
-        // Guardamos solo el Base64 (quitamos el prefijo data:image/...)
-        selectedImageBase64 = e.target.result.split(',')[1];
-        // Mostramos la vista previa
+        selectedImageBase64 = e.target.result.split(',')[1]; // Solo la data Base64
         document.getElementById('image-preview').src = e.target.result;
         document.getElementById('image-preview-container').classList.remove('hidden');
     };
@@ -65,7 +63,7 @@ function clearImage() {
     document.getElementById('image-preview-container').classList.add('hidden');
 }
 
-// --- 4. GESTIÓN DE AGENTES Y DOCUMENTOS ---
+// --- 4. GESTIÓN DE CONCIENCIAS Y DOCUMENTOS ---
 async function cargarAgentes() {
     const { data, error } = await supabaseClient.from('agentes').select('*').order('created_at', { ascending: false });
     if (error) return;
@@ -75,7 +73,6 @@ async function cargarAgentes() {
     data.forEach((agente, index) => {
         const div = document.createElement('div');
         div.id = `agent-${agente.id}`;
-        // Estilo de tarjeta con texto blanco para el sidebar oscuro
         div.className = "agent-card p-4 rounded-2xl cursor-pointer mb-2 transition-all";
         div.onclick = () => setAgent(agente);
         div.innerHTML = `
@@ -83,7 +80,7 @@ async function cargarAgentes() {
             <div class="text-[10px] text-white opacity-60 uppercase">${agente.descripcion || 'Conciencia'}</div>
         `;
         list.appendChild(div);
-        if (index === 0) setAgent(agente); // Seleccionar el primero por defecto
+        if (index === 0) setAgent(agente);
     });
 }
 
@@ -91,26 +88,24 @@ async function setAgent(agente) {
     currentAgent = agente;
     currentAgent.conocimiento_texto = ""; 
 
-    // Si el agente tiene un archivo (PDF/DOCX/TXT), extraemos su contenido
     if (agente.archivo_url) {
         try {
             const response = await fetch(agente.archivo_url);
             const blob = await response.blob();
-            const extension = agente.archivo_url.split('.').pop().toLowerCase().split('?')[0];
+            const ext = agente.archivo_url.split('.').pop().toLowerCase().split('?')[0];
 
-            if (extension === 'txt' || extension === 'json') {
+            if (ext === 'txt' || ext === 'json') {
                 currentAgent.conocimiento_texto = await blob.text();
-            } else if (extension === 'pdf') {
+            } else if (ext === 'pdf') {
                 currentAgent.conocimiento_texto = await extractTextFromPDF(agente.archivo_url);
-            } else if (extension === 'docx') {
+            } else if (ext === 'docx') {
                 const arrayBuffer = await blob.arrayBuffer();
                 const result = await mammoth.extractRawText({ arrayBuffer });
                 currentAgent.conocimiento_texto = result.value;
             }
-        } catch(e) { console.error("Error cargando conocimiento:", e); }
+        } catch(e) { console.error("Error cargando documento:", e); }
     }
 
-    // Actualizar UI
     document.getElementById('active-agent-name').innerText = currentAgent.nombre;
     document.getElementById('active-agent-desc').innerText = currentAgent.descripcion || "Conciencia";
     
@@ -134,27 +129,31 @@ async function extractTextFromPDF(url) {
     return text;
 }
 
-// --- 5. LÓGICA DE ENVÍO Y COMUNICACIÓN CON IA ---
+// --- 5. LÓGICA DE CHAT Y ENVÍO A IA ---
 async function handleSend() {
     const text = chatInput.value.trim();
     if (!text && !selectedImageBase64) return;
 
-    // Crear contenido visual para la burbuja del usuario
+    // 1. Mostrar en UI
     let displayHtml = text;
     if (selectedImageBase64) {
         const imgUrl = document.getElementById('image-preview').src;
-        displayHtml = `<div><img src="${imgUrl}" class="max-w-[200px] rounded-lg mb-2 border-2 border-white shadow-md"><br>${text}</div>`;
+        displayHtml = `
+            <div class="flex flex-col gap-2">
+                <img src="${imgUrl}" class="max-w-[200px] rounded-lg border-2 border-white shadow-md">
+                <span>${text || "Analiza esta imagen."}</span>
+            </div>`;
     }
 
     appendBubble(displayHtml, true);
     chatInput.value = '';
     
     const typing = showTyping();
-    const imageToSend = selectedImageBase64;
-    clearImage(); // Limpiar UI de imagen después de enviar
+    const imageData = selectedImageBase64;
+    const userMessage = text;
+    clearImage(); 
 
     try {
-        // El prompt del sistema incluye las instrucciones del agente y el texto del archivo subido
         const systemPrompt = `${currentAgent.instrucciones}\n\nCONTEXTO ADICIONAL:\n${currentAgent.conocimiento_texto || ''}`;
         
         const response = await fetch('/api/gemini', {
@@ -163,7 +162,8 @@ async function handleSend() {
             body: JSON.stringify({ 
                 systemInstruction: systemPrompt, 
                 contents: chatHistory,
-                image: imageToSend // Si hay imagen, el backend la procesará
+                image: imageData, // El backend debe procesar este campo
+                text: userMessage || "Analiza esta imagen."
             })
         });
 
@@ -172,11 +172,11 @@ async function handleSend() {
 
         if (data.success) {
             appendBubble(data.text, false);
-            await saveToHubHistory(); // Guardar progreso en Supabase
+            await saveToHubHistory();
         }
     } catch (err) {
         if(typing) typing.remove();
-        appendBubble("El espejo está empañado. Intentá de nuevo.", false);
+        appendBubble("El espejo está empañado. Intenta de nuevo.", false);
     }
 }
 
@@ -184,26 +184,34 @@ function appendBubble(text, isUser) {
     const div = document.createElement('div');
     div.className = `flex w-full ${isUser ? 'justify-end' : 'justify-start'}`;
     
-    // Si contiene HTML (imagen), lo ponemos directo, si no, saltos de línea
-    const content = text.includes('<div') ? text : text.replace(/\n/g, '<br>');
-    div.innerHTML = `<div class="bubble ${isUser ? 'bubble-user' : 'bubble-ai'}">${content}</div>`;
+    // Detectar si el texto tiene HTML (como una imagen) o es texto plano
+    const isHtml = text.includes('<div') || text.includes('<img');
+    const content = isHtml ? text : text.replace(/\n/g, '<br>');
     
+    div.innerHTML = `<div class="bubble ${isUser ? 'bubble-user' : 'bubble-ai'}">${content}</div>`;
     chatBox.appendChild(div);
     chatBox.scrollTop = chatBox.scrollHeight;
 
-    // Guardar en el array de memoria para la IA
-    // Si enviamos imagen, guardamos un placeholder de texto para no romper el historial JSON
-    const historyText = text.includes('<div') ? `[Imagen enviada] ${text.split('<br>')[1] || ''}` : text;
-    chatHistory.push({ role: isUser ? "user" : "model", parts: [{ text: historyText }] });
+    // Guardar en la memoria de la sesión para enviar a Gemini
+    let historyText = text;
+    if (isHtml) {
+        const temp = document.createElement('div');
+        temp.innerHTML = text;
+        historyText = `[Imagen adjunta] ${temp.innerText.trim()}`;
+    }
+
+    chatHistory.push({ 
+        role: isUser ? "user" : "model", 
+        parts: [{ text: historyText }] 
+    });
 }
 
-// --- 6. PERSISTENCIA (SUPABASE reflexiones_hub) ---
+// --- 6. PERSISTENCIA EN SUPABASE ---
 async function saveToHubHistory() {
     if (!currentUser || chatHistory.length < 2) return;
 
-    // Título basado en el primer mensaje
     const firstMsg = chatHistory.find(m => m.role === "user")?.parts[0].text || "Reflexión";
-    const title = firstMsg.substring(0, 30) + "...";
+    const title = firstMsg.substring(0, 35).replace("[Imagen adjunta]", "📷") + "...";
 
     await supabaseClient.from('reflexiones_hub').upsert({
         id: currentChatId,
@@ -267,15 +275,13 @@ function toggleSidebar(id, show) {
 function showTyping() {
     const div = document.createElement('div');
     div.className = "text-xs opacity-50 italic p-2 dark:text-white";
-    div.innerText = `${currentAgent ? currentAgent.nombre : 'Espejo'} analizando...`;
+    div.innerText = `${currentAgent?.nombre || 'Espejo'} analizando...`;
     chatBox.appendChild(div);
     chatBox.scrollTop = chatBox.scrollHeight;
     return div;
 }
 
-function toggleDarkMode() { 
-    document.documentElement.classList.toggle('dark'); 
-}
+function toggleDarkMode() { document.documentElement.classList.toggle('dark'); }
 
 function createParticle() {
     const container = document.getElementById('particle-container');
@@ -289,5 +295,5 @@ function createParticle() {
     setTimeout(() => p.remove(), 12000);
 }
 
-// INICIAR
+// INICIAR APLICACIÓN
 init();
