@@ -10,6 +10,7 @@ body {
     font-family: 'Plus Jakarta Sans', sans-serif; 
     display: flex;
     flex-direction: column;
+    /* Imagen de fondo */
     background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=1920'); 
     background-size: cover;
     background-position: center;
@@ -17,16 +18,54 @@ body {
     transition: background-color 0.4s ease;
 }
 
+/* CAPA DE TINTE (Overlay) */
 body::before {
     content: "";
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(255, 252, 247, 0.75); 
+    /* 0.6 permite que la imagen se vea claramente */
+    background: rgba(255, 255, 255, 0.6); 
+    backdrop-filter: blur(2px); /* Un toque de desenfoque para ayudar a la lectura */
     z-index: 0;
 }
 
+/* FONDO MODO OSCURO */
 .dark body::before {
     background: rgba(8, 10, 15, 0.85); 
+    backdrop-filter: blur(4px);
+}
+
+/* TÍTULO PRINCIPAL - MÁXIMA LEGIBILIDAD SOBRE IMAGEN */
+#active-agent-name {
+    color: #000000 !important; 
+    font-weight: 900 !important;
+    position: relative;
+    z-index: 10;
+    /* Borde negro fino y sombra blanca para que resalte sobre cualquier color de la foto */
+    -webkit-text-stroke: 0.5px #000000;
+    text-shadow: 2px 2px 0px rgba(255, 255, 255, 1), 
+                 0px 0px 15px rgba(255, 255, 255, 0.8);
+    font-size: 2.5rem;
+}
+
+.dark #active-agent-name {
+    color: #ffffff !important;
+    -webkit-text-stroke: 0px;
+    text-shadow: 0px 0px 15px rgba(245, 158, 11, 0.5);
+}
+
+#active-agent-desc {
+    color: #000000 !important;
+    font-weight: 800 !important;
+    background: rgba(255, 255, 255, 0.4); /* Fondo sutil para la descripción */
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 5px;
+}
+
+.dark #active-agent-desc {
+    color: #f59e0b !important;
+    background: transparent;
 }
 
 main {
@@ -45,18 +84,19 @@ main {
 /* MARCO DEL CHAT */
 .chat-frame {
     flex: 1;
-    background: rgba(255, 255, 255, 0.92); 
+    background: rgba(255, 255, 255, 0.9); /* Un poco de transparencia */
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(245, 158, 11, 0.4);
+    border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 2rem;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
 }
 
 .dark .chat-frame {
     background: rgba(15, 23, 42, 0.9);
+    border-color: rgba(245, 158, 11, 0.3);
 }
 
 .chat-container {
@@ -68,7 +108,7 @@ main {
     gap: 1.2rem;
 }
 
-/* BURBUJAS - TEXTOS NEGROS EN MODO CLARO */
+/* BURBUJAS */
 .bubble {
     border-radius: 1.2rem;
     padding: 1rem 1.2rem;
@@ -76,170 +116,71 @@ main {
     line-height: 1.5;
     font-size: 1.05rem;
     font-weight: 600;
-    color: #000000 !important;
 }
 
 .bubble-ai {
     background-color: #f1f5f9; 
+    color: #000000 !important;
     align-self: flex-start;
-    border: 1px solid #cbd5e1;
-    border-bottom-left-radius: 0.2rem;
+    border: 1px solid rgba(0,0,0,0.05);
 }
 
 .bubble-user {
     background-color: #fbbf24;
+    color: #000000 !important;
     align-self: flex-end;
-    border-bottom-right-radius: 0.2rem;
 }
 
-.dark .bubble { color: #ffffff !important; }
-.dark .bubble-ai { background: rgba(245, 158, 11, 0.1); color: #fef3c7 !important; border-color: rgba(245, 158, 11, 0.2); }
+.dark .bubble-ai { background: rgba(30, 41, 59, 0.8); color: #ffffff !important; border-color: rgba(245, 158, 11, 0.2); }
 .dark .bubble-user { background: #f59e0b; color: #ffffff !important; }
 
 /* INPUT */
 #chat-input {
-    background: #ffffff;
+    background: rgba(255, 255, 255, 0.95);
     color: #000000 !important;
-    border: 2px solid #f59e0b44;
-    font-weight: 600;
+    border: 2px solid transparent;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
 }
+#chat-input:focus { border-color: #f59e0b; }
+
 .dark #chat-input { background: #0f172a; color: #ffffff !important; border-color: rgba(245, 158, 11, 0.3); }
 
-/* HISTORIAL - SOLUCIÓN AGRESIVA PARA MÁXIMA LEGIBILIDAD */
-
-/* Items del historial - MODO CLARO */
+/* HISTORIAL */
 .history-item {
-    padding: 1.2rem;
-    border-radius: 1rem;
-    background: #fff3e0 !important; /* Fondo naranja muy claro */
-    border: 2px solid #ffb74d !important; /* Borde naranja visible */
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-bottom: 0.75rem;
+    background: rgba(255, 255, 255, 0.8) !important;
+    border: 1px solid rgba(0,0,0,0.1) !important;
+    margin-bottom: 8px;
+    padding: 15px;
+    border-radius: 12px;
 }
 
-.history-item:hover { 
-    background: #ffe0b2 !important; /* Naranja más oscuro al hover */
-    border-color: #ff9800 !important;
-    transform: translateX(4px);
-    box-shadow: 0 4px 12px rgba(255, 152, 0, 0.2);
-}
+.history-item:hover { background: #ffffff !important; border-color: #f59e0b !important; }
 
-.history-item.active { 
-    background: #ffcc80 !important; /* Naranja medio cuando activo */
-    border-color: #f57c00 !important;
-    box-shadow: 0 4px 16px rgba(245, 124, 0, 0.3);
-}
+.history-item * { color: #000000 !important; }
 
-/* TODO el texto dentro de history-item en MODO CLARO */
-.history-item,
-.history-item *,
-.history-item .title,
-.history-item .preview,
-.history-item .date,
-.history-item div,
-.history-item p,
-.history-item span {
-    color: #1a1a1a !important; /* Negro casi puro para máxima legibilidad */
-    font-weight: 700 !important;
-}
-
-.history-item .title { 
-    font-size: 0.9rem !important;
-    font-weight: 900 !important;
-    color: #000000 !important;
-    margin-bottom: 6px;
-    line-height: 1.3;
-}
-
-.history-item .preview {
-    font-size: 0.75rem !important;
-    color: #333333 !important;
-    font-weight: 600 !important;
-    line-height: 1.4;
-}
-
-.history-item .date {
-    font-size: 0.65rem !important;
-    color: #555555 !important;
-    font-weight: 700 !important;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-top: 6px;
-}
-
-/* MODO OSCURO - Historial */
-.dark .history-item { 
-    background: rgba(245, 158, 11, 0.15) !important;
-    border: 2px solid rgba(245, 158, 11, 0.4) !important;
-}
-
-.dark .history-item:hover {
-    background: rgba(245, 158, 11, 0.25) !important;
-    border-color: rgba(245, 158, 11, 0.6) !important;
-}
-
-.dark .history-item.active {
-    background: rgba(245, 158, 11, 0.35) !important;
-    border-color: #f59e0b !important;
-}
-
-/* TODO el texto dentro de history-item en MODO OSCURO */
-.dark .history-item,
-.dark .history-item *,
-.dark .history-item .title,
-.dark .history-item .preview,
-.dark .history-item .date,
-.dark .history-item div,
-.dark .history-item p,
-.dark .history-item span {
-    color: #ffffff !important; /* Blanco puro para modo oscuro */
-    font-weight: 700 !important;
-}
-
-.dark .history-item .title { 
-    color: #ffffff !important;
-    font-weight: 900 !important;
-}
-
-.dark .history-item .preview {
-    color: #f5f5f5 !important;
-    font-weight: 600 !important;
-}
-
-.dark .history-item .date {
-    color: #e0e0e0 !important;
-    font-weight: 700 !important;
-}
-
-/* Botón de eliminar en historial */
-.history-item button {
-    background: rgba(239, 68, 68, 0.1) !important;
-    color: #dc2626 !important;
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    transition: all 0.2s;
-}
-
-.history-item button:hover {
-    background: rgba(239, 68, 68, 0.2) !important;
-    color: #b91c1c !important;
-}
-
-.dark .history-item button {
-    background: rgba(239, 68, 68, 0.2) !important;
-    color: #fca5a5 !important;
-}
-
-.dark .history-item button:hover {
-    background: rgba(239, 68, 68, 0.3) !important;
-    color: #ef4444 !important;
-}
+.dark .history-item { background: rgba(30, 41, 59, 0.5) !important; border-color: rgba(245, 158, 11, 0.2) !important; }
+.dark .history-item * { color: #ffffff !important; }
 
 /* PARTÍCULAS */
 #particle-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
-.particle { position: absolute; top: -20px; background: #f59e0b; border-radius: 50%; animation: fall var(--duration) linear infinite; }
-@keyframes fall { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: var(--opacity); } 100% { transform: translateY(110vh); opacity: 0; } }
+.particle { position: absolute; top: -20px; background: #f59e0b; border-radius: 50%; opacity: 0.5; animation: fall var(--duration) linear infinite; }
+@keyframes fall { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: 0.5; } 100% { transform: translateY(110vh); opacity: 0; } }
 
-.chat-container::-webkit-scrollbar { width: 5px; }
-.chat-container::-webkit-scrollbar-thumb { background: #f59e0b66; border-radius: 10px; }
+/* Ajustes para los botones de navegación en modo oscuro */
+.dark nav button {
+    background-color: #1e293b !important; /* Fondo azul oscuro */
+    border-color: #f59e0b !important;    /* Borde ámbar */
+    shadow: none !important;
+    box-shadow: 4px 4px 0px 0px #f59e0b !important; /* Sombra ámbar */
+    color: white !important;
+}
+
+/* El botón de 'Conciencias' (el de la derecha) siempre un poco más llamativo */
+nav button:last-child {
+    background-color: #f59e0b !important;
+}
+
+.dark nav button:last-child {
+    background-color: #f59e0b !important;
+    color: black !important;
+}

@@ -1,222 +1,313 @@
 <!DOCTYPE html>
-<html lang="es" class="transition-colors duration-700">
+<html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-<title>Hub de Conciencias | Refugio Místico</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>Hub de Conciencias | Espejo Digital</title>
+    
+    <!-- Librerías Externas -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Procesadores de Documentos -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 
-<!-- Tailwind -->
-<script src="https://cdn.tailwindcss.com"></script>
-
-<!-- Tipografías -->
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
-
-<!-- Supabase -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<!-- Procesadores -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
-
-<style>
-/* ========================= */
-/* 🌕🌑 SISTEMA DE COLORES */
-/* ========================= */
-
-:root{
-  --bg-main:#F6F4EF;
-  --bg-panel:rgba(255,255,255,.78);
-  --bg-soft:rgba(245,242,235,.95);
-  --text-main:#2E2A25;
-  --text-soft:#6B645C;
-  --gold:#C9A24D;
-  --gold-strong:#B8963E;
-  --border-gold:rgba(201,162,77,.35);
-  --glow:rgba(201,162,77,.25);
-}
-
-.dark{
-  --bg-main:#0E1116;
-  --bg-panel:rgba(18,22,30,.88);
-  --bg-soft:rgba(12,15,20,.96);
-  --text-main:#EDE9E1;
-  --text-soft:#A8A29A;
-  --gold:#D4AF6A;
-  --gold-strong:#B8963E;
-  --border-gold:rgba(212,175,106,.45);
-  --glow:rgba(212,175,106,.35);
-}
-
-body{
-  font-family:'Plus Jakarta Sans',sans-serif;
-  background:var(--bg-main);
-  color:var(--text-main);
-}
-
-/* Sidebars */
-#history-sidebar,#agents-sidebar{
-  background:linear-gradient(180deg,var(--bg-panel),var(--bg-soft));
-  backdrop-filter:blur(18px);
-  border-color:var(--border-gold);
-}
-
-/* Cards */
-.agent-card{
-  background:var(--bg-panel);
-  border:1px solid var(--border-gold);
-  transition:.3s;
-}
-.agent-card.active{
-  background:linear-gradient(135deg,rgba(201,162,77,.22),rgba(201,162,77,.12));
-  box-shadow:0 0 30px var(--glow);
-}
-
-/* Historial */
-.history-item{
-  background:var(--bg-panel);
-  border:1px solid rgba(120,120,120,.15);
-  transition:.25s;
-}
-.history-item:hover{
-  background:rgba(201,162,77,.12);
-  border-color:var(--gold);
-}
-
-/* Chat */
-.bubble-user{
-  background:linear-gradient(135deg,var(--gold),var(--gold-strong));
-  color:#1E1B16;
-  padding:14px 18px;
-  border-radius:1.25rem;
-  max-width:75%;
-  box-shadow:0 10px 30px var(--glow);
-}
-.bubble-ai{
-  background:var(--bg-panel);
-  border:1px solid rgba(120,120,120,.15);
-  padding:14px 18px;
-  border-radius:1.25rem;
-  max-width:75%;
-}
-
-/* Input */
-#chat-input{
-  background:var(--bg-panel);
-  color:var(--text-main);
-}
-#chat-input:focus{
-  border-color:var(--gold);
-  box-shadow:0 0 0 3px var(--glow);
-}
-
-/* Titulos */
-h1,h2{
-  font-family:'Cormorant Garamond',serif;
-  letter-spacing:.05em;
-}
-
-/* Partículas */
-#particle-container{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:1;
-}
-.particle{
-  position:absolute;
-  bottom:-10px;
-  width:6px;
-  height:6px;
-  background:var(--gold);
-  border-radius:50%;
-  opacity:.35;
-  animation:float var(--duration) linear forwards;
-}
-@keyframes float{
-  to{transform:translateY(-120vh);opacity:0;}
-}
-</style>
+    <link rel="stylesheet" href="style.css"> 
 </head>
+<body class="bg-slate-50 dark:bg-slate-950 transition-colors duration-500 overflow-hidden h-screen">
+    
+    <div id="particle-container"></div>
 
-<body class="overflow-hidden h-screen">
-
-<div id="particle-container"></div>
-
-<!-- SIDEBAR HISTORIAL -->
-<div id="history-sidebar" class="fixed top-0 left-0 h-full w-80 -translate-x-full transition z-50 border-r shadow-2xl">
-  <div class="p-6 flex flex-col h-full">
-    <div class="flex justify-between mb-6">
-      <h2 class="uppercase text-xs tracking-widest text-[var(--gold)]">Mis Reflexiones</h2>
-      <button onclick="toggleSidebar('history-sidebar',false)">×</button>
+    <!-- SIDEBAR: HISTORIAL -->
+    <div id="history-sidebar" class="fixed top-0 left-0 h-full w-80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl z-50 transform -translate-x-full transition-transform duration-300 border-r border-amber-500/20 shadow-2xl">
+        <div class="p-6 flex flex-col h-full">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-amber-600 font-black uppercase tracking-widest text-sm">Mis Reflexiones</h2>
+                <button onclick="toggleSidebar('history-sidebar', false)" class="text-slate-400 hover:text-amber-600 text-3xl">&times;</button>
+            </div>
+            <div id="history-list" class="flex-1 overflow-y-auto space-y-3"></div>
+            <button onclick="createNewChat()" class="mt-4 w-full py-3 bg-amber-600 text-white rounded-xl font-bold uppercase text-[10px] tracking-widest">
+                + Nueva Sesión
+            </button>
+        </div>
     </div>
-    <div id="history-list" class="flex-1 space-y-3 overflow-y-auto"></div>
-    <button onclick="createNewChat()" class="mt-4 py-3 rounded-xl bg-[var(--gold)] text-black text-xs uppercase">+ Nueva sesión</button>
-  </div>
-</div>
 
-<!-- SIDEBAR AGENTES -->
-<div id="agents-sidebar" class="fixed top-0 right-0 h-full w-80 translate-x-full transition z-50 border-l shadow-2xl">
-  <div class="p-6 flex flex-col h-full">
-    <div class="flex justify-between mb-6">
-      <h2 class="uppercase text-xs tracking-widest text-[var(--gold)]">Conciencias</h2>
-      <button onclick="toggleSidebar('agents-sidebar',false)">×</button>
+    <!-- SIDEBAR: AGENTES (CONCIENCIAS) -->
+    <div id="agents-sidebar" class="fixed top-0 right-0 h-full w-80 bg-slate-900/95 backdrop-blur-xl z-50 transform translate-x-full transition-transform duration-300 border-l border-amber-500/20 shadow-2xl">
+        <div class="p-6 flex flex-col h-full">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-amber-500 font-black uppercase tracking-widest text-sm">Conciencias</h2>
+                <button onclick="toggleSidebar('agents-sidebar', false)" class="text-slate-400 hover:text-amber-500 text-3xl">&times;</button>
+            </div>
+            
+            <!-- Botón con contraseña -->
+            <button onclick="checkAdminPassword()" class="mb-6 w-full block text-center py-3 rounded-xl border-2 border-dashed border-amber-500/50 text-amber-500 font-bold text-[10px] uppercase tracking-widest hover:bg-amber-500/20 transition-all">
+                + Crear Nueva Conciencia
+            </button>
+
+            <div id="agents-list" class="flex-1 overflow-y-auto space-y-3 pr-2">
+                <!-- Se carga dinámicamente con JS -->
+            </div>
+        </div>
     </div>
-    <a href="configurador.html" class="mb-4 block text-center py-3 border border-dashed rounded-xl text-xs uppercase">+ Crear Conciencia</a>
-    <div id="agents-list" class="flex-1 space-y-3 overflow-y-auto"></div>
-  </div>
-</div>
 
-<!-- NAV -->
-<nav class="p-6 flex justify-between max-w-7xl mx-auto relative z-20">
-  <button onclick="toggleSidebar('history-sidebar',true)">⌛</button>
-  <div class="flex gap-3">
-    <button onclick="toggleDarkMode()">🌙</button>
-    <button onclick="toggleSidebar('agents-sidebar',true)">✨</button>
-  </div>
-</nav>
+    <!-- NAVEGACIÓN PRINCIPAL -->
+    <nav class="p-6 flex justify-between items-center max-w-7xl mx-auto w-full relative z-20">
+        <!-- Botón Historial -->
+        <button onclick="toggleSidebar('history-sidebar', true)" 
+                class="p-3 rounded-full bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none transition-all text-xl">
+            ⌛
+        </button>
+        
+        <div class="flex items-center gap-3">
+            <!-- Botón Dark Mode -->
+            <button onclick="toggleDarkMode()" 
+                    class="p-3 rounded-full bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none transition-all text-xl">
+                🌙
+            </button>
+            <!-- Botón Agentes -->
+            <button onclick="toggleSidebar('agents-sidebar', true)" 
+                    class="p-3 rounded-full bg-amber-500 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none transition-all text-xl">
+                ✨
+            </button>
+        </div>
+    </nav>
 
-<!-- MAIN -->
-<main class="relative z-10 flex flex-col h-[calc(100vh-140px)] max-w-4xl mx-auto px-4">
+    <main class="relative z-10 flex flex-col h-[calc(100vh-140px)] max-w-4xl mx-auto px-4 w-full">
+        <div class="text-center mb-6">
+            <h1 id="active-agent-name" class="text-4xl font-black uppercase tracking-tighter">Cargando...</h1>
+            <p id="active-agent-desc" class="text-[10px] uppercase tracking-[0.4em] font-bold">Selecciona una conciencia</p>
+        </div>
 
-<div class="text-center mb-6">
-  <h1 id="active-agent-name" class="text-3xl font-semibold">Cargando…</h1>
-  <p id="active-agent-desc" class="text-xs uppercase tracking-[0.3em] text-[var(--gold)]">Conciencia</p>
-</div>
+        <div class="chat-frame flex-1 overflow-hidden flex flex-col shadow-2xl">
+            <div id="chat-box" class="chat-container flex-1 overflow-y-auto p-6 space-y-4"></div>
+        </div>
 
-<div id="chat-box" class="flex-1 overflow-y-auto p-6 space-y-4"></div>
+        <div class="mt-6 relative w-full mb-4">
+            <input type="text" id="chat-input" placeholder="Dime lo que piensas..." 
+                   class="w-full p-5 pr-16 rounded-2xl text-lg italic shadow-xl border-2 border-transparent focus:border-amber-500 outline-none">
+            <button id="send-btn" onclick="handleSend()" class="absolute right-3 top-1/2 -translate-y-1/2 bg-amber-600 text-white p-3.5 rounded-xl hover:bg-amber-700 shadow-lg">➤</button>
+        </div>
+    </main>
 
-<div class="mt-4 relative">
-  <input id="chat-input" placeholder="Dime lo que piensas…" class="w-full p-5 pr-16 rounded-2xl">
-  <button onclick="handleSend()" class="absolute right-3 top-1/2 -translate-y-1/2">➤</button>
-</div>
+    <script src="config.js"></script>
+    <script>
+        const chatBox = document.getElementById('chat-box');
+        const chatInput = document.getElementById('chat-input');
+        const supabaseClient = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
 
-</main>
+        let currentAgent = null;
+        let currentChatId = null;
+        let chatHistory = []; 
+        let currentUser = null;
 
-<script src="config.js"></script>
-<script>
-/* === TU LÓGICA ORIGINAL COMPLETA === */
-/* (sin modificar comportamiento) */
+        async function init() {
+            const { data: authData } = await supabaseClient.auth.signInAnonymously();
+            currentUser = authData.user;
 
-const chatBox=document.getElementById('chat-box');
-const chatInput=document.getElementById('chat-input');
-const supabaseClient=supabase.createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_KEY);
+            await cargarAgentes();
+            await refreshHistorySidebar();
+            
+            setInterval(createParticle, 600);
+            chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleSend(); });
+        }
 
-let currentAgent=null,currentChatId=null,chatHistory=[],currentUser=null;
+        // --- SEGURIDAD: CONTRASEÑA ADMIN ---
+        function checkAdminPassword() {
+            const password = prompt("Introduce la contraseña de administrador:");
+            if (password === "admin123") {
+                window.location.href = "configurador.html";
+            } else {
+                alert("Acceso denegado.");
+            }
+        }
 
-async function init(){
- const {data}=await supabaseClient.auth.signInAnonymously();
- currentUser=data.user;
- await cargarAgentes();
- await refreshHistorySidebar();
- setInterval(createParticle,900);
- chatInput.addEventListener('keydown',e=>{if(e.key==='Enter')handleSend()});
-}
+        // --- GESTIÓN DE AGENTES ---
+        async function cargarAgentes() {
+            const { data, error } = await supabaseClient.from('agentes').select('*').order('created_at', { ascending: false });
+            if (error) return;
 
-/* === resto de funciones === */
-/* (idénticas a tu archivo original) */
+            const list = document.getElementById('agents-list');
+            list.innerHTML = '';
+            data.forEach((agente, index) => {
+                const div = document.createElement('div');
+                div.id = `agent-${agente.id}`;
+                // Aplicamos clases para que los nombres sean blancos sobre fondo oscuro
+                div.className = "agent-card p-4 rounded-2xl cursor-pointer mb-2 transition-all";
+                div.onclick = () => setAgent(agente);
+                div.innerHTML = `
+                    <div class="font-bold text-sm text-white">✨ ${agente.nombre}</div>
+                    <div class="text-[10px] text-white opacity-60 uppercase">${agente.descripcion || 'Conciencia'}</div>
+                `;
+                list.appendChild(div);
+                if (index === 0) setAgent(agente);
+            });
+        }
 
-</script>
+        async function setAgent(agente) {
+            currentAgent = agente;
+            currentAgent.conocimiento_texto = ""; 
 
+            if (agente.archivo_url) {
+                try {
+                    const response = await fetch(agente.archivo_url);
+                    const blob = await response.blob();
+                    const extension = agente.archivo_url.split('.').pop().toLowerCase().split('?')[0];
+
+                    if (extension === 'txt' || extension === 'json') {
+                        currentAgent.conocimiento_texto = await blob.text();
+                    } else if (extension === 'pdf') {
+                        currentAgent.conocimiento_texto = await extractTextFromPDF(agente.archivo_url);
+                    } else if (extension === 'docx') {
+                        const arrayBuffer = await blob.arrayBuffer();
+                        const result = await mammoth.extractRawText({ arrayBuffer });
+                        currentAgent.conocimiento_texto = result.value;
+                    }
+                } catch(e) { console.error("Error cargando archivo:", e); }
+            }
+
+            document.getElementById('active-agent-name').innerText = currentAgent.nombre;
+            document.getElementById('active-agent-desc').innerText = currentAgent.descripcion || "Conciencia";
+            
+            document.querySelectorAll('.agent-card').forEach(c => c.classList.remove('active'));
+            if(document.getElementById(`agent-${agente.id}`)) document.getElementById(`agent-${agente.id}`).classList.add('active');
+            
+            toggleSidebar('agents-sidebar', false);
+            createNewChat();
+        }
+
+        async function extractTextFromPDF(url) {
+            const pdfjsLib = window['pdfjs-dist/build/pdf'];
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+            const pdf = await pdfjsLib.getDocument(url).promise;
+            let text = "";
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const content = await page.getTextContent();
+                text += content.items.map(s => s.str).join(" ") + "\n";
+            }
+            return text;
+        }
+
+        // --- LÓGICA DE CHAT ---
+        async function handleSend() {
+            const text = chatInput.value.trim();
+            if (!text || !currentAgent) return;
+
+            appendBubble(text, true);
+            chatInput.value = '';
+            const typing = showTyping();
+
+            try {
+                const systemPrompt = `${currentAgent.instrucciones}\n\nCONTEXTO ADICIONAL:\n${currentAgent.conocimiento_texto || ''}`;
+                const response = await fetch('/api/gemini', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ systemInstruction: systemPrompt, contents: chatHistory })
+                });
+
+                const data = await response.json();
+                typing.remove();
+                if (data.success) {
+                    appendBubble(data.text, false);
+                    await saveToHubHistory();
+                }
+            } catch (err) {
+                if(typing) typing.remove();
+                appendBubble("El espejo está empañado. Intenta de nuevo.", false);
+            }
+        }
+
+        function appendBubble(text, isUser) {
+            const div = document.createElement('div');
+            div.className = `flex w-full ${isUser ? 'justify-end' : 'justify-start'}`;
+            div.innerHTML = `<div class="bubble ${isUser ? 'bubble-user' : 'bubble-ai'}">${text.replace(/\n/g, '<br>')}</div>`;
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            chatHistory.push({ role: isUser ? "user" : "model", parts: [{ text }] });
+        }
+
+        // --- PERSISTENCIA ---
+        async function saveToHubHistory() {
+            if (!currentUser || chatHistory.length < 2) return;
+            const firstMsg = chatHistory.find(m => m.role === "user")?.parts[0].text || "Reflexión";
+            await supabaseClient.from('reflexiones_hub').upsert({
+                id: currentChatId,
+                user_id: currentUser.id,
+                agent_id: currentAgent.id,
+                title: firstMsg.substring(0, 30) + "...",
+                history: chatHistory,
+                updated_at: new Date().toISOString()
+            });
+            refreshHistorySidebar();
+        }
+
+        async function refreshHistorySidebar() {
+            const { data } = await supabaseClient.from('reflexiones_hub').select('*').eq('user_id', currentUser.id).order('updated_at', { ascending: false });
+            const list = document.getElementById('history-list');
+            if (list) {
+                list.innerHTML = data.map(chat => `
+                    <div onclick="loadChat('${chat.id}')" class="history-item">
+                        <div class="text-xs font-bold truncate">${chat.title}</div>
+                        <div class="text-[8px] opacity-60 uppercase mt-1">${new Date(chat.updated_at).toLocaleDateString()}</div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        async function loadChat(id) {
+            const { data } = await supabaseClient.from('reflexiones_hub').select('*').eq('id', id).single();
+            if(data) {
+                currentChatId = data.id;
+                chatHistory = data.history;
+                chatBox.innerHTML = '';
+                chatHistory.forEach(msg => {
+                    const div = document.createElement('div');
+                    div.className = `flex w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`;
+                    div.innerHTML = `<div class="bubble ${msg.role === 'user' ? 'bubble-user' : 'bubble-ai'}">${msg.parts[0].text.replace(/\n/g, '<br>')}</div>`;
+                    chatBox.appendChild(div);
+                });
+                chatBox.scrollTop = chatBox.scrollHeight;
+                toggleSidebar('history-sidebar', false);
+            }
+        }
+
+        function createNewChat() {
+            currentChatId = Date.now();
+            chatHistory = [];
+            chatBox.innerHTML = '';
+            if(currentAgent) appendBubble(`Soy ${currentAgent.nombre}. ¿Qué buscas reflejar hoy?`, false);
+        }
+
+        // --- UI HELPERS ---
+        function toggleSidebar(id, show) {
+            const el = document.getElementById(id);
+            el.style.transform = show ? 'translateX(0)' : (id === 'history-sidebar' ? 'translateX(-100%)' : 'translateX(100%)');
+        }
+
+        function showTyping() {
+            const div = document.createElement('div');
+            div.className = "text-xs opacity-50 italic p-2 dark:text-white";
+            div.innerText = `${currentAgent.nombre} procesando...`;
+            chatBox.appendChild(div);
+            return div;
+        }
+
+        function toggleDarkMode() { document.documentElement.classList.toggle('dark'); }
+
+        function createParticle() {
+            const container = document.getElementById('particle-container');
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.left = `${Math.random() * 100}%`;
+            p.style.setProperty('--duration', `${Math.random() * 12 + 8}s`);
+            container.appendChild(p);
+            setTimeout(() => p.remove(), 12000);
+        }
+
+        init();
+    </script>
 </body>
 </html>
