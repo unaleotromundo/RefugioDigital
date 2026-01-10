@@ -1,12 +1,13 @@
 // api/gemini.js
+// Esta función se ejecuta en el servidor de Vercel, NO en el navegador
+
 const GEMINI_API_KEYS = [
     process.env.GEMINI_KEY_1,
     process.env.GEMINI_KEY_2,
     process.env.GEMINI_KEY_3,
     process.env.GEMINI_KEY_4
-].filter(Boolean);
+].filter(Boolean); // Elimina undefined
 
-// RESTAURADOS TUS MODELOS ORIGINALES
 const MODELS = [
     "gemini-3-flash-preview",
     "gemini-3-pro",
@@ -16,33 +17,24 @@ const MODELS = [
 ];
 
 export default async function handler(req, res) {
-    if (req.method !== 'POST') return res.status(405).json({ error: 'Método no permitido' });
-
-    const { contents, systemInstruction, image, text } = req.body;
-
-    // --- CONSTRUCCIÓN DEL MENSAJE MULTIMODAL ---
-    // Si hay imagen, se mete en el mismo bloque que el texto para que la IA la vea.
-    let currentParts = [];
-    if (image) {
-        currentParts.push({
-            inlineData: { mimeType: "image/jpeg", data: image }
-        });
+    // Solo permitir POST
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Método no permitido' });
     }
-    currentParts.push({ text: text || "Analiza esta imagen profesionalmente." });
 
-    const finalContents = [
-        ...contents,
-        { role: "user", parts: currentParts }
-    ];
+    const { contents } = req.body;
 
-    const systemInstructionConfig = systemInstruction ? {
-        parts: [{ text: systemInstruction }]
-    } : undefined;
+    if (!contents || !Array.isArray(contents)) {
+        return res.status(400).json({ error: 'Formato inválido' });
+    }
 
+    // Intentar con cada modelo y cada clave
     for (let modelName of MODELS) {
         let keys = [...GEMINI_API_KEYS].sort(() => Math.random() - 0.5);
+        
         for (let key of keys) {
             const apiVersions = ['v1beta', 'v1'];
+            
             for (let ver of apiVersions) {
                 try {
                     const response = await fetch(
@@ -50,10 +42,7 @@ export default async function handler(req, res) {
                         {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ 
-                                contents: finalContents,
-                                systemInstruction: systemInstructionConfig 
-                            })
+                            body: JSON.stringify({ contents })
                         }
                     );
 
@@ -65,6 +54,9 @@ export default async function handler(req, res) {
                             text: data.candidates[0].content.parts[0].text,
                             model: modelName
                         });
+                    } else if (data.error?.message.includes("leaked")) {
+                        console.error(`🔒 Clave bloqueada: ${key.slice(0, 10)}...`);
+                        break; // Saltar a la siguiente clave
                     }
                 } catch (error) {
                     console.error(`Error con ${modelName}:`, error.message);
@@ -73,5 +65,9 @@ export default async function handler(req, res) {
         }
     }
 
-    return res.status(500).json({ success: false, error: 'Error general de conexión' });
+    // Si llegamos aquí, todas las claves fallaron
+    return res.status(500).json({ 
+        success: false, 
+        error: 'Todas las claves API están agotadas o bloqueadas' 
+    });
 }
