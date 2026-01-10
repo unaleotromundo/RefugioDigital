@@ -42,26 +42,32 @@
                 <button onclick="toggleSidebar('agents-sidebar', false)" class="text-slate-400 hover:text-amber-500 text-3xl">&times;</button>
             </div>
             
+            <!-- Botón con contraseña -->
             <button onclick="checkAdminPassword()" class="mb-6 w-full block text-center py-3 rounded-xl border-2 border-dashed border-amber-500/50 text-amber-500 font-bold text-[10px] uppercase tracking-widest hover:bg-amber-500/20 transition-all">
                 + Crear Nueva Conciencia
             </button>
 
-            <div id="agents-list" class="flex-1 overflow-y-auto space-y-3 pr-2"></div>
+            <div id="agents-list" class="flex-1 overflow-y-auto space-y-3 pr-2">
+                <!-- Se carga dinámicamente con JS -->
+            </div>
         </div>
     </div>
 
     <!-- NAVEGACIÓN PRINCIPAL -->
     <nav class="p-6 flex justify-between items-center max-w-7xl mx-auto w-full relative z-20">
+        <!-- Botón Historial -->
         <button onclick="toggleSidebar('history-sidebar', true)" 
                 class="p-3 rounded-full bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none transition-all text-xl">
             ⌛
         </button>
         
         <div class="flex items-center gap-3">
+            <!-- Botón Dark Mode -->
             <button onclick="toggleDarkMode()" 
                     class="p-3 rounded-full bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none transition-all text-xl">
                 🌙
             </button>
+            <!-- Botón Agentes -->
             <button onclick="toggleSidebar('agents-sidebar', true)" 
                     class="p-3 rounded-full bg-amber-500 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none transition-all text-xl">
                 ✨
@@ -79,28 +85,10 @@
             <div id="chat-box" class="chat-container flex-1 overflow-y-auto p-6 space-y-4"></div>
         </div>
 
-        <!-- INPUT Y ANALIZADOR DE IMAGEN -->
         <div class="mt-6 relative w-full mb-4">
-            <div id="image-preview-container" class="hidden absolute bottom-full mb-3 left-0 p-2 bg-white dark:bg-slate-800 rounded-xl border-2 border-black shadow-lg flex items-center gap-2">
-                <img id="image-preview" src="" class="h-16 w-16 object-cover rounded-lg border border-slate-300">
-                <button onclick="clearImage()" class="bg-red-500 text-white rounded-full p-1 hover:bg-red-600 text-xs">✕</button>
-            </div>
-
-            <div class="flex gap-2">
-                <div class="relative flex-1">
-                    <input type="text" id="chat-input" placeholder="Dime lo que piensas o sube una imagen..." 
-                           class="w-full p-5 pr-16 rounded-2xl text-lg italic shadow-xl border-2 border-transparent focus:border-amber-500 outline-none dark:bg-slate-900 dark:text-white">
-                    
-                    <label for="image-upload" class="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer hover:scale-110 transition-transform text-2xl">
-                        📎
-                        <input type="file" id="image-upload" accept="image/*" class="hidden" onchange="handleImageSelect(event)">
-                    </label>
-                </div>
-                
-                <button id="send-btn" onclick="handleSend()" class="bg-amber-600 text-white p-5 rounded-2xl hover:bg-amber-700 shadow-lg font-bold">
-                    ➤
-                </button>
-            </div>
+            <input type="text" id="chat-input" placeholder="Dime lo que piensas..." 
+                   class="w-full p-5 pr-16 rounded-2xl text-lg italic shadow-xl border-2 border-transparent focus:border-amber-500 outline-none">
+            <button id="send-btn" onclick="handleSend()" class="absolute right-3 top-1/2 -translate-y-1/2 bg-amber-600 text-white p-3.5 rounded-xl hover:bg-amber-700 shadow-lg">➤</button>
         </div>
     </main>
 
@@ -114,52 +102,45 @@
         let currentChatId = null;
         let chatHistory = []; 
         let currentUser = null;
-        let selectedImageBase64 = null;
 
         async function init() {
             const { data: authData } = await supabaseClient.auth.signInAnonymously();
             currentUser = authData.user;
+
             await cargarAgentes();
             await refreshHistorySidebar();
+            
             setInterval(createParticle, 600);
             chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleSend(); });
         }
 
-        function handleImageSelect(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                selectedImageBase64 = e.target.result.split(',')[1];
-                document.getElementById('image-preview').src = e.target.result;
-                document.getElementById('image-preview-container').classList.remove('hidden');
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function clearImage() {
-            selectedImageBase64 = null;
-            document.getElementById('image-upload').value = '';
-            document.getElementById('image-preview-container').classList.add('hidden');
-        }
-
+        // --- SEGURIDAD: CONTRASEÑA ADMIN ---
         function checkAdminPassword() {
             const password = prompt("Introduce la contraseña de administrador:");
-            if (password === "admin123") window.location.href = "configurador.html";
-            else alert("Acceso denegado.");
+            if (password === "admin123") {
+                window.location.href = "configurador.html";
+            } else {
+                alert("Acceso denegado.");
+            }
         }
 
+        // --- GESTIÓN DE AGENTES ---
         async function cargarAgentes() {
             const { data, error } = await supabaseClient.from('agentes').select('*').order('created_at', { ascending: false });
             if (error) return;
+
             const list = document.getElementById('agents-list');
             list.innerHTML = '';
             data.forEach((agente, index) => {
                 const div = document.createElement('div');
                 div.id = `agent-${agente.id}`;
+                // Aplicamos clases para que los nombres sean blancos sobre fondo oscuro
                 div.className = "agent-card p-4 rounded-2xl cursor-pointer mb-2 transition-all";
                 div.onclick = () => setAgent(agente);
-                div.innerHTML = `<div class="font-bold text-sm text-white">✨ ${agente.nombre}</div><div class="text-[10px] text-white opacity-60 uppercase">${agente.descripcion || 'Conciencia'}</div>`;
+                div.innerHTML = `
+                    <div class="font-bold text-sm text-white">✨ ${agente.nombre}</div>
+                    <div class="text-[10px] text-white opacity-60 uppercase">${agente.descripcion || 'Conciencia'}</div>
+                `;
                 list.appendChild(div);
                 if (index === 0) setAgent(agente);
             });
@@ -168,90 +149,87 @@
         async function setAgent(agente) {
             currentAgent = agente;
             currentAgent.conocimiento_texto = ""; 
+
             if (agente.archivo_url) {
                 try {
                     const response = await fetch(agente.archivo_url);
                     const blob = await response.blob();
                     const extension = agente.archivo_url.split('.').pop().toLowerCase().split('?')[0];
-                    if (extension === 'txt' || extension === 'json') currentAgent.conocimiento_texto = await blob.text();
-                    else if (extension === 'pdf') currentAgent.conocimiento_texto = await extractTextFromPDF(agente.archivo_url);
-                    else if (extension === 'docx') {
+
+                    if (extension === 'txt' || extension === 'json') {
+                        currentAgent.conocimiento_texto = await blob.text();
+                    } else if (extension === 'pdf') {
+                        currentAgent.conocimiento_texto = await extractTextFromPDF(agente.archivo_url);
+                    } else if (extension === 'docx') {
                         const arrayBuffer = await blob.arrayBuffer();
                         const result = await mammoth.extractRawText({ arrayBuffer });
                         currentAgent.conocimiento_texto = result.value;
                     }
                 } catch(e) { console.error("Error cargando archivo:", e); }
             }
+
             document.getElementById('active-agent-name').innerText = currentAgent.nombre;
             document.getElementById('active-agent-desc').innerText = currentAgent.descripcion || "Conciencia";
+            
             document.querySelectorAll('.agent-card').forEach(c => c.classList.remove('active'));
             if(document.getElementById(`agent-${agente.id}`)) document.getElementById(`agent-${agente.id}`).classList.add('active');
+            
             toggleSidebar('agents-sidebar', false);
             createNewChat();
         }
 
+        async function extractTextFromPDF(url) {
+            const pdfjsLib = window['pdfjs-dist/build/pdf'];
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+            const pdf = await pdfjsLib.getDocument(url).promise;
+            let text = "";
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const content = await page.getTextContent();
+                text += content.items.map(s => s.str).join(" ") + "\n";
+            }
+            return text;
+        }
+
+        // --- LÓGICA DE CHAT ---
         async function handleSend() {
             const text = chatInput.value.trim();
-            if (!text && !selectedImageBase64) return;
+            if (!text || !currentAgent) return;
 
-            // Prompt limpio para la IA
-            const promptParaIA = text || "Analiza esta imagen detenidamente";
-
-            // Contenido visual para la burbuja
-            let displayContent = text;
-            if (selectedImageBase64) {
-                const imgUrl = document.getElementById('image-preview').src;
-                displayContent = `<div><img src="${imgUrl}" class="max-w-[200px] rounded-lg mb-2 shadow-md border-2 border-white"><br>${text}</div>`;
-            }
-
-            // Añadimos a la UI y al historial (pasamos prompt limpio para el historial)
-            appendBubble(displayContent, true, promptParaIA);
-            
+            appendBubble(text, true);
             chatInput.value = '';
             const typing = showTyping();
-            const imageToSend = selectedImageBase64;
-            clearImage();
 
             try {
                 const systemPrompt = `${currentAgent.instrucciones}\n\nCONTEXTO ADICIONAL:\n${currentAgent.conocimiento_texto || ''}`;
                 const response = await fetch('/api/gemini', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        systemInstruction: systemPrompt, 
-                        contents: chatHistory,
-                        image: imageToSend 
-                    })
+                    body: JSON.stringify({ systemInstruction: systemPrompt, contents: chatHistory })
                 });
 
                 const data = await response.json();
                 typing.remove();
                 if (data.success) {
-                    appendBubble(data.text, false, data.text);
+                    appendBubble(data.text, false);
                     await saveToHubHistory();
                 }
             } catch (err) {
                 if(typing) typing.remove();
-                appendBubble("El espejo está empañado. Intenta de nuevo.", false, "Error de conexión");
+                appendBubble("El espejo está empañado. Intenta de nuevo.", false);
             }
         }
 
-        // Función appendBubble mejorada para separar UI de Historial
-        function appendBubble(visualText, isUser, historyText) {
+        function appendBubble(text, isUser) {
             const div = document.createElement('div');
             div.className = `flex w-full ${isUser ? 'justify-end' : 'justify-start'}`;
-            // Solo usamos HTML si es un contenido complejo (imagen), si no, texto plano
-            div.innerHTML = `<div class="bubble ${isUser ? 'bubble-user' : 'bubble-ai'}">${visualText.includes('<div') ? visualText : visualText.replace(/\n/g, '<br>')}</div>`;
+            div.innerHTML = `<div class="bubble ${isUser ? 'bubble-user' : 'bubble-ai'}">${text.replace(/\n/g, '<br>')}</div>`;
             chatBox.appendChild(div);
             chatBox.scrollTop = chatBox.scrollHeight;
-
-            // Guardamos en el historial el texto sin HTML para que la IA no se confunda
-            chatHistory.push({ 
-                role: isUser ? "user" : "model", 
-                parts: [{ text: historyText || visualText }] 
-            });
+            chatHistory.push({ role: isUser ? "user" : "model", parts: [{ text }] });
         }
 
+        // --- PERSISTENCIA ---
         async function saveToHubHistory() {
             if (!currentUser || chatHistory.length < 2) return;
             const firstMsg = chatHistory.find(m => m.role === "user")?.parts[0].text || "Reflexión";
@@ -269,7 +247,7 @@
         async function refreshHistorySidebar() {
             const { data } = await supabaseClient.from('reflexiones_hub').select('*').eq('user_id', currentUser.id).order('updated_at', { ascending: false });
             const list = document.getElementById('history-list');
-            if(list) {
+            if (list) {
                 list.innerHTML = data.map(chat => `
                     <div onclick="loadChat('${chat.id}')" class="history-item">
                         <div class="text-xs font-bold truncate">${chat.title}</div>
@@ -300,9 +278,10 @@
             currentChatId = Date.now();
             chatHistory = [];
             chatBox.innerHTML = '';
-            if(currentAgent) appendBubble(`Soy ${currentAgent.nombre}. ¿Qué buscas reflejar hoy?`, false, `Soy ${currentAgent.nombre}. ¿Qué buscas reflejar hoy?`);
+            if(currentAgent) appendBubble(`Soy ${currentAgent.nombre}. ¿Qué buscas reflejar hoy?`, false);
         }
 
+        // --- UI HELPERS ---
         function toggleSidebar(id, show) {
             const el = document.getElementById(id);
             el.style.transform = show ? 'translateX(0)' : (id === 'history-sidebar' ? 'translateX(-100%)' : 'translateX(100%)');
@@ -311,7 +290,7 @@
         function showTyping() {
             const div = document.createElement('div');
             div.className = "text-xs opacity-50 italic p-2 dark:text-white";
-            div.innerText = `${currentAgent.nombre} analizando...`;
+            div.innerText = `${currentAgent.nombre} procesando...`;
             chatBox.appendChild(div);
             return div;
         }

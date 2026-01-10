@@ -1,11 +1,12 @@
 // api/gemini.js
+// Esta función se ejecuta en el servidor de Vercel, NO en el navegador
 
 const GEMINI_API_KEYS = [
     process.env.GEMINI_KEY_1,
     process.env.GEMINI_KEY_2,
     process.env.GEMINI_KEY_3,
     process.env.GEMINI_KEY_4
-].filter(Boolean);
+].filter(Boolean); // Elimina undefined
 
 const MODELS = [
     "gemini-3-flash-preview",
@@ -16,50 +17,18 @@ const MODELS = [
 ];
 
 export default async function handler(req, res) {
-    if (req.method !== 'POST') return res.status(405).json({ error: 'Método no permitido' });
+    // Solo permitir POST
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Método no permitido' });
+    }
 
-    const { contents, systemInstruction, image } = req.body;
-
-    // --- LOG DE ENTRADA ---
-    console.log("--- NUEVA PETICIÓN RECIBIDA ---");
-    console.log("¿Hay imagen?:", !!image);
-    console.log("Número de mensajes en historial:", contents?.length);
+    const { contents } = req.body;
 
     if (!contents || !Array.isArray(contents)) {
         return res.status(400).json({ error: 'Formato inválido' });
     }
 
-    let finalContents = JSON.parse(JSON.stringify(contents)); 
-    
-    if (image) {
-        const lastMessage = finalContents[finalContents.length - 1];
-        if (lastMessage && lastMessage.role === 'user') {
-            console.log("Insertando imagen en el último mensaje del usuario...");
-            const originalText = lastMessage.parts[0].text;
-            
-            // Re-estructuramos para cumplir con el formato Multimodal de Google
-            lastMessage.parts = [
-                { text: originalText },
-                {
-                    inline_data: {
-                        mime_type: "image/jpeg",
-                        data: image
-                    }
-                }
-            ];
-        }
-    }
-
-    const requestPayload = {
-        contents: finalContents
-    };
-
-    if (systemInstruction) {
-        requestPayload.system_instruction = {
-            parts: [{ text: systemInstruction }]
-        };
-    }
-
+    // Intentar con cada modelo y cada clave
     for (let modelName of MODELS) {
         let keys = [...GEMINI_API_KEYS].sort(() => Math.random() - 0.5);
         
@@ -68,36 +37,37 @@ export default async function handler(req, res) {
             
             for (let ver of apiVersions) {
                 try {
-                    console.log(`Probando modelo: ${modelName} (${ver}) con clave: ${key.slice(0, 6)}...`);
-                    
                     const response = await fetch(
                         `https://generativelanguage.googleapis.com/${ver}/models/${modelName}:generateContent?key=${key}`,
                         {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(requestPayload)
+                            body: JSON.stringify({ contents })
                         }
                     );
 
                     const data = await response.json();
 
                     if (response.ok && data.candidates) {
-                        console.log("✅ Respuesta exitosa del modelo:", modelName);
                         return res.status(200).json({
                             success: true,
                             text: data.candidates[0].content.parts[0].text,
                             model: modelName
                         });
-                    } else {
-                        // Log del error específico de la API de Google
-                        console.error(`❌ Error en ${modelName}:`, data.error?.message || "Error desconocido");
+                    } else if (data.error?.message.includes("leaked")) {
+                        console.error(`🔒 Clave bloqueada: ${key.slice(0, 10)}...`);
+                        break; // Saltar a la siguiente clave
                     }
                 } catch (error) {
-                    console.error(`Critico en ${modelName}:`, error.message);
+                    console.error(`Error con ${modelName}:`, error.message);
                 }
             }
         }
     }
 
-    return res.status(500).json({ success: false, error: 'Todas las rutas fallaron' });
+    // Si llegamos aquí, todas las claves fallaron
+    return res.status(500).json({ 
+        success: false, 
+        error: 'Todas las claves API están agotadas o bloqueadas' 
+    });
 }
