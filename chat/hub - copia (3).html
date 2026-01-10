@@ -20,7 +20,7 @@
     
     <div id="particle-container"></div>
 
-    <!-- SIDEBAR: HISTORIAL (Izquierda) -->
+    <!-- SIDEBAR: HISTORIAL -->
     <div id="history-sidebar" class="fixed top-0 left-0 h-full w-80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl z-50 transform -translate-x-full transition-transform duration-300 border-r border-amber-500/20 shadow-2xl">
         <div class="p-6 flex flex-col h-full">
             <div class="flex justify-between items-center mb-8">
@@ -34,7 +34,7 @@
         </div>
     </div>
 
-    <!-- SIDEBAR: AGENTES / CONCIENCIAS (Derecha) -->
+    <!-- SIDEBAR: AGENTES (CONCIENCIAS) -->
     <div id="agents-sidebar" class="fixed top-0 right-0 h-full w-80 bg-slate-900/95 backdrop-blur-xl z-50 transform translate-x-full transition-transform duration-300 border-l border-amber-500/20 shadow-2xl">
         <div class="p-6 flex flex-col h-full">
             <div class="flex justify-between items-center mb-6">
@@ -42,32 +42,27 @@
                 <button onclick="toggleSidebar('agents-sidebar', false)" class="text-slate-400 hover:text-amber-500 text-3xl">&times;</button>
             </div>
             
-            <!-- Botón Crear con Contraseña -->
+            <!-- Botón con contraseña -->
             <button onclick="checkAdminPassword()" class="mb-6 w-full block text-center py-3 rounded-xl border-2 border-dashed border-amber-500/50 text-amber-500 font-bold text-[10px] uppercase tracking-widest hover:bg-amber-500/20 transition-all">
                 + Crear Nueva Conciencia
             </button>
 
-            <div id="agents-list" class="flex-1 overflow-y-auto space-y-3 pr-2">
-                <!-- Los nombres aquí aparecerán en blanco por el CSS de agent-card -->
-            </div>
+            <div id="agents-list" class="flex-1 overflow-y-auto space-y-3 pr-2"></div>
         </div>
     </div>
 
     <!-- NAVEGACIÓN PRINCIPAL -->
     <nav class="p-6 flex justify-between items-center max-w-7xl mx-auto w-full relative z-20">
-        <!-- Botón Historial -->
         <button onclick="toggleSidebar('history-sidebar', true)" 
                 class="p-3 rounded-full bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none transition-all text-xl">
             ⌛
         </button>
         
         <div class="flex items-center gap-3">
-            <!-- Botón Dark Mode -->
             <button onclick="toggleDarkMode()" 
                     class="p-3 rounded-full bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none transition-all text-xl">
                 🌙
             </button>
-            <!-- Botón Conciencias -->
             <button onclick="toggleSidebar('agents-sidebar', true)" 
                     class="p-3 rounded-full bg-amber-500 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none transition-all text-xl">
                 ✨
@@ -76,20 +71,18 @@
     </nav>
 
     <main class="relative z-10 flex flex-col h-[calc(100vh-140px)] max-w-4xl mx-auto px-4 w-full">
-        <!-- Título Dinámico -->
         <div class="text-center mb-6">
             <h1 id="active-agent-name" class="text-4xl font-black uppercase tracking-tighter">Cargando...</h1>
             <p id="active-agent-desc" class="text-[10px] uppercase tracking-[0.4em] font-bold">Selecciona una conciencia</p>
         </div>
 
-        <!-- Caja de Chat -->
         <div class="chat-frame flex-1 overflow-hidden flex flex-col shadow-2xl">
             <div id="chat-box" class="chat-container flex-1 overflow-y-auto p-6 space-y-4"></div>
         </div>
 
-        <!-- Entrada de Texto e Imagen -->
+        <!-- INPUT Y ANALIZADOR DE IMAGEN -->
         <div class="mt-6 relative w-full mb-4">
-            <!-- Miniatura de Imagen -->
+            <!-- Vista previa de imagen seleccionada -->
             <div id="image-preview-container" class="hidden absolute bottom-full mb-3 left-0 p-2 bg-white dark:bg-slate-800 rounded-xl border-2 border-black shadow-lg flex items-center gap-2">
                 <img id="image-preview" src="" class="h-16 w-16 object-cover rounded-lg border border-slate-300">
                 <button onclick="clearImage()" class="bg-red-500 text-white rounded-full p-1 hover:bg-red-600 text-xs">✕</button>
@@ -100,7 +93,7 @@
                     <input type="text" id="chat-input" placeholder="Dime lo que piensas o sube una imagen..." 
                            class="w-full p-5 pr-16 rounded-2xl text-lg italic shadow-xl border-2 border-transparent focus:border-amber-500 outline-none dark:bg-slate-900 dark:text-white">
                     
-                    <!-- Clip para adjuntar imagen -->
+                    <!-- Botón Clip para Imagen -->
                     <label for="image-upload" class="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer hover:scale-110 transition-transform text-2xl">
                         📎
                         <input type="file" id="image-upload" accept="image/*" class="hidden" onchange="handleImageSelect(event)">
@@ -116,7 +109,6 @@
 
     <script src="config.js"></script>
     <script>
-        // --- LÓGICA DE LA APLICACIÓN ---
         const chatBox = document.getElementById('chat-box');
         const chatInput = document.getElementById('chat-input');
         const supabaseClient = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
@@ -138,17 +130,7 @@
             chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleSend(); });
         }
 
-        // 1. SEGURIDAD: CONTRASEÑA ADMIN
-        function checkAdminPassword() {
-            const password = prompt("Introduce la contraseña de administrador:");
-            if (password === "admin123") {
-                window.location.href = "configurador.html";
-            } else {
-                alert("Contraseña incorrecta. Acceso denegado.");
-            }
-        }
-
-        // 2. MANEJO DE IMÁGENES
+        // --- MANEJO DE IMÁGENES ---
         function handleImageSelect(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -168,7 +150,17 @@
             document.getElementById('image-preview-container').classList.add('hidden');
         }
 
-        // 3. GESTIÓN DE AGENTES / CONCIENCIAS
+        // --- SEGURIDAD ---
+        function checkAdminPassword() {
+            const password = prompt("Introduce la contraseña de administrador:");
+            if (password === "admin123") {
+                window.location.href = "configurador.html";
+            } else {
+                alert("Acceso denegado.");
+            }
+        }
+
+        // --- GESTIÓN DE AGENTES ---
         async function cargarAgentes() {
             const { data, error } = await supabaseClient.from('agentes').select('*').order('created_at', { ascending: false });
             if (error) return;
@@ -196,17 +188,17 @@
                 try {
                     const response = await fetch(agente.archivo_url);
                     const blob = await response.blob();
-                    const ext = agente.archivo_url.split('.').pop().toLowerCase().split('?')[0];
-                    if (ext === 'txt' || ext === 'json') {
+                    const extension = agente.archivo_url.split('.').pop().toLowerCase().split('?')[0];
+                    if (extension === 'txt' || extension === 'json') {
                         currentAgent.conocimiento_texto = await blob.text();
-                    } else if (ext === 'pdf') {
+                    } else if (extension === 'pdf') {
                         currentAgent.conocimiento_texto = await extractTextFromPDF(agente.archivo_url);
-                    } else if (ext === 'docx') {
+                    } else if (extension === 'docx') {
                         const arrayBuffer = await blob.arrayBuffer();
                         const result = await mammoth.extractRawText({ arrayBuffer });
                         currentAgent.conocimiento_texto = result.value;
                     }
-                } catch(e) { console.error("Error cargando documento:", e); }
+                } catch(e) { console.error("Error cargando archivo:", e); }
             }
             document.getElementById('active-agent-name').innerText = currentAgent.nombre;
             document.getElementById('active-agent-desc').innerText = currentAgent.descripcion || "Conciencia";
@@ -216,59 +208,38 @@
             createNewChat();
         }
 
-        async function extractTextFromPDF(url) {
-            const pdfjsLib = window['pdfjs-dist/build/pdf'];
-            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
-            const pdf = await pdfjsLib.getDocument(url).promise;
-            let text = "";
-            for (let i = 1; i <= pdf.numPages; i++) {
-                const page = await pdf.getPage(i);
-                const content = await page.getTextContent();
-                text += content.items.map(s => s.str).join(" ") + "\n";
-            }
-            return text;
-        }
-
-        // 4. LÓGICA DE CHAT
+        // --- LÓGICA DE ENVÍO ---
         async function handleSend() {
             const text = chatInput.value.trim();
             if (!text && !selectedImageBase64) return;
 
-            let displayHtml = text;
+            let displayContent = text;
             if (selectedImageBase64) {
                 const imgUrl = document.getElementById('image-preview').src;
-                displayHtml = `
-                    <div class="flex flex-col gap-2">
-                        <img src="${imgUrl}" class="max-w-[200px] rounded-lg border-2 border-white shadow-md">
-                        <span>${text || "Analiza esta imagen."}</span>
-                    </div>`;
+                displayContent = `<div><img src="${imgUrl}" class="max-w-[200px] rounded-lg mb-2 shadow-md border-2 border-white"><br>${text}</div>`;
             }
 
-            appendBubble(displayHtml, true);
+            appendBubble(displayContent, true);
             chatInput.value = '';
-            
             const typing = showTyping();
-            const imageData = selectedImageBase64;
-            const userMsg = text;
-            clearImage(); 
+            
+            const imageToSend = selectedImageBase64;
+            clearImage();
 
             try {
                 const systemPrompt = `${currentAgent.instrucciones}\n\nCONTEXTO ADICIONAL:\n${currentAgent.conocimiento_texto || ''}`;
-                
                 const response = await fetch('/api/gemini', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         systemInstruction: systemPrompt, 
                         contents: chatHistory,
-                        image: imageData,
-                        text: userMsg || "Analiza esta imagen e interpreta su significado."
+                        image: imageToSend 
                     })
                 });
 
                 const data = await response.json();
                 typing.remove();
-
                 if (data.success) {
                     appendBubble(data.text, false);
                     await saveToHubHistory();
@@ -282,38 +253,21 @@
         function appendBubble(text, isUser) {
             const div = document.createElement('div');
             div.className = `flex w-full ${isUser ? 'justify-end' : 'justify-start'}`;
-            
-            const isHtml = text.includes('<div') || text.includes('<img');
-            const content = isHtml ? text : text.replace(/\n/g, '<br>');
-            
-            div.innerHTML = `<div class="bubble ${isUser ? 'bubble-user' : 'bubble-ai'}">${content}</div>`;
+            div.innerHTML = `<div class="bubble ${isUser ? 'bubble-user' : 'bubble-ai'}">${text.includes('<div') ? text : text.replace(/\n/g, '<br>')}</div>`;
             chatBox.appendChild(div);
             chatBox.scrollTop = chatBox.scrollHeight;
-
-            let historyText = text;
-            if (isHtml) {
-                const temp = document.createElement('div');
-                temp.innerHTML = text;
-                historyText = `[Imagen enviada] ${temp.innerText.trim()}`;
-            }
-
-            chatHistory.push({ 
-                role: isUser ? "user" : "model", 
-                parts: [{ text: historyText }] 
-            });
+            chatHistory.push({ role: isUser ? "user" : "model", parts: [{ text: text.includes('<div') ? "Imagen adjunta y texto" : text }] });
         }
 
-        // 5. PERSISTENCIA EN SUPABASE
+        // --- PERSISTENCIA Y UI ---
         async function saveToHubHistory() {
             if (!currentUser || chatHistory.length < 2) return;
             const firstMsg = chatHistory.find(m => m.role === "user")?.parts[0].text || "Reflexión";
-            const title = firstMsg.substring(0, 30).replace("[Imagen enviada]", "📷") + "...";
-
             await supabaseClient.from('reflexiones_hub').upsert({
                 id: currentChatId,
                 user_id: currentUser.id,
                 agent_id: currentAgent.id,
-                title: title,
+                title: firstMsg.substring(0, 30) + "...",
                 history: chatHistory,
                 updated_at: new Date().toISOString()
             });
@@ -321,10 +275,9 @@
         }
 
         async function refreshHistorySidebar() {
-            if (!currentUser) return;
             const { data } = await supabaseClient.from('reflexiones_hub').select('*').eq('user_id', currentUser.id).order('updated_at', { ascending: false });
             const list = document.getElementById('history-list');
-            if (list) {
+            if(list) {
                 list.innerHTML = data.map(chat => `
                     <div onclick="loadChat('${chat.id}')" class="history-item">
                         <div class="text-xs font-bold truncate">${chat.title}</div>
@@ -358,19 +311,16 @@
             if(currentAgent) appendBubble(`Soy ${currentAgent.nombre}. ¿Qué buscas reflejar hoy?`, false);
         }
 
-        // 6. UI HELPERS
         function toggleSidebar(id, show) {
             const el = document.getElementById(id);
-            const isLeft = id === 'history-sidebar';
-            el.style.transform = show ? 'translateX(0)' : (isLeft ? 'translateX(-100%)' : 'translateX(100%)');
+            el.style.transform = show ? 'translateX(0)' : (id === 'history-sidebar' ? 'translateX(-100%)' : 'translateX(100%)');
         }
 
         function showTyping() {
             const div = document.createElement('div');
             div.className = "text-xs opacity-50 italic p-2 dark:text-white";
-            div.innerText = `${currentAgent?.nombre || 'Espejo'} analizando...`;
+            div.innerText = `${currentAgent.nombre} analizando...`;
             chatBox.appendChild(div);
-            chatBox.scrollTop = chatBox.scrollHeight;
             return div;
         }
 
@@ -378,7 +328,6 @@
 
         function createParticle() {
             const container = document.getElementById('particle-container');
-            if (!container) return;
             const p = document.createElement('div');
             p.className = 'particle';
             p.style.left = `${Math.random() * 100}%`;
