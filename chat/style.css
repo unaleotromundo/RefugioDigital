@@ -1,5 +1,10 @@
 /* RESET Y BASE */
-html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; }
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
 
 body { 
     font-family: 'Plus Jakarta Sans', sans-serif; 
@@ -9,53 +14,115 @@ body {
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
+    transition: background-color 0.4s ease;
 }
 
-/* FONDO MODO CLARO: Imagen visible */
 body::before {
-    content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(255, 255, 255, 0.65); 
-    backdrop-filter: blur(2px); z-index: 0;
+    content: "";
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(255, 252, 247, 0.75); 
+    z-index: 0;
 }
 
-/* FONDO MODO OSCURO */
-.dark body::before { background: rgba(8, 10, 15, 0.85); backdrop-filter: blur(4px); }
-
-/* TÍTULO PRINCIPAL - ALTO CONTRASTE */
-#active-agent-name {
-    color: #000000 !important; font-weight: 900 !important; position: relative; z-index: 10;
-    -webkit-text-stroke: 0.5px #000000;
-    text-shadow: 2px 2px 0px rgba(255, 255, 255, 1);
-    font-size: 2.5rem;
+.dark body::before {
+    background: rgba(8, 10, 15, 0.85); 
 }
-.dark #active-agent-name { color: #ffffff !important; -webkit-text-stroke: 0px; text-shadow: 0px 0px 15px rgba(245, 158, 11, 0.5); }
 
-/* BOTONES NEO-BRUTALISTAS */
-nav button, #send-btn {
-    background: white; border: 2px solid black !important;
-    box-shadow: 4px 4px 0px 0px rgba(0,0,0,1) !important;
-    transition: all 0.2s;
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 1rem 1.5rem 1rem;
+    overflow: hidden;
+    position: relative;
+    z-index: 10;
 }
-nav button:active, #send-btn:active { transform: translate(2px, 2px); box-shadow: 0px 0px 0px 0px rgba(0,0,0,1) !important; }
 
-/* CHAT FRAME */
+/* MARCO DEL CHAT */
 .chat-frame {
-    flex: 1; background: rgba(255, 255, 255, 0.95); 
-    border: 2px solid black; border-radius: 2rem;
-    overflow: hidden; position: relative; z-index: 10;
+    flex: 1;
+    background: rgba(255, 255, 255, 0.92); 
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    border-radius: 2rem;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
 }
-.dark .chat-frame { background: rgba(15, 23, 42, 0.95); border-color: #f59e0b; }
 
-/* BURBUJAS */
-.bubble { border-radius: 1.2rem; padding: 1rem; max-width: 85%; font-weight: 600; border: 1px solid black; }
-.bubble-user { background: #fbbf24; align-self: flex-end; color: black !important; }
-.bubble-ai { background: #f1f5f9; align-self: flex-start; color: black !important; }
-.dark .bubble-ai { background: #1e293b; color: white !important; border-color: #f59e0b; }
+.dark .chat-frame {
+    background: rgba(15, 23, 42, 0.9);
+}
 
-/* SIDEBAR AGENTES - NOMBRES EN BLANCO */
-.agent-card { background: #0f172a !important; border: 1px solid #f59e0b44 !important; color: white !important; margin-bottom: 8px; }
-.agent-card div { color: white !important; }
-.agent-card.active { border-color: #f59e0b !important; background: #1e293b !important; box-shadow: 0 0 10px #f59e0b44; }
+.chat-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+/* BURBUJAS - TEXTOS NEGROS EN MODO CLARO */
+.bubble {
+    border-radius: 1.2rem;
+    padding: 1rem 1.2rem;
+    max-width: 85%;
+    line-height: 1.5;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #000000 !important; /* Negro puro */
+}
+
+.bubble-ai {
+    background-color: #f1f5f9; 
+    align-self: flex-start;
+    border: 1px solid #cbd5e1;
+    border-bottom-left-radius: 0.2rem;
+}
+
+.bubble-user {
+    background-color: #fbbf24; /* Naranja más claro para leer negro */
+    align-self: flex-end;
+    border-bottom-right-radius: 0.2rem;
+}
+
+.dark .bubble { color: #ffffff !important; }
+.dark .bubble-ai { background: rgba(245, 158, 11, 0.1); color: #fef3c7 !important; border-color: rgba(245, 158, 11, 0.2); }
+.dark .bubble-user { background: #f59e0b; color: #ffffff !important; }
+
+/* INPUT */
+#chat-input {
+    background: #ffffff;
+    color: #000000 !important;
+    border: 2px solid #f59e0b44;
+    font-weight: 600;
+}
+.dark #chat-input { background: #0f172a; color: #ffffff !important; border-color: rgba(245, 158, 11, 0.3); }
+
+/* HISTORIAL */
+.history-item {
+    padding: 1rem;
+    border-radius: 1rem;
+    background: rgba(245, 158, 11, 0.05);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.history-item:hover { background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.3); }
+.history-item.active { background: rgba(245, 158, 11, 0.15); border-color: #f59e0b; }
+.history-item .title { font-size: 0.85rem; font-weight: 800; color: #1e293b; margin-bottom: 2px; }
+.dark .history-item .title { color: #f1f5f9; }
 
 /* PARTÍCULAS */
-.particle { position: absolute; background: #f59e0b; border-radius: 50%; opacity: 0.5; pointer-events: none; }
+#particle-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+.particle { position: absolute; top: -20px; background: #f59e0b; border-radius: 50%; animation: fall var(--duration) linear infinite; }
+@keyframes fall { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: var(--opacity); } 100% { transform: translateY(110vh); opacity: 0; } }
+
+.chat-container::-webkit-scrollbar { width: 5px; }
+.chat-container::-webkit-scrollbar-thumb { background: #f59e0b66; border-radius: 10px; }
