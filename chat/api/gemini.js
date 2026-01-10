@@ -16,26 +16,28 @@ const MODELS = [
 ];
 
 export default async function handler(req, res) {
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Método no permitido' });
-    }
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Método no permitido' });
 
-    // Recogemos los nuevos campos: systemInstruction e image
     const { contents, systemInstruction, image } = req.body;
+
+    // --- LOG DE ENTRADA ---
+    console.log("--- NUEVA PETICIÓN RECIBIDA ---");
+    console.log("¿Hay imagen?:", !!image);
+    console.log("Número de mensajes en historial:", contents?.length);
 
     if (!contents || !Array.isArray(contents)) {
         return res.status(400).json({ error: 'Formato inválido' });
     }
 
-    // --- PREPARACIÓN DEL CUERPO DE LA PETICIÓN ---
     let finalContents = JSON.parse(JSON.stringify(contents)); 
     
-    // Si hay una imagen, la insertamos en el último mensaje del historial (el del usuario)
     if (image) {
         const lastMessage = finalContents[finalContents.length - 1];
         if (lastMessage && lastMessage.role === 'user') {
-            // Reestructuramos las partes para que incluyan texto e imagen
+            console.log("Insertando imagen en el último mensaje del usuario...");
             const originalText = lastMessage.parts[0].text;
+            
+            // Re-estructuramos para cumplir con el formato Multimodal de Google
             lastMessage.parts = [
                 { text: originalText },
                 {
@@ -48,12 +50,10 @@ export default async function handler(req, res) {
         }
     }
 
-    // Construimos el objeto que Gemini espera
     const requestPayload = {
         contents: finalContents
     };
 
-    // Añadimos la instrucción de sistema si existe
     if (systemInstruction) {
         requestPayload.system_instruction = {
             parts: [{ text: systemInstruction }]
@@ -68,32 +68,36 @@ export default async function handler(req, res) {
             
             for (let ver of apiVersions) {
                 try {
+                    console.log(`Probando modelo: ${modelName} (${ver}) con clave: ${key.slice(0, 6)}...`);
+                    
                     const response = await fetch(
                         `https://generativelanguage.googleapis.com/${ver}/models/${modelName}:generateContent?key=${key}`,
                         {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(requestPayload) // Enviamos el payload completo
+                            body: JSON.stringify(requestPayload)
                         }
                     );
 
                     const data = await response.json();
 
                     if (response.ok && data.candidates) {
+                        console.log("✅ Respuesta exitosa del modelo:", modelName);
                         return res.status(200).json({
                             success: true,
                             text: data.candidates[0].content.parts[0].text,
                             model: modelName
                         });
-                    } else if (data.error?.message.includes("leaked")) {
-                        break; 
+                    } else {
+                        // Log del error específico de la API de Google
+                        console.error(`❌ Error en ${modelName}:`, data.error?.message || "Error desconocido");
                     }
                 } catch (error) {
-                    console.error(`Error con ${modelName}:`, error.message);
+                    console.error(`Critico en ${modelName}:`, error.message);
                 }
             }
         }
     }
 
-    return res.status(500).json({ success: false, error: 'Error de conexión' });
+    return res.status(500).json({ success: false, error: 'Todas las rutas fallaron' });
 }
