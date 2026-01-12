@@ -14,11 +14,18 @@ async function init() {
     console.log("🚀 Espejo Digital: Iniciando...");
 
     try {
-        // Autenticación Anónima para historial único
-        const { data: authData, error: authError } = await supabaseClient.auth.signInAnonymously();
-        if (authError) throw authError;
-        currentUser = authData.user;
-        console.log("👤 Usuario identificado:", currentUser.id);
+        // Verificar sesión existente o crear una nueva
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        
+        if (session) {
+            currentUser = session.user;
+            console.log("👤 Sesión existente:", currentUser.id);
+        } else {
+            const { data: authData, error: authError } = await supabaseClient.auth.signInAnonymously();
+            if (authError) throw authError;
+            currentUser = authData.user;
+            console.log("👤 Nueva sesión creada:", currentUser.id);
+        }
 
         // Cargar datos iniciales
         await cargarAgentes();
@@ -30,41 +37,63 @@ async function init() {
             if (e.key === 'Enter') { e.preventDefault(); handleSend(); }
         });
 
+        console.log("✅ Inicialización completa");
+
     } catch (err) {
         console.error("❌ Error en init:", err.message);
+        alert("Error de conexión: " + err.message);
     }
 }
 
 // --- 2. GESTIÓN DE AGENTES ---
 async function cargarAgentes() {
-    const { data, error } = await supabaseClient
-        .from('agentes')
-        .select('*')
-        .order('created_at', { ascending: false });
+    try {
+        const { data, error } = await supabaseClient
+            .from('agentes')
+            .select('*')
+            .order('created_at', { ascending: false });
 
-    if (error) {
+        if (error) throw error;
+
+        console.log("✅ Agentes cargados:", data?.length || 0);
+        listaAgentesGlobal = data || [];
+        const list = document.getElementById('agents-list');
+        
+        if (!list) {
+            console.error("❌ Elemento #agents-list no encontrado");
+            return;
+        }
+        
+        list.innerHTML = '';
+        
+        if (!data || data.length === 0) {
+            list.innerHTML = '<p class="text-xs text-center opacity-40 py-10">No hay conciencias creadas aún.</p>';
+            return;
+        }
+        
+        data.forEach((agente) => {
+            const div = document.createElement('div');
+            div.id = `agent-${agente.id}`;
+            div.className = "agent-card p-4 rounded-2xl cursor-pointer mb-2 hover:bg-amber-500/10 transition-all";
+            div.onclick = () => setAgent(agente);
+            div.innerHTML = `
+                <div class="font-bold text-sm text-white">✨ ${agente.nombre}</div>
+                <div class="text-[10px] text-slate-400 uppercase tracking-tighter">${agente.descripcion || 'Conciencia'}</div>
+            `;
+            list.appendChild(div);
+        });
+        
+        // Si entramos de cero, activar el primero
+        if (data.length > 0 && !currentChatId) {
+            setAgent(data[0]);
+        }
+    } catch (error) {
         console.error("❌ Error cargando agentes:", error);
-        return;
+        const list = document.getElementById('agents-list');
+        if (list) {
+            list.innerHTML = '<p class="text-xs text-center text-red-400 py-10">Error al cargar conciencias.<br>Revisa la consola.</p>';
+        }
     }
-
-    listaAgentesGlobal = data;
-    const list = document.getElementById('agents-list');
-    list.innerHTML = '';
-    
-    data.forEach((agente) => {
-        const div = document.createElement('div');
-        div.id = `agent-${agente.id}`;
-        div.className = "agent-card p-4 rounded-2xl cursor-pointer mb-2 hover:bg-amber-500/10 transition-all";
-        div.onclick = () => setAgent(agente);
-        div.innerHTML = `
-            <div class="font-bold text-sm text-white">✨ ${agente.nombre}</div>
-            <div class="text-[10px] text-slate-400 uppercase tracking-tighter">${agente.descripcion || 'Conciencia'}</div>
-        `;
-        list.appendChild(div);
-    });
-    
-    // Si entramos de cero, activar el primero
-    if (data.length > 0 && !currentChatId) setAgent(data[0]);
 }
 
 async function setAgent(agente, isLoadingFromHistory = false) {
@@ -96,7 +125,9 @@ async function setAgent(agente, isLoadingFromHistory = false) {
                 const response = await fetch(agente.archivo_url);
                 currentAgent.conocimiento_texto = await response.text();
             }
-        } catch(e) { console.error("⚠️ Error leyendo archivo:", e); }
+        } catch(e) { 
+            console.error("⚠️ Error leyendo archivo:", e); 
+        }
     }
 
     // Si es un cambio manual (no desde historial), limpiar chat
@@ -121,7 +152,10 @@ async function handleSend() {
         const response = await fetch('/api/gemini', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ systemInstruction: systemPrompt, contents: chatHistory })
+            body: JSON.stringify({ 
+                systemInstruction: systemPrompt, 
+                contents: chatHistory 
+            })
         });
 
         const data = await response.json();
@@ -129,9 +163,12 @@ async function handleSend() {
 
         if (data.success) {
             appendBubble(data.text, false);
-            await saveToHubHistory(); // Guardar en DB tras cada respuesta
+            await saveToHubHistory();
+        } else {
+            throw new Error(data.error || "Error desconocido");
         }
     } catch (err) {
+        console.error("❌ Error:", err);
         if(typing) typing.remove();
         appendBubble("El espejo está empañado. Intenta de nuevo.", false);
     }
@@ -155,7 +192,7 @@ async function saveToHubHistory() {
     const firstMsg = chatHistory.find(m => m.role === "user")?.parts[0].text || "Reflexión";
     const chatTitle = firstMsg.substring(0, 30) + "...";
 
-    console.log("💾 Guardando en historial...");
+    console.log("💾 Guardando historial...");
     const { error } = await supabaseClient.from('reflexiones_hub').upsert({
         id: currentChatId,
         user_id: currentUser.id,
@@ -165,8 +202,11 @@ async function saveToHubHistory() {
         updated_at: new Date().toISOString()
     });
 
-    if (error) console.error("❌ Error guardando:", error.message);
-    else refreshHistorySidebar();
+    if (error) {
+        console.error("❌ Error guardando:", error.message);
+    } else {
+        refreshHistorySidebar();
+    }
 }
 
 async function refreshHistorySidebar() {
@@ -183,10 +223,12 @@ async function refreshHistorySidebar() {
         return;
     }
 
+    console.log("📜 Reflexiones encontradas:", data?.length || 0);
+
     const list = document.getElementById('history-list');
     if (!list) return;
 
-    if (data.length === 0) {
+    if (!data || data.length === 0) {
         list.innerHTML = '<p class="text-[10px] text-center opacity-40 py-10">No hay reflexiones aún.</p>';
         return;
     }
@@ -255,6 +297,7 @@ function toggleDarkMode() { document.documentElement.classList.toggle('dark'); }
 
 function createParticle() {
     const container = document.getElementById('particle-container');
+    if (!container) return;
     const p = document.createElement('div');
     p.className = 'particle';
     p.style.left = `${Math.random() * 100}%`;
