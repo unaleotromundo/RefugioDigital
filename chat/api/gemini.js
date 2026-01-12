@@ -8,14 +8,21 @@ const GEMINI_API_KEYS = [
     process.env.GEMINI_KEY_4
 ].filter(Boolean); // Elimina undefined
 
-// Modelos que REALMENTE soportan visión (verificados)
+// Modelos que soportan visión - incluye Gemini 3 (experimental/preview)
 const MODELS = [
-    "gemini-1.5-flash",             // ✅ Funciona con imágenes
-    "gemini-1.5-flash-latest",      // ✅ Funciona con imágenes
-    "gemini-1.5-pro",               // ✅ Funciona con imágenes
-    "gemini-1.5-pro-latest",        // ✅ Funciona con imágenes
-    "gemini-exp-1206",              // ✅ Experimental con visión
-    "gemini-2.0-flash-exp"          // ✅ Gemini 2.0 experimental
+    // Gemini 3 (experimental - tus modelos que funcionan)
+    "gemini-3-flash-preview",
+    "gemini-3-pro",
+    "gemini-3-flash-8b",
+    "gemini-3-flash",
+    // Gemini 2.0
+    "gemini-2.0-flash-exp",
+    // Gemini 1.5 (verificados con visión)
+    "gemini-1.5-flash",
+    "gemini-1.5-flash-latest",
+    "gemini-1.5-pro",
+    "gemini-1.5-pro-latest",
+    "gemini-exp-1206"
 ];
 
 export default async function handler(req, res) {
