@@ -187,25 +187,42 @@ function appendBubble(text, isUser) {
 
 // --- 4. PERSISTENCIA (SUPABASE) ---
 async function saveToHubHistory() {
-    if (!currentUser || chatHistory.length < 1) return;
+    if (!currentUser || chatHistory.length < 1) {
+        console.warn("⚠️ No se puede guardar: usuario o historial vacío");
+        return;
+    }
 
     const firstMsg = chatHistory.find(m => m.role === "user")?.parts[0].text || "Reflexión";
     const chatTitle = firstMsg.substring(0, 30) + "...";
 
-    console.log("💾 Guardando historial...");
-    const { error } = await supabaseClient.from('reflexiones_hub').upsert({
-        id: currentChatId,
-        user_id: currentUser.id,
-        agent_id: currentAgent.id,
-        title: chatTitle,
-        history: chatHistory,
-        updated_at: new Date().toISOString()
+    console.log("💾 Guardando historial...", {
+        chatId: currentChatId,
+        userId: currentUser.id,
+        agentId: currentAgent.id,
+        messagesCount: chatHistory.length
     });
 
-    if (error) {
-        console.error("❌ Error guardando:", error.message);
-    } else {
-        refreshHistorySidebar();
+    try {
+        const { data, error } = await supabaseClient.from('reflexiones_hub').upsert({
+            id: currentChatId,
+            user_id: currentUser.id,
+            agent_id: currentAgent.id,
+            title: chatTitle,
+            history: chatHistory,
+            updated_at: new Date().toISOString()
+        }, {
+            onConflict: 'id'
+        });
+
+        if (error) {
+            console.error("❌ Error guardando:", error);
+            console.error("Detalles completos:", JSON.stringify(error, null, 2));
+        } else {
+            console.log("✅ Historial guardado correctamente");
+            await refreshHistorySidebar();
+        }
+    } catch (err) {
+        console.error("❌ Excepción al guardar:", err);
     }
 }
 
