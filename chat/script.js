@@ -1,4 +1,4 @@
-// --- VARIABLES GLOBALES ---
+// --- CONFIGURACIÓN Y VARIABLES ---
 const chatBox = document.getElementById('chat-box');
 const chatInput = document.getElementById('chat-input');
 const supabaseClient = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
@@ -7,35 +7,35 @@ let currentAgent = null;
 let currentChatId = null;
 let chatHistory = []; 
 let currentUser = null;
-let listaAgentesGlobal = []; // Para buscar agentes al cargar historial
+let listaAgentesGlobal = []; 
 
-// --- INICIALIZACIÓN ---
+// --- 1. INICIALIZACIÓN ---
 async function init() {
-    console.log("Iniciando Espejo Digital...");
+    console.log("🚀 Espejo Digital: Iniciando...");
 
-    // 1. Autenticación Anónima (Para historial individual)
-    const { data: authData, error: authError } = await supabaseClient.auth.signInAnonymously();
-    if (authError) {
-        console.error("Error de autenticación:", authError);
-        return;
+    try {
+        // Autenticación Anónima para historial único
+        const { data: authData, error: authError } = await supabaseClient.auth.signInAnonymously();
+        if (authError) throw authError;
+        currentUser = authData.user;
+        console.log("👤 Usuario identificado:", currentUser.id);
+
+        // Cargar datos iniciales
+        await cargarAgentes();
+        await refreshHistorySidebar();
+        
+        // Partículas y Eventos
+        setInterval(createParticle, 600);
+        chatInput.addEventListener('keydown', (e) => { 
+            if (e.key === 'Enter') { e.preventDefault(); handleSend(); }
+        });
+
+    } catch (err) {
+        console.error("❌ Error en init:", err.message);
     }
-    currentUser = authData.user;
-
-    // 2. Cargar Agentes y luego el Historial
-    await cargarAgentes();
-    await refreshHistorySidebar();
-    
-    // 3. Activar partículas y eventos
-    setInterval(createParticle, 600);
-    chatInput.addEventListener('keydown', (e) => { 
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            handleSend();
-        }
-    });
 }
 
-// --- GESTIÓN DE AGENTES (CONCIENCIAS) ---
+// --- 2. GESTIÓN DE AGENTES ---
 async function cargarAgentes() {
     const { data, error } = await supabaseClient
         .from('agentes')
@@ -43,7 +43,7 @@ async function cargarAgentes() {
         .order('created_at', { ascending: false });
 
     if (error) {
-        console.error("Error cargando agentes:", error);
+        console.error("❌ Error cargando agentes:", error);
         return;
     }
 
@@ -54,7 +54,6 @@ async function cargarAgentes() {
     data.forEach((agente) => {
         const div = document.createElement('div');
         div.id = `agent-${agente.id}`;
-        // Clase active se maneja en setAgent
         div.className = "agent-card p-4 rounded-2xl cursor-pointer mb-2 hover:bg-amber-500/10 transition-all";
         div.onclick = () => setAgent(agente);
         div.innerHTML = `
@@ -64,131 +63,110 @@ async function cargarAgentes() {
         list.appendChild(div);
     });
     
-    // Si es una sesión nueva, cargar el primer agente por defecto
-    if (data.length > 0 && !currentChatId) {
-        setAgent(data[0]);
-    }
+    // Si entramos de cero, activar el primero
+    if (data.length > 0 && !currentChatId) setAgent(data[0]);
 }
 
 async function setAgent(agente, isLoadingFromHistory = false) {
+    console.log("🧠 Cambiando a conciencia:", agente.nombre);
     currentAgent = agente;
-    currentAgent.conocimiento_texto = ""; // Limpiar conocimiento previo
+    currentAgent.conocimiento_texto = ""; 
 
-    // Actualizar UI
+    // UI: Títulos centrales
     document.getElementById('active-agent-name').innerText = agente.nombre;
     document.getElementById('active-agent-desc').innerText = agente.descripcion || "Conciencia";
     
-    // Marcar tarjeta activa en el sidebar
+    // UI: Marcar tarjeta activa en sidebar
     document.querySelectorAll('.agent-card').forEach(c => c.classList.remove('active'));
     const card = document.getElementById(`agent-${agente.id}`);
     if (card) card.classList.add('active');
 
-    // Cargar Conocimiento (Archivo) si existe
+    // Cargar Conocimiento de Archivo (PDF/Docx/Txt)
     if (agente.archivo_url) {
         try {
-            const response = await fetch(agente.archivo_url);
-            const blob = await response.blob();
-            const extension = agente.archivo_url.split('.').pop().toLowerCase().split('?')[0];
-
-            if (extension === 'pdf') {
+            const ext = agente.archivo_url.split('.').pop().toLowerCase().split('?')[0];
+            if (ext === 'pdf') {
                 currentAgent.conocimiento_texto = await extractTextFromPDF(agente.archivo_url);
-            } else if (extension === 'docx') {
-                const arrayBuffer = await blob.arrayBuffer();
+            } else if (ext === 'docx') {
+                const response = await fetch(agente.archivo_url);
+                const arrayBuffer = await response.arrayBuffer();
                 const result = await mammoth.extractRawText({ arrayBuffer });
                 currentAgent.conocimiento_texto = result.value;
             } else {
-                currentAgent.conocimiento_texto = await blob.text();
+                const response = await fetch(agente.archivo_url);
+                currentAgent.conocimiento_texto = await response.text();
             }
-            console.log("Conocimiento cargado para:", agente.nombre);
-        } catch(e) {
-            console.error("Error cargando archivo de conocimiento:", e);
-        }
+        } catch(e) { console.error("⚠️ Error leyendo archivo:", e); }
     }
 
-    // Si no estamos cargando un chat viejo, iniciamos uno nuevo con este agente
+    // Si es un cambio manual (no desde historial), limpiar chat
     if (!isLoadingFromHistory) {
         createNewChat();
         toggleSidebar('agents-sidebar', false);
     }
 }
 
-// --- LÓGICA DE CHAT ---
+// --- 3. LÓGICA DE CHAT ---
 async function handleSend() {
     const text = chatInput.value.trim();
     if (!text || !currentAgent) return;
 
-    // Mostrar en UI y limpiar input
     appendBubble(text, true);
     chatInput.value = '';
-    
-    const typingIndicator = showTyping();
+    const typing = showTyping();
 
     try {
-        // Construir el prompt del sistema combinando instrucciones + archivos
-        const systemPrompt = `${currentAgent.instrucciones}\n\nCONTEXTO DE CONOCIMIENTO:\n${currentAgent.conocimiento_texto || 'No hay archivos adicionales.'}`;
+        const systemPrompt = `${currentAgent.instrucciones}\n\nCONTEXTO ADICIONAL:\n${currentAgent.conocimiento_texto || ''}`;
         
         const response = await fetch('/api/gemini', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                systemInstruction: systemPrompt, 
-                contents: chatHistory 
-            })
+            body: JSON.stringify({ systemInstruction: systemPrompt, contents: chatHistory })
         });
 
         const data = await response.json();
-        typingIndicator.remove();
+        typing.remove();
 
         if (data.success) {
             appendBubble(data.text, false);
-            await saveToHubHistory(); // Guardar progreso en Supabase
-        } else {
-            appendBubble("El espejo está empañado en este momento. Intenta de nuevo.", false);
+            await saveToHubHistory(); // Guardar en DB tras cada respuesta
         }
     } catch (err) {
-        if(typingIndicator) typingIndicator.remove();
-        console.error("Error en handleSend:", err);
-        appendBubble("Se perdió la conexión con la conciencia.", false);
+        if(typing) typing.remove();
+        appendBubble("El espejo está empañado. Intenta de nuevo.", false);
     }
 }
 
 function appendBubble(text, isUser) {
     const div = document.createElement('div');
     div.className = `flex w-full ${isUser ? 'justify-end' : 'justify-start'}`;
-    div.innerHTML = `
-        <div class="bubble ${isUser ? 'bubble-user' : 'bubble-ai'}">
-            ${text.replace(/\n/g, '<br>')}
-        </div>
-    `;
+    div.innerHTML = `<div class="bubble ${isUser ? 'bubble-user' : 'bubble-ai'}">${text.replace(/\n/g, '<br>')}</div>`;
     chatBox.appendChild(div);
     chatBox.scrollTop = chatBox.scrollHeight;
     
-    // Guardar en el historial local (formato Gemini)
-    chatHistory.push({ 
-        role: isUser ? "user" : "model", 
-        parts: [{ text: text }] 
-    });
+    // Guardar en el array temporal para la IA
+    chatHistory.push({ role: isUser ? "user" : "model", parts: [{ text: text }] });
 }
 
-// --- PERSISTENCIA E HISTORIAL (Supabase) ---
+// --- 4. PERSISTENCIA (SUPABASE) ---
 async function saveToHubHistory() {
-    if (!currentUser || chatHistory.length < 2) return;
+    if (!currentUser || chatHistory.length < 1) return;
 
-    // El título es el primer mensaje del usuario
     const firstMsg = chatHistory.find(m => m.role === "user")?.parts[0].text || "Reflexión";
-    const title = firstMsg.substring(0, 35) + "...";
+    const chatTitle = firstMsg.substring(0, 30) + "...";
 
+    console.log("💾 Guardando en historial...");
     const { error } = await supabaseClient.from('reflexiones_hub').upsert({
         id: currentChatId,
         user_id: currentUser.id,
         agent_id: currentAgent.id,
-        title: title,
+        title: chatTitle,
         history: chatHistory,
         updated_at: new Date().toISOString()
     });
 
-    if (error) console.error("Error al guardar historial:", error);
-    refreshHistorySidebar();
+    if (error) console.error("❌ Error guardando:", error.message);
+    else refreshHistorySidebar();
 }
 
 async function refreshHistorySidebar() {
@@ -200,66 +178,61 @@ async function refreshHistorySidebar() {
         .eq('user_id', currentUser.id)
         .order('updated_at', { ascending: false });
 
-    if (error) return;
+    if (error) {
+        console.error("❌ Error cargando historial:", error);
+        return;
+    }
 
     const list = document.getElementById('history-list');
+    if (!list) return;
+
+    if (data.length === 0) {
+        list.innerHTML = '<p class="text-[10px] text-center opacity-40 py-10">No hay reflexiones aún.</p>';
+        return;
+    }
+
     list.innerHTML = data.map(chat => `
-        <div onclick="loadChat('${chat.id}')" class="history-item p-3 rounded-xl cursor-pointer transition-all">
-            <div class="text-xs font-bold truncate">${chat.title}</div>
-            <div class="text-[8px] opacity-60 uppercase mt-1 text-amber-500">
-                ${new Date(chat.updated_at).toLocaleDateString()}
-            </div>
+        <div onclick="loadChat('${chat.id}')" class="history-item p-3 rounded-xl cursor-pointer transition-all mb-2 border border-white/5 hover:border-amber-500/50 bg-white/5">
+            <div class="text-xs font-bold truncate text-white">${chat.title}</div>
+            <div class="text-[8px] opacity-50 uppercase mt-1 text-amber-500">${new Date(chat.updated_at).toLocaleDateString()}</div>
         </div>
     `).join('');
 }
 
 async function loadChat(id) {
-    const { data: chat, error } = await supabaseClient
-        .from('reflexiones_hub')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-    if (error || !chat) return;
-
-    // 1. Restaurar ID y Datos
-    currentChatId = chat.id;
-    chatHistory = chat.history;
+    console.log("📂 Cargando chat:", id);
+    const { data: chat } = await supabaseClient.from('reflexiones_hub').select('*').eq('id', id).single();
     
-    // 2. CAMBIO DE CONTEXTO: Buscar el agente que se usó en ese chat
-    const agenteAsociado = listaAgentesGlobal.find(a => a.id === chat.agent_id);
-    if (agenteAsociado) {
-        await setAgent(agenteAsociado, true); // true indica que no debe limpiar el chat
+    if (chat) {
+        currentChatId = chat.id;
+        chatHistory = chat.history;
+        
+        // Cambiar automáticamente al agente que pertenece al chat
+        const agenteAsociado = listaAgentesGlobal.find(a => a.id === chat.agent_id);
+        if (agenteAsociado) await setAgent(agenteAsociado, true);
+
+        // Renderizar mensajes
+        chatBox.innerHTML = '';
+        chatHistory.forEach(msg => {
+            const isUser = msg.role === 'user';
+            const div = document.createElement('div');
+            div.className = `flex w-full ${isUser ? 'justify-end' : 'justify-start'}`;
+            div.innerHTML = `<div class="bubble ${isUser ? 'bubble-user' : 'bubble-ai'}">${msg.parts[0].text.replace(/\n/g, '<br>')}</div>`;
+            chatBox.appendChild(div);
+        });
+        chatBox.scrollTop = chatBox.scrollHeight;
+        toggleSidebar('history-sidebar', false);
     }
-
-    // 3. Renderizar mensajes en pantalla
-    chatBox.innerHTML = '';
-    chatHistory.forEach(msg => {
-        const isUser = msg.role === 'user';
-        const div = document.createElement('div');
-        div.className = `flex w-full ${isUser ? 'justify-end' : 'justify-start'}`;
-        div.innerHTML = `
-            <div class="bubble ${isUser ? 'bubble-user' : 'bubble-ai'}">
-                ${msg.parts[0].text.replace(/\n/g, '<br>')}
-            </div>
-        `;
-        chatBox.appendChild(div);
-    });
-
-    chatBox.scrollTop = chatBox.scrollHeight;
-    toggleSidebar('history-sidebar', false);
 }
 
 function createNewChat() {
-    currentChatId = crypto.randomUUID(); // Generar ID único de conversación
+    currentChatId = crypto.randomUUID();
     chatHistory = [];
     chatBox.innerHTML = '';
-    if(currentAgent) {
-        appendBubble(`Soy ${currentAgent.nombre}. ¿Qué buscas reflejar hoy?`, false);
-    }
+    if(currentAgent) appendBubble(`Soy ${currentAgent.nombre}. ¿Qué buscas reflejar hoy?`, false);
 }
 
-// --- UI HELPERS ---
+// --- 5. UI HELPERS ---
 function toggleSidebar(id, show) {
     const el = document.getElementById(id);
     if (id === 'history-sidebar') {
@@ -271,32 +244,27 @@ function toggleSidebar(id, show) {
 
 function showTyping() {
     const div = document.createElement('div');
-    div.className = "text-[10px] opacity-50 italic p-2 dark:text-amber-500 font-bold uppercase tracking-widest";
+    div.className = "text-[10px] opacity-50 italic p-2 text-slate-500 dark:text-amber-500 font-bold uppercase";
     div.innerText = `${currentAgent.nombre} reflexionando...`;
     chatBox.appendChild(div);
     chatBox.scrollTop = chatBox.scrollHeight;
     return div;
 }
 
-function toggleDarkMode() {
-    document.documentElement.classList.toggle('dark');
-}
+function toggleDarkMode() { document.documentElement.classList.toggle('dark'); }
 
 function createParticle() {
     const container = document.getElementById('particle-container');
-    if (!container) return;
     const p = document.createElement('div');
     p.className = 'particle';
-    const size = Math.random() * 3 + 2;
-    p.style.width = `${size}px`;
-    p.style.height = `${size}px`;
     p.style.left = `${Math.random() * 100}%`;
-    p.style.setProperty('--duration', `${Math.random() * 8 + 6}s`);
+    const size = Math.random() * 3 + 2;
+    p.style.width = size + 'px'; p.style.height = size + 'px';
+    p.style.setProperty('--duration', `${Math.random() * 10 + 6}s`);
     container.appendChild(p);
     setTimeout(() => p.remove(), 12000);
 }
 
-// Extractor de texto para PDFs
 async function extractTextFromPDF(url) {
     const pdfjsLib = window['pdfjs-dist/build/pdf'];
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
@@ -311,13 +279,8 @@ async function extractTextFromPDF(url) {
 }
 
 function checkAdminPassword() {
-    const pass = prompt("Acceso Restringido. Introduce la clave de constructor:");
-    if (pass === "admin123") {
-        window.location.href = "configurador.html";
-    } else {
-        alert("Clave incorrecta.");
-    }
+    if (prompt("Clave de constructor:") === "admin123") window.location.href = "configurador.html";
 }
 
-// Iniciar aplicación
+// Iniciar app
 init();
