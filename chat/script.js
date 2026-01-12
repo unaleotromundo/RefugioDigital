@@ -221,10 +221,12 @@ async function handleSend() {
     if (!currentAgent) return;
 
     let imageUrl = null;
+    let imageMimeType = null;
     
     try {
-        // Subir imagen si existe
+        // Guardar el tipo MIME antes de limpiar
         if (selectedImage) {
+            imageMimeType = selectedImage.type || 'image/jpeg';
             imageUrl = await uploadImageToStorage(selectedImage);
         }
         
@@ -242,8 +244,6 @@ async function handleSend() {
         if (imageUrl) {
             const base64Image = await imageUrlToBase64(imageUrl);
             if (base64Image) {
-                // Detectar tipo MIME
-                const mimeType = selectedImage.type || 'image/jpeg';
                 
                 geminiContents.push({
                     role: "user",
@@ -251,7 +251,7 @@ async function handleSend() {
                         { text: text || "Analiza esta imagen" },
                         {
                             inline_data: {
-                                mime_type: mimeType,
+                                mime_type: imageMimeType,
                                 data: base64Image
                             }
                         }
