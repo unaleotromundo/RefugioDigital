@@ -7,8 +7,7 @@ let currentAgent = null;
 let currentChatId = null;
 let chatHistory = []; 
 let currentUser = null;
-let listaAgentesGlobal = [];
-let selectedImage = null; // Imagen seleccionada para enviar
+let listaAgentesGlobal = []; 
 
 // --- 1. INICIALIZACIÓN ---
 async function init() {
@@ -46,83 +45,7 @@ async function init() {
     }
 }
 
-// --- 2. GESTIÓN DE IMÁGENES ---
-function handleImageSelect(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    
-    // Validar tipo
-    if (!file.type.startsWith('image/')) {
-        alert('Por favor selecciona solo archivos de imagen');
-        return;
-    }
-    
-    // Validar tamaño (máx 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-        alert('La imagen es muy grande. Máximo 5MB');
-        return;
-    }
-    
-    selectedImage = file;
-    
-    // Mostrar preview
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        document.getElementById('image-preview').src = e.target.result;
-        document.getElementById('image-preview-wrapper').classList.remove('hidden');
-    };
-    reader.readAsDataURL(file);
-    
-    console.log("📸 Imagen seleccionada:", file.name);
-}
-
-function removeImagePreview() {
-    selectedImage = null;
-    document.getElementById('image-preview-wrapper').classList.add('hidden');
-    document.getElementById('image-input').value = '';
-}
-
-async function uploadImageToStorage(file) {
-    const fileName = `${currentUser.id}/${currentChatId}/${Date.now()}_${file.name.replace(/\s/g, '_')}`;
-    
-    console.log("📤 Subiendo imagen a Storage:", fileName);
-    
-    const { data, error } = await supabaseClient.storage
-        .from('imagenes_chat')
-        .upload(fileName, file);
-    
-    if (error) throw error;
-    
-    // Obtener URL pública
-    const { data: publicUrlData } = supabaseClient.storage
-        .from('imagenes_chat')
-        .getPublicUrl(fileName);
-    
-    console.log("✅ Imagen subida:", publicUrlData.publicUrl);
-    return publicUrlData.publicUrl;
-}
-
-async function imageUrlToBase64(url) {
-    try {
-        const response = await fetch(url);
-        const blob = await response.blob();
-        
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                const base64 = reader.result.split(',')[1];
-                resolve(base64);
-            };
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-        });
-    } catch (error) {
-        console.error("Error convirtiendo imagen a Base64:", error);
-        return null;
-    }
-}
-
-// --- 3. GESTIÓN DE AGENTES ---
+// --- 2. GESTIÓN DE AGENTES ---
 async function cargarAgentes() {
     try {
         const { data, error } = await supabaseClient
@@ -214,57 +137,16 @@ async function setAgent(agente, isLoadingFromHistory = false) {
     }
 }
 
-// --- 4. LÓGICA DE CHAT ---
+// --- 3. LÓGICA DE CHAT ---
 async function handleSend() {
     const text = chatInput.value.trim();
-    if (!text && !selectedImage) return;
-    if (!currentAgent) return;
+    if (!text || !currentAgent) return;
 
-    let imageUrl = null;
-    
+    appendBubble(text, true);
+    chatInput.value = '';
+    const typing = showTyping();
+
     try {
-        // Subir imagen si existe
-        if (selectedImage) {
-            imageUrl = await uploadImageToStorage(selectedImage);
-        }
-        
-        // Mostrar mensaje del usuario
-        appendBubble(text || "📸 Imagen adjunta", true, imageUrl);
-        chatInput.value = '';
-        removeImagePreview();
-        
-        const typing = showTyping();
-
-        // Preparar contenido para Gemini
-        let geminiContents = [...chatHistory];
-        
-        // Si hay imagen, convertir a Base64 y agregar al último mensaje
-        if (imageUrl) {
-            const base64Image = await imageUrlToBase64(imageUrl);
-            if (base64Image) {
-                // Detectar tipo MIME
-                const mimeType = selectedImage.type || 'image/jpeg';
-                
-                geminiContents.push({
-                    role: "user",
-                    parts: [
-                        { text: text || "Analiza esta imagen" },
-                        {
-                            inline_data: {
-                                mime_type: mimeType,
-                                data: base64Image
-                            }
-                        }
-                    ]
-                });
-            }
-        } else {
-            geminiContents.push({
-                role: "user",
-                parts: [{ text: text }]
-            });
-        }
-        
         const systemPrompt = `${currentAgent.instrucciones}\n\nCONTEXTO ADICIONAL:\n${currentAgent.conocimiento_texto || ''}`;
         
         const response = await fetch('/api/gemini', {
@@ -272,7 +154,7 @@ async function handleSend() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
                 systemInstruction: systemPrompt, 
-                contents: geminiContents 
+                contents: chatHistory 
             })
         });
 
@@ -287,34 +169,23 @@ async function handleSend() {
         }
     } catch (err) {
         console.error("❌ Error:", err);
-        const typing = document.querySelector('.text-\\[10px\\].opacity-50');
         if(typing) typing.remove();
         appendBubble("El espejo está empañado. Intenta de nuevo.", false);
     }
 }
 
-function appendBubble(text, isUser, imageUrl = null) {
+function appendBubble(text, isUser) {
     const div = document.createElement('div');
     div.className = `flex w-full ${isUser ? 'justify-end' : 'justify-start'}`;
-    
-    let content = text.replace(/\n/g, '<br>');
-    if (imageUrl) {
-        content += `<br><img src="${imageUrl}" alt="Imagen adjunta" style="max-width: 300px; margin-top: 8px; border-radius: 12px;">`;
-    }
-    
-    div.innerHTML = `<div class="bubble ${isUser ? 'bubble-user' : 'bubble-ai'}">${content}</div>`;
+    div.innerHTML = `<div class="bubble ${isUser ? 'bubble-user' : 'bubble-ai'}">${text.replace(/\n/g, '<br>')}</div>`;
     chatBox.appendChild(div);
     chatBox.scrollTop = chatBox.scrollHeight;
     
     // Guardar en el array temporal para la IA
-    chatHistory.push({ 
-        role: isUser ? "user" : "model", 
-        parts: [{ text: text }],
-        imageUrl: imageUrl || undefined
-    });
+    chatHistory.push({ role: isUser ? "user" : "model", parts: [{ text: text }] });
 }
 
-// --- 5. PERSISTENCIA (SUPABASE) ---
+// --- 4. PERSISTENCIA (SUPABASE) ---
 async function saveToHubHistory() {
     if (!currentUser || chatHistory.length < 1) {
         console.warn("⚠️ No se puede guardar: usuario o historial vacío");
@@ -356,50 +227,35 @@ async function saveToHubHistory() {
 }
 
 async function refreshHistorySidebar() {
-    if (!currentUser) {
-        console.warn("⚠️ No hay usuario para cargar historial");
+    if (!currentUser) return;
+
+    const { data, error } = await supabaseClient
+        .from('reflexiones_hub')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .order('updated_at', { ascending: false });
+
+    if (error) {
+        console.error("❌ Error cargando historial:", error);
         return;
     }
 
-    console.log("🔄 Cargando historial para usuario:", currentUser.id);
+    console.log("📜 Reflexiones encontradas:", data?.length || 0);
 
-    try {
-        const { data, error } = await supabaseClient
-            .from('reflexiones_hub')
-            .select('*')
-            .eq('user_id', currentUser.id)
-            .order('updated_at', { ascending: false });
+    const list = document.getElementById('history-list');
+    if (!list) return;
 
-        if (error) {
-            console.error("❌ Error cargando historial:", error);
-            console.error("Detalles completos:", JSON.stringify(error, null, 2));
-            return;
-        }
-
-        console.log("📜 Reflexiones encontradas:", data?.length || 0, data);
-
-        const list = document.getElementById('history-list');
-        if (!list) {
-            console.error("❌ Elemento #history-list no encontrado");
-            return;
-        }
-
-        if (!data || data.length === 0) {
-            list.innerHTML = '<p class="text-[10px] text-center opacity-40 py-10">No hay reflexiones aún.<br><small>Envía un mensaje para crear una.</small></p>';
-            return;
-        }
-
-        list.innerHTML = data.map(chat => `
-            <div onclick="loadChat('${chat.id}')" class="history-item p-3 rounded-xl cursor-pointer transition-all mb-2 border border-white/5 hover:border-amber-500/50 bg-white/5">
-                <div class="text-xs font-bold truncate text-white">${chat.title}</div>
-                <div class="text-[8px] opacity-50 uppercase mt-1 text-amber-500">${new Date(chat.updated_at).toLocaleDateString()}</div>
-            </div>
-        `).join('');
-        
-        console.log("✅ Sidebar actualizado con", data.length, "conversaciones");
-    } catch (err) {
-        console.error("❌ Excepción en refreshHistorySidebar:", err);
+    if (!data || data.length === 0) {
+        list.innerHTML = '<p class="text-[10px] text-center opacity-40 py-10">No hay reflexiones aún.</p>';
+        return;
     }
+
+    list.innerHTML = data.map(chat => `
+        <div onclick="loadChat('${chat.id}')" class="history-item p-3 rounded-xl cursor-pointer transition-all mb-2 border border-white/5 hover:border-amber-500/50 bg-white/5">
+            <div class="text-xs font-bold truncate text-white">${chat.title}</div>
+            <div class="text-[8px] opacity-50 uppercase mt-1 text-amber-500">${new Date(chat.updated_at).toLocaleDateString()}</div>
+        </div>
+    `).join('');
 }
 
 async function loadChat(id) {
@@ -418,17 +274,9 @@ async function loadChat(id) {
         chatBox.innerHTML = '';
         chatHistory.forEach(msg => {
             const isUser = msg.role === 'user';
-            const text = msg.parts[0].text;
-            const imageUrl = msg.imageUrl;
-            
-            let content = text.replace(/\n/g, '<br>');
-            if (imageUrl) {
-                content += `<br><img src="${imageUrl}" alt="Imagen" style="max-width: 300px; margin-top: 8px; border-radius: 12px;">`;
-            }
-            
             const div = document.createElement('div');
             div.className = `flex w-full ${isUser ? 'justify-end' : 'justify-start'}`;
-            div.innerHTML = `<div class="bubble ${isUser ? 'bubble-user' : 'bubble-ai'}">${content}</div>`;
+            div.innerHTML = `<div class="bubble ${isUser ? 'bubble-user' : 'bubble-ai'}">${msg.parts[0].text.replace(/\n/g, '<br>')}</div>`;
             chatBox.appendChild(div);
         });
         chatBox.scrollTop = chatBox.scrollHeight;
@@ -443,7 +291,7 @@ function createNewChat() {
     if(currentAgent) appendBubble(`Soy ${currentAgent.nombre}. ¿Qué buscas reflejar hoy?`, false);
 }
 
-// --- 6. UI HELPERS ---
+// --- 5. UI HELPERS ---
 function toggleSidebar(id, show) {
     const el = document.getElementById(id);
     if (id === 'history-sidebar') {

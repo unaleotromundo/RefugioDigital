@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Hub de Conciencias | Espejo Digital</title>
     
     <!-- Librerías Externas -->
@@ -14,304 +17,108 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 
-    <link rel="stylesheet" href="style.css"> 
-    <style>
-        .agent-card {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid rgba(245, 158, 11, 0.2);
-            background: rgba(255, 255, 255, 0.8);
-        }
-        .dark .agent-card {
-            background: rgba(30, 41, 59, 0.6);
-            border-color: rgba(245, 158, 11, 0.3);
-        }
-        .agent-card.active {
-            border-color: #f59e0b;
-            background: rgba(245, 158, 11, 0.15);
-            box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
-        }
-        .dark .agent-card.active {
-            background: rgba(245, 158, 11, 0.2);
-            box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
-        }
-        .history-item {
-            padding: 1rem;
-            border-radius: 1rem;
-            background: rgba(226, 232, 240, 0.6);
-            cursor: pointer;
-            transition: 0.2s;
-            border: 1px solid rgba(203, 213, 225, 0.5);
-        }
-        .dark .history-item { 
-            background: rgba(30, 41, 59, 0.5);
-            border-color: rgba(71, 85, 105, 0.5);
-        }
-        .history-item:hover { 
-            border-color: #f59e0b; 
-            background: rgba(245, 158, 11, 0.1); 
-        }
-        .dark .history-item:hover {
-            background: rgba(245, 158, 11, 0.15);
-        }
-    </style>
+    <!-- Estilos Personalizados -->
+    <link rel="stylesheet" href="style.css?v=1.0.2"> 
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 transition-colors duration-500 overflow-hidden h-screen">
     
+    <!-- Contenedor de Partículas -->
     <div id="particle-container"></div>
 
-    <!-- SIDEBAR: HISTORIAL (reflexiones_hub) -->
-    <div id="history-sidebar" class="fixed top-0 left-0 h-full w-80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl z-50 transform -translate-x-full transition-transform duration-300 border-r border-amber-500/20 shadow-2xl">
+    <!-- SIDEBAR: HISTORIAL (Izquierda) - SIEMPRE OSCURO -->
+    <div id="history-sidebar" class="fixed top-0 left-0 h-full w-80 bg-slate-900/95 backdrop-blur-xl z-50 transform -translate-x-full transition-transform duration-300 border-r border-amber-500/20 shadow-2xl text-white">
         <div class="p-6 flex flex-col h-full">
             <div class="flex justify-between items-center mb-8">
-                <h2 class="text-amber-600 font-black uppercase tracking-widest text-sm">Mis Reflexiones</h2>
-                <button onclick="toggleSidebar('history-sidebar', false)" class="text-slate-400 hover:text-amber-600 text-3xl">&times;</button>
+                <h2 class="text-amber-500 font-black uppercase tracking-widest text-sm">Mis Reflexiones</h2>
+                <button onclick="toggleSidebar('history-sidebar', false)" class="text-slate-400 hover:text-amber-500 text-3xl transition-colors">&times;</button>
             </div>
-            <div id="history-list" class="flex-1 overflow-y-auto space-y-3"></div>
-            <button onclick="createNewChat()" class="mt-4 w-full py-3 bg-amber-600 text-white rounded-xl font-bold uppercase text-[10px] tracking-widest">
+            
+            <!-- Lista de Chats (JS inyectará contenido aquí) -->
+            <div id="history-list" class="flex-1 overflow-y-auto space-y-3 pr-2 custom-scrollbar">
+                <!-- Los items aquí siempre se verán con texto claro por el contenedor padre -->
+            </div>
+
+            <!-- Botón Nueva Sesión -->
+            <button onclick="createNewChat()" class="mt-4 w-full py-4 bg-amber-600 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-amber-700 transition-all shadow-lg active:scale-95">
                 + Nueva Sesión
             </button>
         </div>
     </div>
 
-    <!-- SIDEBAR: AGENTES (agentes) -->
-    <div id="agents-sidebar" class="fixed top-0 right-0 h-full w-80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl z-50 transform translate-x-full transition-transform duration-300 border-l border-amber-500/20 shadow-2xl">
+    <!-- SIDEBAR: AGENTES (Derecha) - SIEMPRE OSCURO -->
+    <div id="agents-sidebar" class="fixed top-0 right-0 h-full w-80 bg-slate-900/95 backdrop-blur-xl z-50 transform translate-x-full transition-transform duration-300 border-l border-amber-500/20 shadow-2xl text-white">
         <div class="p-6 flex flex-col h-full">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-amber-600 font-black uppercase tracking-widest text-sm">Conciencias</h2>
-                <button onclick="toggleSidebar('agents-sidebar', false)" class="text-slate-400 hover:text-amber-600 text-3xl">&times;</button>
+                <h2 class="text-amber-500 font-black uppercase tracking-widest text-sm">Conciencias</h2>
+                <button onclick="toggleSidebar('agents-sidebar', false)" class="text-slate-400 hover:text-amber-500 text-3xl transition-colors">&times;</button>
             </div>
-            <a href="configurador.html" class="mb-6 block text-center py-3 rounded-xl border-2 border-dashed border-amber-500/30 text-amber-600 font-bold text-[10px] uppercase tracking-widest hover:bg-amber-500/10 transition-all">
-                + Crear Nueva Conciencia
-            </a>
-            <div id="agents-list" class="flex-1 overflow-y-auto space-y-3 pr-2"></div>
+            
+            <!-- Botón Configuración (Protegido) -->
+            <button onclick="checkAdminPassword()" class="mb-6 w-full block text-center py-3 rounded-xl border-2 border-dashed border-amber-500/40 text-amber-500/80 font-bold text-[10px] uppercase tracking-widest hover:bg-amber-500/10 transition-all">
+                + Configurar Nueva
+            </button>
+
+            <!-- Lista de Agentes (JS inyectará contenido aquí) -->
+            <div id="agents-list" class="flex-1 overflow-y-auto space-y-3 pr-2 custom-scrollbar">
+                <!-- Las tarjetas aquí siempre se verán con texto claro por el contenedor padre -->
+            </div>
         </div>
     </div>
 
+    <!-- NAVEGACIÓN PRINCIPAL -->
     <nav class="p-6 flex justify-between items-center max-w-7xl mx-auto w-full relative z-20">
-        <button onclick="toggleSidebar('history-sidebar', true)" class="p-3 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-500 border border-amber-500/20">⌛</button>
+        <!-- Botón Historial -->
+        <button onclick="toggleSidebar('history-sidebar', true)" class="nav-btn">
+            ⌛
+        </button>
+        
         <div class="flex items-center gap-3">
-            <button onclick="toggleDarkMode()" class="p-3 rounded-full bg-slate-500/10 text-slate-700 dark:text-slate-400 border border-slate-500/20">🌙</button>
-            <button onclick="toggleSidebar('agents-sidebar', true)" class="p-3 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-500 border border-amber-500/20">✨</button>
+            <!-- Botón Dark Mode -->
+            <button onclick="toggleDarkMode()" class="nav-btn">
+                🌙
+            </button>
+            <!-- Botón Agentes -->
+            <button onclick="toggleSidebar('agents-sidebar', true)" class="nav-btn bg-amber-500 border-black">
+                ✨
+            </button>
         </div>
     </nav>
 
+    <!-- CONTENIDO CENTRAL -->
     <main class="relative z-10 flex flex-col h-[calc(100vh-140px)] max-w-4xl mx-auto px-4 w-full">
+        
+        <!-- Info del Agente Activo -->
         <div class="text-center mb-6">
-            <h1 id="active-agent-name" class="text-3xl font-black text-slate-800 dark:text-white uppercase tracking-tighter">Cargando...</h1>
-            <p id="active-agent-desc" class="text-[10px] text-amber-600 font-bold uppercase tracking-[0.4em] opacity-80">Selecciona una conciencia</p>
+            <h1 id="active-agent-name" class="text-4xl font-black uppercase tracking-tighter transition-colors">
+                Cargando...
+            </h1>
+            <p id="active-agent-desc" class="text-[10px] uppercase tracking-[0.4em] font-bold transition-colors">
+                Selecciona una conciencia
+            </p>
         </div>
 
-        <div class="chat-frame flex-1 overflow-hidden flex flex-col shadow-2xl">
-            <div id="chat-box" class="chat-container flex-1 overflow-y-auto p-6 space-y-4"></div>
+        <!-- Marco del Chat -->
+        <div class="chat-frame flex-1 overflow-hidden flex flex-col shadow-2xl rounded-[2.5rem]">
+            <div id="chat-box" class="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
+                <!-- Los mensajes aparecen aquí -->
+            </div>
         </div>
 
+        <!-- Entrada de Texto -->
         <div class="mt-6 relative w-full mb-4">
-            <input type="text" id="chat-input" placeholder="Dime lo que piensas..." 
-                   class="w-full p-5 pr-16 rounded-2xl text-lg italic shadow-xl border-2 border-transparent focus:border-amber-500 dark:bg-slate-900 dark:text-white outline-none">
-            <button id="send-btn" onclick="handleSend()" class="absolute right-3 top-1/2 -translate-y-1/2 bg-amber-600 text-white p-3.5 rounded-xl hover:bg-amber-700 shadow-lg">➤</button>
+            <input type="text" id="chat-input" placeholder="Escribe tu reflexión..." 
+                   class="w-full p-5 pr-16 rounded-2xl text-lg italic shadow-xl outline-none transition-all">
+            
+            <button id="send-btn" onclick="handleSend()" 
+                    class="absolute right-3 top-1/2 -translate-y-1/2 bg-amber-600 text-white p-3.5 rounded-xl hover:bg-amber-700 shadow-lg transition-transform active:scale-90">
+                ➤
+            </button>
         </div>
     </main>
 
-    <script src="config.js"></script>
-    <script>
-        const chatBox = document.getElementById('chat-box');
-        const chatInput = document.getElementById('chat-input');
-        const supabaseClient = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+    <!-- Scripts de Configuración y Lógica -->
+    <script src="config.js?v=1.0.2"></script>
+    <script src="script.js?v=1.0.2"></script>
 
-        let currentAgent = null;
-        let currentChatId = null;
-        let chatHistory = []; 
-        let currentUser = null;
-
-        async function init() {
-            const { data: authData } = await supabaseClient.auth.signInAnonymously();
-            currentUser = authData.user;
-
-            await cargarAgentes();
-            await refreshHistorySidebar();
-            
-            // Motor de partículas
-            setInterval(createParticle, 600);
-            chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleSend(); });
-        }
-
-        // --- GESTIÓN DE AGENTES Y DOCUMENTOS ---
-        async function cargarAgentes() {
-            const { data, error } = await supabaseClient.from('agentes').select('*').order('created_at', { ascending: false });
-            if (error) return;
-
-            const list = document.getElementById('agents-list');
-            list.innerHTML = '';
-            data.forEach((agente, index) => {
-                const div = document.createElement('div');
-                div.id = `agent-${agente.id}`;
-                div.className = "agent-card p-4 rounded-2xl cursor-pointer bg-white/50 dark:bg-white/5 mb-2";
-                div.onclick = () => setAgent(agente);
-                div.innerHTML = `<div class="font-bold text-sm">✨ ${agente.nombre}</div><div class="text-[10px] opacity-60 uppercase">${agente.descripcion || 'Conciencia'}</div>`;
-                list.appendChild(div);
-                if (index === 0) setAgent(agente);
-            });
-        }
-
-        async function setAgent(agente) {
-            currentAgent = agente;
-            currentAgent.conocimiento_texto = ""; 
-
-            if (agente.archivo_url) {
-                try {
-                    const response = await fetch(agente.archivo_url);
-                    const blob = await response.blob();
-                    const extension = agente.archivo_url.split('.').pop().toLowerCase().split('?')[0];
-
-                    if (extension === 'txt' || extension === 'json') {
-                        currentAgent.conocimiento_texto = await blob.text();
-                    } else if (extension === 'pdf') {
-                        currentAgent.conocimiento_texto = await extractTextFromPDF(agente.archivo_url);
-                    } else if (extension === 'docx') {
-                        const arrayBuffer = await blob.arrayBuffer();
-                        const result = await mammoth.extractRawText({ arrayBuffer });
-                        currentAgent.conocimiento_texto = result.value;
-                    }
-                } catch(e) { console.error("Error cargando archivo:", e); }
-            }
-
-            document.getElementById('active-agent-name').innerText = currentAgent.nombre;
-            document.getElementById('active-agent-desc').innerText = currentAgent.descripcion || "Conciencia";
-            document.querySelectorAll('.agent-card').forEach(c => c.classList.remove('active'));
-            if(document.getElementById(`agent-${agente.id}`)) document.getElementById(`agent-${agente.id}`).classList.add('active');
-            
-            toggleSidebar('agents-sidebar', false);
-            createNewChat();
-        }
-
-        async function extractTextFromPDF(url) {
-            const pdfjsLib = window['pdfjs-dist/build/pdf'];
-            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
-            const pdf = await pdfjsLib.getDocument(url).promise;
-            let text = "";
-            for (let i = 1; i <= pdf.numPages; i++) {
-                const page = await pdf.getPage(i);
-                const content = await page.getTextContent();
-                text += content.items.map(s => s.str).join(" ") + "\n";
-            }
-            return text;
-        }
-
-        // --- LÓGICA DE CHAT ---
-        async function handleSend() {
-            const text = chatInput.value.trim();
-            if (!text || !currentAgent) return;
-
-            appendBubble(text, true);
-            chatInput.value = '';
-            const typing = showTyping();
-
-            try {
-                const systemPrompt = `${currentAgent.instrucciones}\n\nCONTEXTO ADICIONAL:\n${currentAgent.conocimiento_texto || ''}`;
-                const response = await fetch('/api/gemini', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ systemInstruction: systemPrompt, contents: chatHistory })
-                });
-
-                const data = await response.json();
-                typing.remove();
-                if (data.success) {
-                    appendBubble(data.text, false);
-                    await saveToHubHistory();
-                }
-            } catch (err) {
-                if(typing) typing.remove();
-                appendBubble("El espejo está empañado. Intenta de nuevo.", false);
-            }
-        }
-
-        function appendBubble(text, isUser) {
-            const div = document.createElement('div');
-            div.className = `flex w-full ${isUser ? 'justify-end' : 'justify-start'}`;
-            div.innerHTML = `<div class="bubble ${isUser ? 'bubble-user' : 'bubble-ai'}">${text.replace(/\n/g, '<br>')}</div>`;
-            chatBox.appendChild(div);
-            chatBox.scrollTop = chatBox.scrollHeight;
-            chatHistory.push({ role: isUser ? "user" : "model", parts: [{ text }] });
-        }
-
-        // --- PERSISTENCIA (reflexiones_hub) ---
-        async function saveToHubHistory() {
-            if (!currentUser || chatHistory.length < 2) return;
-            const firstMsg = chatHistory.find(m => m.role === "user")?.parts[0].text || "Reflexión";
-            await supabaseClient.from('reflexiones_hub').upsert({
-                id: currentChatId,
-                user_id: currentUser.id,
-                agent_id: currentAgent.id,
-                title: firstMsg.substring(0, 30) + "...",
-                history: chatHistory,
-                updated_at: new Date().toISOString()
-            });
-            refreshHistorySidebar();
-        }
-
-        async function refreshHistorySidebar() {
-            const { data } = await supabaseClient.from('reflexiones_hub').select('*').eq('user_id', currentUser.id).order('updated_at', { ascending: false });
-            const list = document.getElementById('history-list');
-            list.innerHTML = data.map(chat => `
-                <div onclick="loadChat('${chat.id}')" class="history-item">
-                    <div class="text-xs font-bold dark:text-white truncate">${chat.title}</div>
-                    <div class="text-[8px] text-amber-600 font-bold uppercase mt-1">Sesión: ${new Date(chat.updated_at).toLocaleDateString()}</div>
-                </div>
-            `).join('');
-        }
-
-        async function loadChat(id) {
-            const { data } = await supabaseClient.from('reflexiones_hub').select('*').eq('id', id).single();
-            if(data) {
-                currentChatId = data.id;
-                chatHistory = data.history;
-                chatBox.innerHTML = '';
-                chatHistory.forEach(msg => {
-                    const div = document.createElement('div');
-                    div.className = `flex w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`;
-                    div.innerHTML = `<div class="bubble ${msg.role === 'user' ? 'bubble-user' : 'bubble-ai'}">${msg.parts[0].text.replace(/\n/g, '<br>')}</div>`;
-                    chatBox.appendChild(div);
-                });
-                chatBox.scrollTop = chatBox.scrollHeight;
-                toggleSidebar('history-sidebar', false);
-            }
-        }
-
-        function createNewChat() {
-            currentChatId = Date.now();
-            chatHistory = [];
-            chatBox.innerHTML = '';
-            if(currentAgent) appendBubble(`Soy ${currentAgent.nombre}. ¿Qué buscas reflejar hoy?`, false);
-        }
-
-        // --- UI HELPERS ---
-        function toggleSidebar(id, show) {
-            const el = document.getElementById(id);
-            el.style.transform = show ? 'translateX(0)' : (id === 'history-sidebar' ? 'translateX(-100%)' : 'translateX(100%)');
-        }
-
-        function showTyping() {
-            const div = document.createElement('div');
-            div.className = "text-xs opacity-50 italic p-2 dark:text-white";
-            div.innerText = `${currentAgent.nombre} procesando...`;
-            chatBox.appendChild(div);
-            return div;
-        }
-
-        function toggleDarkMode() { document.documentElement.classList.toggle('dark'); }
-
-        function createParticle() {
-            const container = document.getElementById('particle-container');
-            const p = document.createElement('div');
-            p.className = 'particle';
-            p.style.left = `${Math.random() * 100}%`;
-            p.style.setProperty('--duration', `${Math.random() * 12 + 8}s`);
-            container.appendChild(p);
-            setTimeout(() => p.remove(), 12000);
-        }
-
-        init();
-    </script>
 </body>
 </html>
