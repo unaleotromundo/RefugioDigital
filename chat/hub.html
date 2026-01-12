@@ -208,6 +208,7 @@
 
         // --- INICIALIZACIÓN ---
         async function init() {
+ applySavedTheme(); 
             try {
                 const { data: { session } } = await supabaseClient.auth.getSession();
                 if (session) {
@@ -374,8 +375,13 @@
             return div;
         }
 
-        function toggleDarkMode() { document.documentElement.classList.toggle('dark'); }
-
+	function toggleDarkMode() {
+    // Cambia la clase 'dark' en el HTML
+    const isDark = document.documentElement.classList.toggle('dark');
+    
+    // Guarda la elección en el almacenamiento local
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+}
         function createParticle() {
             const container = document.getElementById('particle-container');
             const p = document.createElement('div');
@@ -397,7 +403,15 @@
             document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
             if (!isShow) d.classList.add('show');
         }
-
+function applySavedTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    // Si hay algo guardado, lo aplica. Si no, revisa la preferencia del sistema.
+    if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
+}
         init();
     </script>
 </body>
