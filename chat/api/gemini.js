@@ -8,15 +8,19 @@ const GEMINI_API_KEYS = [
     process.env.GEMINI_KEY_4
 ].filter(Boolean); // Elimina undefined
 
+// Modelos que soportan visión (multimodal) - ordenados por preferencia
 const MODELS = [
-    "gemini-3-flash-preview",
-    "gemini-3-pro",
-    "gemini-3-flash-8b",
-    "gemini-3-flash",
-    "gemini-1.5-flash"
-    "gemini-2.0-flash-exp", // Soporta visión
-    "gemini-1.5-flash",     // Soporta visión
-    "gemini-1.5-pro"        // Soporta visión
+    "gemini-3-flash-preview",      // Gemini 3 Flash Preview (más nuevo)
+    "gemini-3-pro",                 // Gemini 3 Pro
+    "gemini-3-flash-8b",            // Gemini 3 Flash 8B
+    "gemini-3-flash",               // Gemini 3 Flash
+    "gemini-2.0-flash-exp",         // Gemini 2.0 Flash (experimental)
+    "gemini-1.5-flash-002",         // Gemini 1.5 Flash versión estable
+    "gemini-1.5-flash",             // Gemini 1.5 Flash
+    "gemini-1.5-flash-latest",      // Gemini 1.5 Flash última versión
+    "gemini-1.5-pro-002",           // Gemini 1.5 Pro versión estable
+    "gemini-1.5-pro",               // Gemini 1.5 Pro
+    "gemini-1.5-pro-latest"         // Gemini 1.5 Pro última versión
 ];
 
 export default async function handler(req, res) {
@@ -33,14 +37,22 @@ export default async function handler(req, res) {
 
     console.log("📥 Request recibida:", {
         messagesCount: contents.length,
-        hasImages: contents.some(c => c.parts?.some(p => p.inline_data))
+        hasImages: contents.some(c => c.parts?.some(p => p.inline_data)),
+        hasSystemInstruction: !!systemInstruction
     });
+
+    // Log del último mensaje para debug
+    const lastContent = contents[contents.length - 1];
+    if (lastContent?.parts?.some(p => p.inline_data)) {
+        console.log("🖼️ Último mensaje contiene imagen");
+    }
 
     // Intentar con cada modelo y cada clave
     for (let modelName of MODELS) {
         let keys = [...GEMINI_API_KEYS].sort(() => Math.random() - 0.5);
         
         for (let key of keys) {
+            // Probar con v1beta primero (mejor soporte para multimodal), luego v1
             const apiVersions = ['v1beta', 'v1'];
             
             for (let ver of apiVersions) {
@@ -57,6 +69,7 @@ export default async function handler(req, res) {
                     }
 
                     console.log(`🔄 Intentando con ${modelName} (${ver})...`);
+                    console.log(`📊 Tamaño del body: ${JSON.stringify(requestBody).length} bytes`);
 
                     const response = await fetch(
                         `https://generativelanguage.googleapis.com/${ver}/models/${modelName}:generateContent?key=${key}`,
@@ -68,6 +81,8 @@ export default async function handler(req, res) {
                     );
 
                     const data = await response.json();
+                    console.log(`📥 Response status: ${response.status}`);
+                    console.log(`📥 Response data:`, JSON.stringify(data).substring(0, 200));
 
                     if (response.ok && data.candidates) {
                         console.log(`✅ Éxito con ${modelName}`);
@@ -79,14 +94,20 @@ export default async function handler(req, res) {
                     } else if (data.error?.message.includes("leaked")) {
                         console.error(`🔒 Clave bloqueada: ${key.slice(0, 10)}...`);
                         break; // Saltar a la siguiente clave
-                    } else if (data.error?.message.includes("SAFETY")) {
+                    } else if (data.error?.message.includes("SAFETY") || data.error?.message.includes("BLOCKED")) {
                         console.warn("⚠️ Contenido bloqueado por seguridad");
                         return res.status(400).json({
                             success: false,
                             error: "El contenido fue bloqueado por políticas de seguridad"
                         });
+                    } else if (data.error?.message.includes("API key not valid")) {
+                        console.error(`🔑 Clave inválida: ${key.slice(0, 10)}...`);
+                        break; // Saltar a la siguiente clave
+                    } else if (data.error?.message.includes("models/") && data.error?.message.includes("is not found")) {
+                        console.warn(`⚠️ Modelo ${modelName} no disponible con esta clave`);
+                        break; // Probar siguiente modelo
                     } else {
-                        console.warn(`⚠️ Error con ${modelName}:`, data.error?.message);
+                        console.warn(`⚠️ Error con ${modelName}:`, data.error?.message || JSON.stringify(data));
                     }
                 } catch (error) {
                     console.error(`❌ Excepción con ${modelName}:`, error.message);
