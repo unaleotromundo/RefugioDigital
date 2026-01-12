@@ -33,17 +33,16 @@
         
         <div class="flex items-center gap-2">
             <!-- BOTÓN DE MÚSICA -->
-            <button id="music-btn" onclick="toggleMusic()" class="p-3 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-500 border border-amber-500/20 hover:scale-110 transition-all">
+            <button onclick="toggleMusic()" class="p-3 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-500 border border-amber-500/20 hover:scale-110 transition-all">
                 <svg id="speaker-icon" class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                    <!-- Icono inyectado por music-player.js -->
                 </svg>
             </button>
 
-            <!-- BOTÓN DE TEMA (AHORA CON SVG) -->
-            <button id="theme-btn" onclick="toggleDarkMode()" class="p-3 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-500 border border-amber-500/20">
-                <svg id="theme-icon" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
-                </svg>
+            <!-- BOTÓN DE TEMA -->
+            <button onclick="toggleDarkMode()" class="p-3 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-500 border border-amber-500/20">
+                <span class="dark:hidden">🌙</span>
+                <span class="hidden dark:inline">☀️</span>
             </button>
         </div>
     </nav>
@@ -109,7 +108,7 @@
         }
         setInterval(createParticle, 600);
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script src="script.js"></script>
     <!-- SCRIPT DE MÚSICA PERSISTENTE -->
