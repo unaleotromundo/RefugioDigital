@@ -1,30 +1,86 @@
-/* --- BASE & FUENTES --- */
+/* --- CONFIGURACIÓN BASE --- */
 body { 
     font-family: 'Plus Jakarta Sans', sans-serif; 
     margin: 0;
     padding: 0;
-    overflow: hidden; /* Evita scroll doble */
+    overflow: hidden; 
     background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=1920'); 
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
+    height: 100vh;
 }
 
-/* Capa de color sobre la imagen de fondo */
+/* Capa de fondo dinámica (Overlay) */
 body::before {
     content: "";
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(255, 252, 247, 0.85); 
+    background: rgba(255, 252, 247, 0.85); /* Crema claro */
     z-index: 0;
     transition: background 0.5s ease;
 }
 
 .dark body::before {
-    background: rgba(8, 10, 15, 0.9); 
+    background: rgba(8, 10, 15, 0.92); /* Azul oscuro profundo */
 }
 
-/* --- BOTONES ESTILO NEOMÓRFICO (STICKER) --- */
+/* --- TÍTULO CENTRAL (FIX DE VISIBILIDAD) --- */
+#active-agent-name {
+    color: #0f172a !important; /* Negro Slate forzado en modo claro */
+    transition: color 0.3s ease;
+    position: relative;
+    z-index: 10;
+}
+
+.dark #active-agent-name {
+    color: #ffffff !important; /* Blanco forzado en modo oscuro */
+}
+
+#active-agent-desc {
+    color: #64748b !important; /* Gris Slate */
+    transition: color 0.3s ease;
+}
+
+.dark #active-agent-desc {
+    color: #f59e0b !important; /* Ámbar en modo oscuro */
+}
+
+/* --- MENÚS LATERALES (SIEMPRE OSCUROS) --- */
+#history-sidebar, #agents-sidebar {
+    background-color: rgba(15, 23, 42, 0.98) !important; /* Slate 900 fijo */
+    color: white !important;
+}
+
+/* Forzar que los textos dentro de los sidebars sean blancos siempre */
+#history-sidebar h2, #agents-sidebar h2,
+#history-sidebar .font-bold, #agents-sidebar .font-bold {
+    color: #ffffff !important;
+}
+
+#history-sidebar .text-slate-400, #agents-sidebar .text-slate-400,
+#history-sidebar .opacity-50 {
+    color: #94a3b8 !important;
+}
+
+/* Estilo de los items dentro de los sidebars */
+.history-item, .agent-card {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(245, 158, 11, 0.1) !important;
+    transition: all 0.3s ease;
+}
+
+.history-item:hover, .agent-card:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(245, 158, 11, 0.4) !important;
+}
+
+.agent-card.active {
+    background: rgba(245, 158, 11, 0.2) !important;
+    border-color: #f59e0b !important;
+}
+
+/* --- BOTONES "STICKER" (NEOMÓRFICOS) --- */
 .nav-btn {
     padding: 0.75rem;
     border-radius: 9999px;
@@ -47,23 +103,24 @@ body::before {
 
 .nav-btn:active { 
     transform: translateY(2px); 
-    box-shadow: 2px 2px 0px 0px rgba(0,0,0,1); 
+    box-shadow: 1px 1px 0px 0px rgba(0,0,0,1); 
 }
 
 /* --- MARCO DEL CHAT (GLASSMORPHISM) --- */
 .chat-frame {
     background: rgba(255, 255, 255, 0.7); 
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(245, 158, 11, 0.3);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    z-index: 10;
 }
 
 .dark .chat-frame {
     background: rgba(15, 23, 42, 0.6);
-    border-color: rgba(245, 158, 11, 0.2);
+    border-color: rgba(245, 158, 11, 0.15);
 }
 
-/* --- BURBUJAS DE CONVERSACIÓN --- */
+/* --- BURBUJAS DE CHAT --- */
 .bubble {
     max-width: 85%;
     padding: 1rem 1.25rem;
@@ -71,56 +128,47 @@ body::before {
     font-size: 1.05rem;
     line-height: 1.5;
     position: relative;
-    animation: bubbleAppear 0.3s ease-out;
 }
 
 .bubble-user {
-    background: #f59e0b; /* Amber 500 */
-    color: white;
+    background: #f59e0b;
+    color: white !important;
     border-bottom-right-radius: 0.25rem;
-    font-weight: 500;
-    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2);
 }
 
 .bubble-ai {
     background: white;
-    color: #1e293b;
+    color: #1e293b !important; /* Texto oscuro para IA en modo claro */
     border-bottom-left-radius: 0.25rem;
     border: 1px solid #e2e8f0;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
 .dark .bubble-ai {
     background: #1e293b;
-    color: #f1f5f9;
+    color: #f1f5f9 !important; /* Texto claro en modo oscuro */
     border-color: #334155;
 }
 
-@keyframes bubbleAppear {
-    from { opacity: 0; transform: translateY(10px) scale(0.95); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
+/* --- INPUT DE TEXTO --- */
+#chat-input {
+    background: rgba(255, 255, 255, 0.95);
+    color: #0f172a !important; /* Texto negro en modo claro */
+    border: 2px solid rgba(0,0,0,0.05);
+    font-weight: 500;
 }
 
-/* --- TARJETAS DE AGENTES & HISTORIAL --- */
-.agent-card, .history-item {
-    transition: all 0.3s ease;
-}
-
-.agent-card.active {
-    background: rgba(245, 158, 11, 0.2) !important;
-    border: 1px solid #f59e0b !important;
-    transform: scale(1.02);
+.dark #chat-input {
+    background: rgba(30, 41, 59, 0.95);
+    color: #ffffff !important; /* Texto blanco en modo oscuro */
+    border-color: rgba(245, 158, 11, 0.2);
 }
 
 /* --- PARTÍCULAS --- */
 #particle-container {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 5;
+    top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 5;
 }
 
 .particle {
@@ -139,35 +187,21 @@ body::before {
 }
 
 /* --- SCROLLBAR PERSONALIZADA --- */
-::-webkit-scrollbar {
+.custom-scrollbar::-webkit-scrollbar {
     width: 6px;
 }
 
-::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
+.custom-scrollbar::-webkit-scrollbar-thumb {
     background: rgba(245, 158, 11, 0.3);
     border-radius: 10px;
 }
 
-::-webkit-scrollbar-thumb:hover {
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: rgba(245, 158, 11, 0.6);
-}
-
-/* --- INPUT DE TEXTO --- */
-#chat-input {
-    background: rgba(255, 255, 255, 0.9);
-}
-
-.dark #chat-input {
-    background: rgba(30, 41, 59, 0.9);
-    color: white;
 }
 
 /* --- RESPONSIVE --- */
 @media (max-width: 640px) {
     .bubble { max-width: 90%; font-size: 0.95rem; }
-    h1 { font-size: 1.8rem !important; }
+    #active-agent-name { font-size: 1.8rem !important; }
 }
