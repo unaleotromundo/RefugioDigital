@@ -1,225 +1,230 @@
-// script.js - Versión segura con API en servidor
 const chatBox = document.getElementById('chat-box');
 const chatInput = document.getElementById('chat-input');
-const sendBtn = document.getElementById('send-btn');
-const historyList = document.getElementById('history-list');
-
-// Inicializar cliente Supabase
 const supabaseClient = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
 
-const SYSTEM_PROMPT = `Actúa como un licenciado en Derecho por la Universidad de Buenos Aires, doctor en Filosofía (Universidad Complutense de Madrid, en Antropología (Universitat Rovira i Virgili de Tarragona, en Psicología (Universidad Ramon Llull, en Historia (Universidad de Lérida), Teología (Universidad de Murcia), Matemática Aplicada (Universidad de Alicante) y Educación (Universidad Ramon Llull). Y sobre todo Maestro y fundador de Escuelas de capacitacion de cábala hebrea. Hablame siempre como un uruguayo. utiliza los conceptos pero no nombres nunca la cabala ni los judíos, cuando dicen hola responde cortito y al pie. cuando hacen una pregunta expande tu respuesta lo que consideres necesario y termina las respuestas con una pregunta que invite a profundizar en algun aspecto importante del tema. no utilices dialectos como "bo" porque a los mayores no les gusta e intenta siempre hablar sin referirte a un genero femenino o masculino especificamente porque no sabemos quien está escribiendo. las personas llegan a vos porque quieren hacerte una pregunta sobre un problema o una situacion o para reflexionar sobre algo.`;
-
+let currentAgent = null;
 let currentChatId = null;
-let chatHistory = [];
+let chatHistory = []; 
 let currentUser = null;
+let listaAgentesGlobal = [];
 
-// --- INICIALIZACIÓN ---
 async function init() {
-    try {
-        const { data: authData, error: authError } = await supabaseClient.auth.signInAnonymously();
-        if (authError) throw authError;
-        currentUser = authData.user;
+    // 1. Auth Anónima
+    const { data: authData } = await supabaseClient.auth.signInAnonymously();
+    currentUser = authData.user;
 
-        await refreshHistoryUI();
-        
-        const chats = await getSavedChats();
-        if (chats.length > 0) {
-            await loadChat(chats[0].id);
-        } else {
-            await createNewChat();
-        }
-    } catch (err) {
-        console.error("Error en inicialización:", err);
-        createNewChat();
-    }
+    // 2. Cargar Agentes y luego el Historial
+    await cargarAgentes();
+    await refreshHistorySidebar();
+    
+    // 3. UI y Eventos
+    setInterval(createParticle, 600);
+    chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleSend(); });
 }
 
-// --- GESTIÓN DE DATOS ---
-async function getSavedChats() {
-    if (currentUser) {
-        const { data, error } = await supabaseClient
-            .from('chats')
-            .select('*')
-            .order('updated_at', { ascending: false });
-        if (!error) return data;
-    }
-    return JSON.parse(localStorage.getItem('refugio_chats') || '[]');
-}
+// --- GESTIÓN DE AGENTES ---
+async function cargarAgentes() {
+    const { data, error } = await supabaseClient.from('agentes').select('*').order('created_at', { ascending: false });
+    if (error) return;
 
-async function saveCurrentChat() {
-    const firstMsg = chatHistory.find(m => m.role === "user")?.parts[0].text || "Nueva reflexión";
-    const title = firstMsg.substring(0, 35) + (firstMsg.length > 35 ? "..." : "");
-
-    const chatData = {
-        id: currentChatId,
-        user_id: currentUser.id,
-        title: title,
-        history: chatHistory,
-        updated_at: new Date().toISOString()
-    };
-
-    if (currentUser) {
-        await supabaseClient.from('chats').upsert(chatData);
-    }
-
-    let localChats = JSON.parse(localStorage.getItem('refugio_chats') || '[]');
-    const index = localChats.findIndex(c => c.id === currentChatId);
-    if (index > -1) localChats[index] = chatData;
-    else localChats.unshift(chatData);
-    localStorage.setItem('refugio_chats', JSON.stringify(localChats));
-}
-
-async function createNewChat() {
-    currentChatId = Date.now();
-    chatHistory = [];
-    renderMessages();
-    appendBubble("Hola. Soy tu espejo digital. En este espacio no existen los juicios, solo la comprensión. ¿Qué necesitas soltar o entender hoy?", false, false);
-    await saveCurrentChat();
-    await refreshHistoryUI();
-    toggleHistory(false);
-}
-
-async function loadChat(id) {
-    const chats = await getSavedChats();
-    const chat = chats.find(c => c.id == id);
-    if (chat) {
-        currentChatId = chat.id;
-        chatHistory = chat.history;
-        renderMessages();
-        await refreshHistoryUI();
-        toggleHistory(false);
-    }
-}
-
-async function deleteChat(id, event) {
-    event.stopPropagation();
-    if (!confirm("¿Deseas borrar esta reflexión para siempre?")) return;
-
-    if (currentUser) {
-        await supabaseClient.from('chats').delete().eq('id', id);
-    }
-
-    let localChats = JSON.parse(localStorage.getItem('refugio_chats') || '[]').filter(c => c.id != id);
-    localStorage.setItem('refugio_chats', JSON.stringify(localChats));
-
-    if (currentChatId == id) {
-        await createNewChat();
-    } else {
-        await refreshHistoryUI();
-    }
-}
-
-// --- INTERFAZ DE USUARIO ---
-async function refreshHistoryUI() {
-    const chats = await getSavedChats();
-    historyList.innerHTML = chats.map(chat => `
-        <div class="history-item ${chat.id === currentChatId ? 'active' : ''}" onclick="loadChat(${chat.id})">
-            <div class="title">${chat.title}</div>
-            <div class="flex justify-between items-center opacity-60">
-                <span class="text-[10px] font-bold">${new Date(chat.updated_at).toLocaleDateString()}</span>
-                <button onclick="deleteChat(${chat.id}, event)" class="text-[10px] text-red-500 font-bold hover:underline">Borrar</button>
-            </div>
-        </div>
-    `).join('');
-}
-
-function toggleHistory(show) {
-    const sidebar = document.getElementById('history-sidebar');
-    if (show) sidebar.classList.remove('-translate-x-full');
-    else sidebar.classList.add('-translate-x-full');
-}
-
-function renderMessages() {
-    chatBox.innerHTML = '';
-    chatHistory.forEach(msg => {
-        if (msg.role !== "system" && msg.parts[0].text !== SYSTEM_PROMPT) {
-            appendBubble(msg.parts[0].text, msg.role === "user", false);
-        }
+    listaAgentesGlobal = data;
+    const list = document.getElementById('agents-list');
+    list.innerHTML = '';
+    
+    data.forEach((agente) => {
+        const div = document.createElement('div');
+        div.id = `agent-${agente.id}`;
+        div.className = "agent-card p-4 rounded-2xl cursor-pointer mb-2 hover:bg-amber-500/10 transition-all";
+        div.onclick = () => setAgent(agente);
+        div.innerHTML = `
+            <div class="font-bold text-sm text-white">✨ ${agente.nombre}</div>
+            <div class="text-[10px] text-slate-400 uppercase tracking-tighter">${agente.descripcion || 'Conciencia'}</div>
+        `;
+        list.appendChild(div);
     });
+    
+    // Si no hay chat activo, cargar el primer agente por defecto
+    if (data.length > 0 && !currentChatId) setAgent(data[0]);
 }
 
-function appendBubble(text, isUser, shouldSave = true) {
-    const wrapper = document.createElement('div');
-    wrapper.className = isUser ? "flex flex-col items-end w-full" : "flex flex-col items-start w-full";
-    
-    const formattedText = text.replace(/\n/g, '<br>');
-    
-    wrapper.innerHTML = `
-        <div class="bubble ${isUser ? 'bubble-user' : 'bubble-ai'} ${!isUser ? 'italic' : ''}">
-            ${formattedText}
-        </div>
-    `;
-    chatBox.appendChild(wrapper);
+async function setAgent(agente, isLoadingFromHistory = false) {
+    currentAgent = agente;
+    currentAgent.conocimiento_texto = ""; 
 
-    if (shouldSave) {
-        chatHistory.push({ role: isUser ? "user" : "model", parts: [{ text: text }] });
-        saveCurrentChat();
+    // Visual
+    document.getElementById('active-agent-name').innerText = agente.nombre;
+    document.getElementById('active-agent-desc').innerText = agente.descripcion || "Conciencia";
+    document.querySelectorAll('.agent-card').forEach(c => c.classList.remove('active'));
+    if(document.getElementById(`agent-${agente.id}`)) document.getElementById(`agent-${agente.id}`).classList.add('active');
+
+    // Cargar Archivo si existe
+    if (agente.archivo_url) {
+        try {
+            const response = await fetch(agente.archivo_url);
+            const blob = await response.blob();
+            const ext = agente.archivo_url.split('.').pop().toLowerCase().split('?')[0];
+            if (ext === 'pdf') currentAgent.conocimiento_texto = await extractTextFromPDF(agente.archivo_url);
+            else if (ext === 'docx') {
+                const arrayBuffer = await blob.arrayBuffer();
+                const result = await mammoth.extractRawText({ arrayBuffer });
+                currentAgent.conocimiento_texto = result.value;
+            } else { currentAgent.conocimiento_texto = await blob.text(); }
+        } catch(e) { console.error("Error archivo:", e); }
     }
 
-    if (!isUser) wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    else chatBox.scrollTop = chatBox.scrollHeight;
+    if (!isLoadingFromHistory) {
+        createNewChat();
+        toggleSidebar('agents-sidebar', false);
+    }
 }
 
-// --- COMUNICACIÓN CON GEMINI (AHORA A TRAVÉS DE VERCEL) ---
-async function send() {
-    const userText = chatInput.value.trim();
-    if (!userText) return;
+// --- LÓGICA DE CHAT ---
+async function handleSend() {
+    const text = chatInput.value.trim();
+    if (!text || !currentAgent) return;
 
-    appendBubble(userText, true);
+    appendBubble(text, true);
     chatInput.value = '';
-
-    const typingId = "typing-" + Date.now();
-    const typingDiv = document.createElement('div');
-    typingDiv.id = typingId;
-    typingDiv.className = "flex flex-col items-start w-full";
-    typingDiv.innerHTML = `<div class="bubble bubble-ai opacity-50">El espejo busca la luz...</div>`;
-    chatBox.appendChild(typingDiv);
-    chatBox.scrollTop = chatBox.scrollHeight;
+    const typing = showTyping();
 
     try {
-        // Llamar a la función serverless de Vercel
+        const systemPrompt = `${currentAgent.instrucciones}\n\nCONTEXTO ADICIONAL:\n${currentAgent.conocimiento_texto || ''}`;
+        
         const response = await fetch('/api/gemini', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                contents: [
-                    { role: "user", parts: [{ text: SYSTEM_PROMPT }] },
-                    ...chatHistory
-                ]
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                systemInstruction: systemPrompt, 
+                contents: chatHistory 
             })
         });
 
         const data = await response.json();
-
-        if (document.getElementById(typingId)) {
-            document.getElementById(typingId).remove();
-        }
+        typing.remove();
 
         if (data.success) {
             appendBubble(data.text, false);
-            await saveCurrentChat();
-        } else {
-            appendBubble("El espejo se siente pesado hoy. Las claves de acceso parecen estar agotadas. Por favor, contacta al administrador.", false);
+            await saveToHubHistory();
         }
-    } catch (error) {
-        if (document.getElementById(typingId)) {
-            document.getElementById(typingId).remove();
-        }
-        console.error("Error al conectar con el servidor:", error);
-        appendBubble("No pude conectar con el servidor. Verifica tu conexión a internet.", false);
+    } catch (err) {
+        typing.remove();
+        appendBubble("El espejo está empañado. Intenta de nuevo.", false);
     }
 }
 
-// --- EVENTOS ---
-sendBtn.addEventListener('click', send);
-chatInput.addEventListener('keydown', (e) => { 
-    if (e.key === 'Enter') { 
-        e.preventDefault(); 
-        send(); 
-    } 
-});
+function appendBubble(text, isUser) {
+    const div = document.createElement('div');
+    div.className = `flex w-full ${isUser ? 'justify-end' : 'justify-start'}`;
+    div.innerHTML = `<div class="bubble ${isUser ? 'bubble-user' : 'bubble-ai'}">${text.replace(/\n/g, '<br>')}</div>`;
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+    chatHistory.push({ role: isUser ? "user" : "model", parts: [{ text }] });
+}
 
-// Iniciar app
+// --- PERSISTENCIA E HISTORIAL ---
+async function saveToHubHistory() {
+    if (!currentUser || chatHistory.length < 2) return;
+    const firstMsg = chatHistory.find(m => m.role === "user")?.parts[0].text || "Reflexión";
+    
+    await supabaseClient.from('reflexiones_hub').upsert({
+        id: currentChatId,
+        user_id: currentUser.id,
+        agent_id: currentAgent.id,
+        title: firstMsg.substring(0, 30) + "...",
+        history: chatHistory,
+        updated_at: new Date().toISOString()
+    });
+    refreshHistorySidebar();
+}
+
+async function refreshHistorySidebar() {
+    if (!currentUser) return;
+    const { data } = await supabaseClient.from('reflexiones_hub').select('*').eq('user_id', currentUser.id).order('updated_at', { ascending: false });
+    const list = document.getElementById('history-list');
+    if (!list) return;
+
+    list.innerHTML = data.map(chat => `
+        <div onclick="loadChat('${chat.id}')" class="p-3 bg-slate-100 dark:bg-slate-800 rounded-xl cursor-pointer hover:border-amber-500 border border-transparent transition-all">
+            <div class="text-xs font-bold truncate dark:text-white">${chat.title}</div>
+            <div class="text-[8px] opacity-50 uppercase mt-1 dark:text-amber-500">${new Date(chat.updated_at).toLocaleDateString()}</div>
+        </div>
+    `).join('');
+}
+
+async function loadChat(id) {
+    const { data: chat } = await supabaseClient.from('reflexiones_hub').select('*').eq('id', id).single();
+    if(chat) {
+        currentChatId = chat.id;
+        chatHistory = chat.history;
+        
+        // Cambiar al agente que corresponde a esta conversación
+        const agenteAsociado = listaAgentesGlobal.find(a => a.id === chat.agent_id);
+        if (agenteAsociado) await setAgent(agenteAsociado, true);
+
+        // Limpiar y renderizar mensajes
+        chatBox.innerHTML = '';
+        chatHistory.forEach(msg => {
+            const div = document.createElement('div');
+            const isUser = msg.role === 'user';
+            div.className = `flex w-full ${isUser ? 'justify-end' : 'justify-start'}`;
+            div.innerHTML = `<div class="bubble ${isUser ? 'bubble-user' : 'bubble-ai'}">${msg.parts[0].text.replace(/\n/g, '<br>')}</div>`;
+            chatBox.appendChild(div);
+        });
+        chatBox.scrollTop = chatBox.scrollHeight;
+        toggleSidebar('history-sidebar', false);
+    }
+}
+
+function createNewChat() {
+    currentChatId = crypto.randomUUID();
+    chatHistory = [];
+    chatBox.innerHTML = '';
+    if(currentAgent) appendBubble(`Soy ${currentAgent.nombre}. ¿Qué buscas reflejar hoy?`, false);
+}
+
+// --- UI HELPERS ---
+function toggleSidebar(id, show) {
+    const el = document.getElementById(id);
+    el.style.transform = show ? 'translateX(0)' : (id === 'history-sidebar' ? 'translateX(-100%)' : 'translateX(100%)');
+}
+
+function showTyping() {
+    const div = document.createElement('div');
+    div.className = "text-xs opacity-50 italic p-2 dark:text-white";
+    div.innerText = `${currentAgent.nombre} procesando...`;
+    chatBox.appendChild(div);
+    return div;
+}
+
+function toggleDarkMode() { document.documentElement.classList.toggle('dark'); }
+
+function createParticle() {
+    const container = document.getElementById('particle-container');
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = `${Math.random() * 100}%`;
+    const size = Math.random() * 4 + 2;
+    p.style.width = size + 'px'; p.style.height = size + 'px';
+    p.style.setProperty('--duration', `${Math.random() * 10 + 5}s`);
+    container.appendChild(p);
+    setTimeout(() => p.remove(), 10000);
+}
+
+async function extractTextFromPDF(url) {
+    const pdfjsLib = window['pdfjs-dist/build/pdf'];
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+    const pdf = await pdfjsLib.getDocument(url).promise;
+    let text = "";
+    for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        text += content.items.map(s => s.str).join(" ") + "\n";
+    }
+    return text;
+}
+
+function checkAdminPassword() {
+    if (prompt("Contraseña:") === "admin123") window.location.href = "configurador.html";
+}
+
 init();
