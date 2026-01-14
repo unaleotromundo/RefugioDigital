@@ -1,4 +1,4 @@
-// script.js - Sincronizado con el Panel de Estudio
+// script.js - PRIVACIDAD TOTAL Y SINCRONIZACIÓN CON SUPABASE
 const chatBox = document.getElementById('chat-box');
 const chatInput = document.getElementById('chat-input');
 const sendBtn = document.getElementById('send-btn');
@@ -16,67 +16,69 @@ let currentUser = null;
 // --- INICIALIZACIÓN ---
 async function init() {
     try {
-        // Loguear anónimamente para tener permiso de escritura
+        // Autenticación Anónima: Crea un ID único para este usuario/navegador
         const { data: authData, error: authError } = await supabaseClient.auth.signInAnonymously();
         if (authError) throw authError;
         currentUser = authData.user;
-        console.log("Sesión iniciada como:", currentUser.id);
+        console.log("Sesión privada iniciada.");
 
-        await refreshHistoryUI();
-        
+        // Cargar solo los chats de ESTE usuario
         const chats = await getSavedChats();
         if (chats.length > 0) {
             await loadChat(chats[0].id);
         } else {
             await createNewChat();
         }
+        await refreshHistoryUI();
     } catch (err) {
-        console.error("Error en inicialización:", err);
-        // Fallback si falla Supabase
-        currentChatId = Date.now();
-        appendBubble("Hola. Soy tu espejo digital. ¿Qué necesitas entender hoy?", false, false);
+        console.error("Error en conexión:", err);
+        // Fallback local si falla la red
+        if (!currentChatId) createNewChat();
     }
 }
 
-// --- GESTIÓN DE DATOS (SUPABASE + LOCAL) ---
+// --- GESTIÓN DE DATOS PRIVADOS ---
 async function getSavedChats() {
-    // Intentar traer de Supabase primero para estar sincronizado con el visor
-    if (currentUser) {
+    if (!currentUser) return JSON.parse(localStorage.getItem('refugio_chats') || '[]');
+
+    try {
+        // FILTRO DE PRIVACIDAD: Solo traemos chats donde user_id sea igual al ID del usuario actual
         const { data, error } = await supabaseClient
             .from('chats')
             .select('*')
+            .eq('user_id', currentUser.id)
             .order('updated_at', { ascending: false });
-        if (!error && data.length > 0) return data;
+        
+        if (error) throw error;
+        return data || [];
+    } catch (e) {
+        console.error("Error al obtener historial privado:", e);
+        return JSON.parse(localStorage.getItem('refugio_chats') || '[]');
     }
-    // Si no hay internet o no hay datos, usar local
-    return JSON.parse(localStorage.getItem('refugio_chats') || '[]');
 }
 
 async function saveCurrentChat() {
-    if (!currentChatId) return;
+    if (!currentChatId || !currentUser) return;
 
     const firstMsg = chatHistory.find(m => m.role === "user")?.parts[0].text || "Nueva reflexión";
     const title = firstMsg.substring(0, 35) + (firstMsg.length > 35 ? "..." : "");
 
     const chatData = {
-        id: currentChatId, // Date.now() funciona bien con int8 en Supabase
-        user_id: currentUser ? currentUser.id : null,
+        id: currentChatId,
+        user_id: currentUser.id, // Vinculamos el chat al usuario
         title: title,
         history: chatHistory,
         updated_at: new Date().toISOString()
     };
 
-    // 1. Guardar en Supabase (Para el visor)
-    if (currentUser) {
-        const { error } = await supabaseClient
-            .from('chats')
-            .upsert(chatData, { onConflict: 'id' });
-        
-        if (error) console.error("Error al sincronizar con la nube:", error.message);
-        else console.log("✅ Sincronizado con el Panel de Estudio");
+    // 1. Sincronizar con Supabase
+    try {
+        await supabaseClient.from('chats').upsert(chatData, { onConflict: 'id' });
+    } catch (e) {
+        console.error("Error de sincronización nube:", e);
     }
 
-    // 2. Guardar en Local (Para rapidez del usuario)
+    // 2. Respaldo en LocalStorage
     let localChats = JSON.parse(localStorage.getItem('refugio_chats') || '[]');
     const index = localChats.findIndex(c => c.id === currentChatId);
     if (index > -1) localChats[index] = chatData;
@@ -106,7 +108,25 @@ async function loadChat(id) {
     }
 }
 
-// --- INTERFAZ ---
+async function deleteChat(id, event) {
+    event.stopPropagation();
+    if (!confirm("¿Deseas borrar esta reflexión?")) return;
+
+    try {
+        if (currentUser) {
+            await supabaseClient.from('chats').delete().eq('id', id).eq('user_id', currentUser.id);
+        }
+        let localChats = JSON.parse(localStorage.getItem('refugio_chats') || '[]').filter(c => c.id != id);
+        localStorage.setItem('refugio_chats', JSON.stringify(localChats));
+
+        if (currentChatId == id) await createNewChat();
+        else await refreshHistoryUI();
+    } catch (e) {
+        console.error("Error al borrar:", e);
+    }
+}
+
+// --- INTERFAZ DE USUARIO ---
 async function refreshHistoryUI() {
     const chats = await getSavedChats();
     historyList.innerHTML = chats.map(chat => `
@@ -144,7 +164,7 @@ function appendBubble(text, isUser, shouldSave = true) {
     else chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// --- ENVÍO A GEMINI ---
+// --- CONEXIÓN CON EL MAESTRO (API) ---
 async function send() {
     const userText = chatInput.value.trim();
     if (!userText) return;
@@ -177,19 +197,24 @@ async function send() {
 
         if (data.success) {
             appendBubble(data.text, false);
-            await saveCurrentChat(); // Guardamos respuesta de la IA
+        } else {
+            throw new Error(data.error);
         }
     } catch (e) {
         if (document.getElementById(typingId)) document.getElementById(typingId).remove();
-        appendBubble("El espejo se ha empañado. Inténtalo de nuevo.", false);
+        console.error("Error API:", e);
+        appendBubble("El espejo se ha empañado. Prueba de nuevo en unos instantes.", false);
     }
 }
 
-// --- EVENTOS ---
-sendBtn.addEventListener('click', send);
-chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') send(); });
+// --- UTILIDADES ---
 function toggleHistory(show) {
     document.getElementById('history-sidebar').classList.toggle('-translate-x-full', !show);
 }
 
+// Eventos
+sendBtn.addEventListener('click', send);
+chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') send(); });
+
+// Iniciar aplicación
 init();
