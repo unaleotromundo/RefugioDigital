@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- SEO BÁSICO -->
     <title>Tu Refugio Digital | Faro de Significado y Propósito</title>
@@ -124,7 +124,7 @@
             min-height: 100vh;
         }
 
-        /* MOBILE OPTIMIZADO */
+        /* MOBILE */
         @media (max-width: 1023px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -134,148 +134,9 @@
             }
             .main-content {
                 margin-left: 0;
-                padding: 0;
             }
             .mobile-header {
                 display: flex !important;
-            }
-            
-            /* === OPTIMIZACIONES PARA MÓVIL === */
-            
-            /* Texto base más legible */
-            body {
-                font-size: 16px;
-                line-height: 1.6;
-            }
-            
-            main {
-                padding-left: 1.5rem !important;
-                padding-right: 1.5rem !important;
-                padding-top: 1.5rem !important;
-                padding-bottom: 1.5rem !important;
-            }
-            
-            /* Tarjetas con bordes más pequeños */
-            .warm-card {
-                border-radius: 2rem !important;
-            }
-            
-            /* Tarjetas de bienvenida con padding reducido */
-            #welcome-section .warm-card {
-                padding: 2rem !important;
-            }
-            
-            /* Carousel más compacto */
-            .swiper {
-                height: 50vh !important;
-                border-radius: 1.5rem !important;
-            }
-            
-            /* Padding del contenido del carousel */
-            .swiper-slide > div {
-                padding: 2rem !important;
-            }
-            
-            /* Grid de posts con menos gap */
-            #posts-grid {
-                gap: 1.5rem !important;
-            }
-            
-            /* Títulos principales más pequeños */
-            h2.text-4xl {
-                font-size: 1.875rem !important;
-                margin-bottom: 1.5rem !important;
-            }
-            
-            /* Títulos de artículos */
-            h3.text-2xl {
-                font-size: 1.375rem !important;
-            }
-            
-            /* Títulos del carousel */
-            .swiper-slide h3 {
-                font-size: 2rem !important;
-                margin-bottom: 1.5rem !important;
-            }
-            
-            /* Botones con altura mínima táctil */
-            button {
-                min-height: 44px;
-                padding-top: 0.75rem;
-                padding-bottom: 0.75rem;
-            }
-            
-            /* Inputs y textareas */
-            textarea {
-                font-size: 16px !important;
-                padding: 1rem !important;
-            }
-            
-            /* Artículos - padding reducido */
-            article > div.p-12 {
-                padding: 1.5rem !important;
-            }
-            
-            /* Imágenes de artículos más pequeñas */
-            article > div.h-72 {
-                height: 14rem !important;
-            }
-            
-            /* Prose (contenido de artículos) */
-            .prose {
-                font-size: 1.0625rem !important;
-            }
-            
-            .prose h1 {
-                font-size: 2.25rem !important;
-                line-height: 1.2 !important;
-                margin-bottom: 1.5rem !important;
-            }
-            
-            .prose p {
-                margin-bottom: 1.25rem !important;
-            }
-            
-            .prose img {
-                margin-top: 1.5rem !important;
-                margin-bottom: 1.5rem !important;
-                border-radius: 1.5rem !important;
-            }
-            
-            /* Sección de comentarios */
-            #post-view .warm-card {
-                padding: 1.5rem !important;
-            }
-            
-            /* Botón de regreso */
-            #post-view button {
-                padding: 0.875rem 1.5rem !important;
-                font-size: 0.75rem !important;
-            }
-            
-            /* Footer más compacto */
-            footer {
-                padding: 2rem 0 !important;
-            }
-        }
-        
-        /* Extra small devices (pantallas muy pequeñas) */
-        @media (max-width: 374px) {
-            body {
-                font-size: 15px;
-            }
-            
-            main {
-                padding-left: 1rem !important;
-                padding-right: 1rem !important;
-            }
-            
-            .swiper-slide h3 {
-                font-size: 1.5rem !important;
-            }
-            
-            h2.text-4xl {
-                font-size: 1.5rem !important;
             }
         }
         
