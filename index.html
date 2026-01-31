@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
     
     <!-- SEO BÁSICO -->
     <title>Tu Refugio Digital | Faro de Significado y Propósito</title>
@@ -124,7 +124,7 @@
             min-height: 100vh;
         }
 
-        /* MOBILE OPTIMIZADO */
+        /* MOBILE OPTIMIZADO - VERSIÓN AGRESIVA */
         @media (max-width: 1023px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -133,149 +133,210 @@
                 transform: translateX(0);
             }
             .main-content {
-                margin-left: 0;
-                padding: 0;
+                margin-left: 0 !important;
+                padding: 0 !important;
             }
             .mobile-header {
                 display: flex !important;
             }
             
-            /* === OPTIMIZACIONES PARA MÓVIL === */
+            /* === TAMAÑOS DE FUENTE MUCHO MÁS GRANDES === */
+            html {
+                font-size: 18px !important;
+            }
             
-            /* Texto base más legible */
             body {
-                font-size: 16px;
-                line-height: 1.6;
+                font-size: 18px !important;
+                line-height: 1.7 !important;
             }
             
+            /* Main con padding generoso */
             main {
-                padding-left: 1.5rem !important;
-                padding-right: 1.5rem !important;
-                padding-top: 1.5rem !important;
-                padding-bottom: 1.5rem !important;
+                padding: 2rem 1.5rem !important;
             }
             
-            /* Tarjetas con bordes más pequeños */
+            /* Tarjetas grandes y legibles */
             .warm-card {
-                border-radius: 2rem !important;
-            }
-            
-            /* Tarjetas de bienvenida con padding reducido */
-            #welcome-section .warm-card {
+                border-radius: 1.5rem !important;
                 padding: 2rem !important;
             }
             
-            /* Carousel más compacto */
+            #welcome-section .warm-card {
+                padding: 2.5rem 2rem !important;
+            }
+            
+            /* Carousel más grande */
             .swiper {
-                height: 50vh !important;
+                height: 65vh !important;
                 border-radius: 1.5rem !important;
             }
             
-            /* Padding del contenido del carousel */
             .swiper-slide > div {
+                padding: 2.5rem 2rem !important;
+            }
+            
+            /* Títulos del carousel MUCHO más grandes */
+            .swiper-slide h3 {
+                font-size: 2.5rem !important;
+                line-height: 1.2 !important;
+                margin-bottom: 2rem !important;
+            }
+            
+            .swiper-slide p {
+                font-size: 1.25rem !important;
+                line-height: 1.6 !important;
+            }
+            
+            .swiper-slide button {
+                font-size: 1rem !important;
+                padding: 1.25rem 2.5rem !important;
+            }
+            
+            /* Grid de posts */
+            #posts-grid {
+                gap: 2rem !important;
+            }
+            
+            /* Títulos principales GRANDES */
+            h2 {
+                font-size: 2.25rem !important;
+                line-height: 1.3 !important;
+                margin-bottom: 2rem !important;
+            }
+            
+            /* Artículos */
+            article h3 {
+                font-size: 1.75rem !important;
+                line-height: 1.3 !important;
+                margin-bottom: 1rem !important;
+            }
+            
+            article p {
+                font-size: 1.125rem !important;
+                line-height: 1.7 !important;
+            }
+            
+            article > div.p-12 {
                 padding: 2rem !important;
             }
             
-            /* Grid de posts con menos gap */
-            #posts-grid {
-                gap: 1.5rem !important;
-            }
-            
-            /* Títulos principales más pequeños */
-            h2.text-4xl {
-                font-size: 1.875rem !important;
-                margin-bottom: 1.5rem !important;
-            }
-            
-            /* Títulos de artículos */
-            h3.text-2xl {
-                font-size: 1.375rem !important;
-            }
-            
-            /* Títulos del carousel */
-            .swiper-slide h3 {
-                font-size: 2rem !important;
-                margin-bottom: 1.5rem !important;
-            }
-            
-            /* Botones con altura mínima táctil */
-            button {
-                min-height: 44px;
-                padding-top: 0.75rem;
-                padding-bottom: 0.75rem;
-            }
-            
-            /* Inputs y textareas */
-            textarea {
-                font-size: 16px !important;
-                padding: 1rem !important;
-            }
-            
-            /* Artículos - padding reducido */
-            article > div.p-12 {
-                padding: 1.5rem !important;
-            }
-            
-            /* Imágenes de artículos más pequeñas */
             article > div.h-72 {
-                height: 14rem !important;
+                height: 16rem !important;
             }
             
-            /* Prose (contenido de artículos) */
+            article span {
+                font-size: 1rem !important;
+            }
+            
+            /* Botones grandes y táctiles */
+            button {
+                min-height: 52px !important;
+                font-size: 1.05rem !important;
+                padding: 1rem 1.75rem !important;
+            }
+            
+            /* Inputs grandes */
+            textarea {
+                font-size: 18px !important;
+                padding: 1.25rem !important;
+                line-height: 1.6 !important;
+            }
+            
+            /* Vista de artículo completo */
             .prose {
-                font-size: 1.0625rem !important;
+                font-size: 1.25rem !important;
+                line-height: 1.75 !important;
             }
             
             .prose h1 {
-                font-size: 2.25rem !important;
+                font-size: 2.75rem !important;
                 line-height: 1.2 !important;
-                margin-bottom: 1.5rem !important;
+                margin-bottom: 2rem !important;
+            }
+            
+            .prose h2 {
+                font-size: 2.25rem !important;
+                line-height: 1.3 !important;
+            }
+            
+            .prose h3 {
+                font-size: 1.875rem !important;
+                line-height: 1.3 !important;
             }
             
             .prose p {
-                margin-bottom: 1.25rem !important;
+                font-size: 1.25rem !important;
+                line-height: 1.75 !important;
+                margin-bottom: 1.5rem !important;
+            }
+            
+            .prose li {
+                font-size: 1.25rem !important;
+                line-height: 1.75 !important;
+                margin-bottom: 0.75rem !important;
             }
             
             .prose img {
-                margin-top: 1.5rem !important;
-                margin-bottom: 1.5rem !important;
+                margin: 2rem 0 !important;
                 border-radius: 1.5rem !important;
             }
             
             /* Sección de comentarios */
             #post-view .warm-card {
+                padding: 2rem !important;
+            }
+            
+            #post-view .warm-card h3 {
+                font-size: 2rem !important;
+                margin-bottom: 1.5rem !important;
+            }
+            
+            #post-view .warm-card p {
+                font-size: 1.125rem !important;
+                line-height: 1.7 !important;
+                margin-bottom: 1.5rem !important;
+            }
+            
+            /* Comentarios individuales */
+            #comments-list > div {
+                font-size: 1.125rem !important;
+                line-height: 1.7 !important;
                 padding: 1.5rem !important;
             }
             
             /* Botón de regreso */
-            #post-view button {
-                padding: 0.875rem 1.5rem !important;
-                font-size: 0.75rem !important;
+            #post-view > button {
+                padding: 1rem 2rem !important;
+                font-size: 0.9rem !important;
+                margin-bottom: 2rem !important;
             }
             
-            /* Footer más compacto */
+            /* Footer */
             footer {
-                padding: 2rem 0 !important;
+                padding: 3rem 0 !important;
+            }
+            
+            footer p {
+                font-size: 0.8rem !important;
             }
         }
         
-        /* Extra small devices (pantallas muy pequeñas) */
+        /* Para pantallas MUY pequeñas */
         @media (max-width: 374px) {
-            body {
-                font-size: 15px;
+            html {
+                font-size: 17px !important;
             }
             
             main {
-                padding-left: 1rem !important;
-                padding-right: 1rem !important;
+                padding: 1.5rem 1rem !important;
             }
             
             .swiper-slide h3 {
-                font-size: 1.5rem !important;
+                font-size: 2rem !important;
             }
             
-            h2.text-4xl {
-                font-size: 1.5rem !important;
+            h2 {
+                font-size: 1.875rem !important;
             }
         }
         
