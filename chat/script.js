@@ -226,7 +226,12 @@ function toggleHistory(show) {
 
 // Eventos
 sendBtn.addEventListener('click', send);
-chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') send(); });
+chatInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        send();
+    }
+});
 
 // Iniciar aplicación
 init();

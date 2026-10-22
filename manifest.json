@@ -1,6 +1,6 @@
 {
-  "name": "Gota a gota",
-  "short_name": "Gota a gota",
+  "name": "Conexión",
+  "short_name": "Conexión",
   "description": "Un espacio para hacer una pausa, leer, compartir preguntas y seguir buscando en compañía.",
   "start_url": "/",
   "scope": "/",
@@ -10,9 +10,9 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "brand-mark.svg",
+      "src": "/cosas%20a%20revisar/logo.png",
       "sizes": "any",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ],

@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- SEO BÁSICO -->
-    <title>Gota a gota | Un espacio para pensar en compañía</title>
+    <title>Conexión | Un espacio para pensar en compañía</title>
     <meta name="description" content="Un espacio para hacer una pausa, leer, compartir preguntas y seguir buscando, sin tener que encontrar todas las respuestas hoy.">
-    <link rel="icon" type="image/svg+xml" href="brand-mark.svg">
+    <link rel="icon" type="image/png" href="cosas%20a%20revisar/logo.png">
 
     <!-- PWA MANIFEST -->
     <link rel="manifest" href="/manifest.json">
@@ -20,19 +20,19 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Gota a gota">
-    <link rel="apple-touch-icon" href="brand-mark.svg">
+    <meta name="apple-mobile-web-app-title" content="Conexión">
+    <link rel="apple-touch-icon" href="cosas%20a%20revisar/logo.png">
     
     <!-- PWA: Para Windows -->
-    <meta name="msapplication-TileImage" content="brand-mark.svg">
+    <meta name="msapplication-TileImage" content="cosas%20a%20revisar/logo.png">
     <meta name="msapplication-TileColor" content="#e9e5d9">
 
     <!-- SEO PARA COMPARTIR -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://refugiodigital.vercel.app">
-    <meta property="og:title" content="Gota a gota | Un espacio para pensar en compañía">
+    <meta property="og:title" content="Conexión | Un espacio para pensar en compañía">
     <meta property="og:description" content="Un espacio para hacer una pausa, leer, compartir preguntas y seguir buscando, sin tener que encontrar todas las respuestas hoy.">
-    <meta property="og:image" content="brand-mark.svg">
+    <meta property="og:image" content="cosas%20a%20revisar/logo.png">
     
     <!-- SCRIPTS Y ESTILOS -->
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
@@ -203,9 +203,9 @@
     <aside id="sidebar" class="sidebar">
         <div class="sidebar-logo">
             <button onclick="showHome()" class="flex items-center gap-3 group">
-                <img src="brand-mark.svg" alt="" class="w-12 h-12 object-contain">
+                <img src="cosas%20a%20revisar/logo.png" alt="" class="w-12 h-12 object-contain">
                 <div class="flex flex-col items-start">
-                    <span class="text-lg font-black tracking-tighter text-amber-600 leading-tight">GOTA A GOTA</span>
+                    <span class="text-lg font-black tracking-tighter text-amber-600 leading-tight">CONEXIÓN</span>
                     <span class="text-xs font-semibold tracking-wide text-slate-900 dark:text-white leading-tight">un espacio compartido</span>
                 </div>
             </button>
@@ -251,8 +251,8 @@
     <!-- HEADER MOBILE -->
     <div class="mobile-header">
         <button onclick="showHome()" class="flex items-center gap-2">
-            <img src="brand-mark.svg" alt="" class="w-8 h-8 object-contain">
-            <span class="text-lg font-black tracking-tighter text-amber-600">Gota a gota</span>
+            <img src="cosas%20a%20revisar/logo.png" alt="" class="w-8 h-8 object-contain">
+            <span class="text-lg font-black tracking-tighter text-amber-600">Conexión</span>
         </button>
         
         <div class="flex items-center gap-2">
@@ -285,7 +285,7 @@
                 </div>
                 <div id="home-offline-state" class="text-center">
                     <p class="offline-kicker">Un espacio sin apuro</p>
-                    <h1>Gota a gota, también se encuentra el camino.</h1>
+                    <h1>En conexión, también encontramos el camino.</h1>
                     <p>No hace falta tener una respuesta lista. Podemos hacer una pausa, leer otras experiencias y mirar lo que nos pasa con un poco más de compañía.</p>
                     <div class="offline-actions">
                         <a href="refugio.html">Compartir una reflexión</a>
@@ -314,7 +314,7 @@
         </main>
 
         <footer class="py-32 text-center opacity-40">
-            <p class="text-xs font-bold uppercase tracking-[0.2em]">Gota a gota · Un espacio para pensar en compañía</p>
+            <p class="text-xs font-bold uppercase tracking-[0.2em]">Conexión · Un espacio para pensar en compañía</p>
         </footer>
     </div>
 
@@ -407,7 +407,7 @@
                 const img = tempDiv.querySelector('img') ? tempDiv.querySelector('img').src.replace('/s72-c/', '/s1600/') : 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1600';
                 const snippet = tempDiv.textContent.trim().substring(0, 160) + "...";
                 if (title.includes("La Conexión, tu refugio")) { welcome.classList.remove('hidden'); document.getElementById('welcome-content').innerHTML = entry.content.$t; }
-                carousel.innerHTML += `<div class="swiper-slide cursor-pointer" onclick="openPost(${index})"><img src="${img}" class="absolute inset-0 w-full h-full object-cover"><div class="slide-overlay"></div><div class="relative z-10 p-12 h-full flex flex-col justify-center items-center text-center text-white"><h3 class="text-4xl md:text-7xl font-black mb-10 leading-none">${title}</h3><p class="mb-12 max-w-2xl text-xl font-light">${snippet}</p><button class="bg-amber-600 px-14 py-6 rounded-full font-bold uppercase tracking-widest text-xs">Entrar al Saber</button></div></div>`;
+                carousel.innerHTML += `<div class="swiper-slide cursor-pointer" onclick="openPost(${index})"><img src="${img}" class="absolute inset-0 w-full h-full object-cover"><div class="slide-overlay"></div><div class="relative z-10 p-12 h-full flex flex-col justify-center items-center text-center text-white"><h3 class="text-4xl md:text-7xl font-black mb-10 leading-none">${title}</h3><p class="mb-12 max-w-2xl text-xl font-light">${snippet}</p><button class="bg-amber-600 px-14 py-6 rounded-full font-bold uppercase tracking-widest text-xs">Leer más</button></div></div>`;
                 grid.innerHTML += `<article class="warm-card rounded-[4rem] overflow-hidden group cursor-pointer shadow-xl transition-all duration-700" onclick="openPost(${index})"><div class="h-72 overflow-hidden relative"><img src="${img}" class="w-full h-full object-cover group-hover:scale-110 transition duration-1000"></div><div class="p-12"><h3 class="font-black text-2xl mb-6 group-hover:text-amber-600 transition-colors duration-500">${title}</h3><p class="text-slate-500 dark:text-slate-400 text-sm mb-10 line-clamp-3">${snippet}</p><span class="text-amber-600 font-bold text-xs uppercase tracking-widest">Explorar →</span></div></article>`;
             });
             new Swiper(".mySwiper", { loop: true, speed: 1200, autoplay: { delay: 7000 }, pagination: { el: ".swiper-pagination", clickable: true }, effect: "fade" });

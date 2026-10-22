@@ -11,7 +11,7 @@ const urlsToCache = [
   '/reflexiones.html',
   '/music-player.js',
   '/site-style.css',
-  '/brand-mark.svg',
+  '/cosas%20a%20revisar/logo.png',
   '/manifest.json',
   'https://cdn.tailwindcss.com',
   'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css',
@@ -136,7 +136,7 @@ async function networkFirst(request) {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Sin conexión - Gota a gota</title>
+        <title>Sin conexión - Conexión</title>
         <style>
           body {
             font-family: system-ui, -apple-system, sans-serif;
@@ -181,7 +181,7 @@ async function networkFirst(request) {
       <body>
         <div class="container">
           <h1>🌟 Sin conexión</h1>
-          <p>Parece que no tienes conexión a internet en este momento. Gota a gota va a seguir acá cuando vuelvas.</p>
+          <p>Parece que no tienes conexión a internet en este momento. Conexión va a seguir acá cuando vuelvas.</p>
           <button onclick="window.location.reload()">Intentar de nuevo</button>
         </div>
       </body>
