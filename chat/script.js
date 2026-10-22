@@ -184,6 +184,11 @@ async function send() {
     appendBubble(userText, true);
     chatInput.value = '';
 
+    if (window.location.protocol === 'file:') {
+        appendBubble("La conversación con IA necesita que abras Conexión desde el sitio publicado: https://refugiodigital.vercel.app/chat/. Esta copia local puede guardar el historial, pero no conectarse al servicio.", false, false);
+        return;
+    }
+
     const typingId = "typing-" + Date.now();
     const typingDiv = document.createElement('div');
     typingDiv.id = typingId;
@@ -204,18 +209,28 @@ async function send() {
             })
         });
 
-        const data = await response.json();
+        const responseBody = await response.text();
+        let data;
+        try {
+            data = JSON.parse(responseBody);
+        } catch {
+            throw new Error(`El servicio respondió con un formato inesperado (HTTP ${response.status}).`);
+        }
         if (document.getElementById(typingId)) document.getElementById(typingId).remove();
+
+        if (!response.ok) {
+            throw new Error(data.error || `El servicio respondió con HTTP ${response.status}.`);
+        }
 
         if (data.success) {
             appendBubble(data.text, false);
         } else {
-            throw new Error(data.error);
+            throw new Error(data.error || "El servicio no pudo generar una respuesta.");
         }
     } catch (e) {
         if (document.getElementById(typingId)) document.getElementById(typingId).remove();
         console.error("Error API:", e);
-        appendBubble("No pudimos conectar con el servicio de conversación. Tu mensaje queda en el historial de este dispositivo; podés intentar de nuevo más tarde.", false, false);
+        appendBubble(`No pudimos conectar con el servicio de conversación. ${e.message} Tu mensaje queda en el historial de este dispositivo.`, false, false);
     }
 }
 
