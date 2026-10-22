@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recomendaciones | Tu Refugio Digital</title>
-    <link rel="icon" type="image/png" href="https://jkhrpbpdewhkzgqqrwmp.supabase.co/storage/v1/object/public/imagenes/logo.png">
+    <title>Lecturas y hallazgos | Gota a gota</title>
+    <link rel="icon" type="image/svg+xml" href="brand-mark.svg">
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     
@@ -223,16 +223,17 @@
             box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
         }
     </style>
+    <link rel="stylesheet" href="site-style.css">
 </head>
 <body class="bg-warmLight text-slate-800 dark:bg-warmDark dark:text-slate-100 transition-colors duration-1000">
 
     <aside id="sidebar" class="sidebar">
         <div class="sidebar-logo">
             <a href="index.html" class="flex items-center gap-3 group">
-                <img src="https://jkhrpbpdewhkzgqqrwmp.supabase.co/storage/v1/object/public/imagenes/logo.png" alt="Logo" class="w-12 h-12 object-contain group-hover:rotate-12 transition">
+                <img src="brand-mark.svg" alt="" class="w-12 h-12 object-contain">
                 <div class="flex flex-col items-start">
-                    <span class="text-lg font-black tracking-tighter text-amber-600 uppercase leading-tight">TU REFUGIO</span>
-                    <span class="text-lg font-black tracking-tighter text-slate-900 dark:text-white italic leading-tight">DIGITAL</span>
+                    <span class="text-lg font-black tracking-tighter text-amber-600 leading-tight">GOTA A GOTA</span>
+                    <span class="text-xs font-semibold tracking-wide text-slate-900 dark:text-white leading-tight">un espacio compartido</span>
                 </div>
             </a>
         </div>
@@ -240,23 +241,23 @@
         <nav class="sidebar-nav">
             <a href="crisis.html" class="sidebar-link text-red-600 hover:text-red-600">
                 <span class="text-xl">🆘</span>
-                <span>Ayuda Ahora</span>
+                <span>Si necesitás ayuda</span>
             </a>
             <a href="recomendaciones.html" class="sidebar-link active">
                 <span class="text-xl">✨</span>
-                <span>Recomendaciones</span>
+                <span>Lecturas y hallazgos</span>
             </a>
             <a href="chat/index.html" class="sidebar-link text-slate-700 dark:text-slate-300">
                 <span class="text-xl">💬</span>
-                <span>Chat Privado</span>
+                <span>Conversar</span>
             </a>
             <a href="refugio.html" class="sidebar-link text-slate-700 dark:text-slate-300">
                 <span class="text-xl">🛡️</span>
-                <span>El Refugio</span>
+                <span>Compartir</span>
             </a>
             <a href="reflexiones.html" class="sidebar-link text-slate-700 dark:text-slate-300">
                 <span class="text-xl">📝</span>
-                <span>Reflexiones</span>
+                <span>Voces</span>
             </a>
         </nav>
         
@@ -271,8 +272,8 @@
 
     <div class="mobile-header">
         <a href="index.html" class="flex items-center gap-2">
-            <img src="https://jkhrpbpdewhkzgqqrwmp.supabase.co/storage/v1/object/public/imagenes/logo.png" alt="Logo" class="w-8 h-8 object-contain">
-            <span class="text-lg font-black tracking-tighter text-amber-600 uppercase">TU REFUGIO</span>
+            <img src="brand-mark.svg" alt="" class="w-8 h-8 object-contain">
+            <span class="text-lg font-black tracking-tighter text-amber-600">Gota a gota</span>
         </a>
         
         <div class="flex items-center gap-2">
@@ -293,29 +294,28 @@
         <div class="max-w-7xl mx-auto px-6 py-16">
             <header class="text-center mb-20">
                 <h1 class="text-5xl md:text-7xl font-black mb-6 tracking-tighter leading-tight">
-                    Tesoros <span class="text-amber-600">Compartidos</span>
+                    Ideas <span class="text-amber-600">para seguir pensando</span>
                 </h1>
                 <div class="h-1.5 w-32 bg-amber-500 mx-auto rounded-full mb-8"></div>
                 <p class="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto font-light italic">
-                    Una colección curada de contenido que ha iluminado mi camino. 
-                    Espero que también ilumine el tuyo.
+                    Lecturas, música y otras cosas que pueden abrir preguntas o acompañar un rato. Cada quien encontrará las suyas.
                 </p>
             </header>
 
             <div class="flex flex-wrap justify-center gap-4 mb-16">
-                <button onclick="filterCategory('todos')" class="category-pill active px-8 py-3 rounded-full font-bold text-sm uppercase tracking-widest bg-amber-500/10 text-amber-600 hover:bg-amber-600 hover:text-white">
+                <button onclick="filterCategory('todos', event)" class="category-pill active px-8 py-3 rounded-full font-bold text-sm uppercase tracking-widest bg-amber-500/10 text-amber-600 hover:bg-amber-600 hover:text-white">
                     Todos
                 </button>
-                <button onclick="filterCategory('youtube')" class="category-pill px-8 py-3 rounded-full font-bold text-sm uppercase tracking-widest bg-amber-500/10 text-amber-600 hover:bg-amber-600 hover:text-white">
+                <button onclick="filterCategory('youtube', event)" class="category-pill px-8 py-3 rounded-full font-bold text-sm uppercase tracking-widest bg-amber-500/10 text-amber-600 hover:bg-amber-600 hover:text-white">
                     📺 YouTube
                 </button>
-                <button onclick="filterCategory('audiolibros')" class="category-pill px-8 py-3 rounded-full font-bold text-sm uppercase tracking-widest bg-amber-500/10 text-amber-600 hover:bg-amber-600 hover:text-white">
+                <button onclick="filterCategory('audiolibros', event)" class="category-pill px-8 py-3 rounded-full font-bold text-sm uppercase tracking-widest bg-amber-500/10 text-amber-600 hover:bg-amber-600 hover:text-white">
                     🎧 Audiolibros
                 </button>
-                <button onclick="filterCategory('peliculas')" class="category-pill px-8 py-3 rounded-full font-bold text-sm uppercase tracking-widest bg-amber-500/10 text-amber-600 hover:bg-amber-600 hover:text-white">
+                <button onclick="filterCategory('peliculas', event)" class="category-pill px-8 py-3 rounded-full font-bold text-sm uppercase tracking-widest bg-amber-500/10 text-amber-600 hover:bg-amber-600 hover:text-white">
                     🎬 Películas
                 </button>
-                <button onclick="filterCategory('musica')" class="category-pill px-8 py-3 rounded-full font-bold text-sm uppercase tracking-widest bg-amber-500/10 text-amber-600 hover:bg-amber-600 hover:text-white">
+                <button onclick="filterCategory('musica', event)" class="category-pill px-8 py-3 rounded-full font-bold text-sm uppercase tracking-widest bg-amber-500/10 text-amber-600 hover:bg-amber-600 hover:text-white">
                     🎵 Música
                 </button>
             </div>
@@ -326,15 +326,15 @@
             <div class="mt-10">
                 <article class="warm-card rounded-[3rem] overflow-hidden shadow-xl p-8 border-2 border-amber-500/30">
                     <div class="text-center mb-8">
-                        <h3 class="font-black text-2xl mb-3 text-amber-600">¿Tienes algo que compartir?</h3>
-                        <p class="text-slate-600 dark:text-slate-400 text-sm">Comparte tu tesoro o agrega uno nuevo</p>
+                        <h3 class="font-black text-2xl mb-3 text-amber-600">¿Encontraste algo que te hizo bien?</h3>
+                        <p class="text-slate-600 dark:text-slate-400 text-sm">Podés compartirlo para que otras personas lo descubran.</p>
                     </div>
 
                     <div class="grid md:grid-cols-2 gap-6">
                         <div class="warm-card rounded-2xl p-6 text-center hover:shadow-lg transition-all cursor-pointer" onclick="openUserSuggestion()">
                             <div class="text-5xl mb-4">💡</div>
-                            <h4 class="font-bold text-lg mb-2">Sugiere una Recomendación</h4>
-                            <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">Comparte contenido que te haya inspirado</p>
+                            <h4 class="font-bold text-lg mb-2">Compartir un hallazgo</h4>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">Dejá una sugerencia para la colección</p>
                             <button class="px-6 py-2 bg-amber-500/20 text-amber-600 rounded-full font-bold text-sm hover:bg-amber-600 hover:text-white transition">
                                 Sugerir
                             </button>
@@ -342,8 +342,8 @@
 
                         <div class="warm-card rounded-2xl p-6 text-center hover:shadow-lg transition-all cursor-pointer" onclick="openAdminAdd()">
                             <div class="text-5xl mb-4">📝</div>
-                            <h4 class="font-bold text-lg mb-2">Agregar Recomendación</h4>
-                            <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">Acceso de administrador</p>
+                            <h4 class="font-bold text-lg mb-2">Editar la colección</h4>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">Herramientas de administración</p>
                             <button class="px-6 py-2 bg-amber-600 text-white rounded-full font-bold text-sm hover:bg-amber-700 transition">
                                 Administrar
                             </button>
@@ -354,15 +354,15 @@
         </div>
 
         <footer class="py-32 text-center opacity-40">
-            <p class="text-xs font-bold uppercase tracking-[0.6em]">Tu Refugio Digital • 2025</p>
+            <p class="text-xs font-bold uppercase tracking-[0.2em]">Gota a gota · Ideas para seguir pensando</p>
         </footer>
     </div>
 
     <div id="userSuggestionModal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-close" onclick="closeUserSuggestion()">✕</div>
-            <h3 class="font-black text-2xl mb-2 text-amber-600">Sugiere una Recomendación</h3>
-            <p class="text-sm text-slate-600 dark:text-slate-400 mb-6">Comparte algo que te haya inspirado</p>
+                <h3 class="font-black text-2xl mb-2 text-amber-600">Compartir un hallazgo</h3>
+                <p class="text-sm text-slate-600 dark:text-slate-400 mb-6">Si querés, contá qué te dejó pensando.</p>
             
             <form id="userSuggestionForm" class="space-y-4">
                 <div>
@@ -494,7 +494,7 @@
                 musica: '🎵 Música'
             };
 
-            grid.innerHTML = filtered.map(rec => `
+            grid.innerHTML = filtered.length ? filtered.map(rec => `
                 <article class="recommendation-card warm-card rounded-[3rem] overflow-hidden shadow-xl group cursor-pointer">
                     <a href="${rec.link}" target="_blank" class="block">
                         <div class="thumbnail-container">
@@ -516,15 +516,20 @@
                         </div>
                     </a>
                 </article>
-            `).join('');
+            `).join('') : `
+                <div class="warm-card p-8 text-center md:col-span-2 lg:col-span-3">
+                    <p class="font-semibold text-slate-700 dark:text-slate-200">Todavía no hay elementos en esta categoría.</p>
+                    <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Cuando haya nuevas lecturas compartidas, van a aparecer acá.</p>
+                </div>
+            `;
         }
 
-        function filterCategory(category) {
+        function filterCategory(category, event) {
             currentFilter = category;
             document.querySelectorAll('.category-pill').forEach(pill => {
                 pill.classList.remove('active');
             });
-            event.target.classList.add('active');
+            event.currentTarget.classList.add('active');
             renderRecommendations();
         }
 

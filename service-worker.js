@@ -1,4 +1,4 @@
-const CACHE_NAME = 'refugio-digital-v2';
+const CACHE_NAME = 'gota-a-gota-v3';
 const DYNAMIC_CACHE = 'refugio-dynamic-v1';
 
 // Archivos críticos para cachear en la instalación
@@ -10,6 +10,9 @@ const urlsToCache = [
   '/refugio.html',
   '/reflexiones.html',
   '/music-player.js',
+  '/site-style.css',
+  '/brand-mark.svg',
+  '/manifest.json',
   'https://cdn.tailwindcss.com',
   'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css',
   'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js',
@@ -133,7 +136,7 @@ async function networkFirst(request) {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Sin conexión - Tu Refugio Digital</title>
+        <title>Sin conexión - Gota a gota</title>
         <style>
           body {
             font-family: system-ui, -apple-system, sans-serif;
@@ -142,7 +145,7 @@ async function networkFirst(request) {
             justify-content: center;
             min-height: 100vh;
             margin: 0;
-            background: linear-gradient(135deg, #fffcf7 0%, #fef3c7 100%);
+            background: linear-gradient(135deg, #e9e5d9 0%, #c8d3c0 100%);
             padding: 20px;
           }
           .container {
@@ -151,7 +154,7 @@ async function networkFirst(request) {
           }
           h1 {
             font-size: 2.5rem;
-            color: #f59e0b;
+            color: #315849;
             margin-bottom: 1rem;
           }
           p {
@@ -162,7 +165,7 @@ async function networkFirst(request) {
           button {
             margin-top: 2rem;
             padding: 1rem 2rem;
-            background: #f59e0b;
+            background: #315849;
             color: white;
             border: none;
             border-radius: 9999px;
@@ -171,14 +174,14 @@ async function networkFirst(request) {
             font-size: 1rem;
           }
           button:hover {
-            background: #d97706;
+            background: #496454;
           }
         </style>
       </head>
       <body>
         <div class="container">
           <h1>🌟 Sin conexión</h1>
-          <p>Parece que no tienes conexión a internet en este momento. Tu Refugio Digital estará aquí cuando vuelvas a conectarte.</p>
+          <p>Parece que no tienes conexión a internet en este momento. Gota a gota va a seguir acá cuando vuelvas.</p>
           <button onclick="window.location.reload()">Intentar de nuevo</button>
         </div>
       </body>

@@ -1,18 +1,18 @@
 {
-  "name": "Tu Refugio Digital - Faro de Significado",
-  "short_name": "Refugio Digital",
-  "description": "En un mundo a veces caótico, es fácil perderse. Aquí encontrarás un faro que te guiará en tu búsqueda de significado y propósito.",
+  "name": "Gota a gota",
+  "short_name": "Gota a gota",
+  "description": "Un espacio para hacer una pausa, leer, compartir preguntas y seguir buscando en compañía.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#fffcf7",
-  "theme_color": "#f59e0b",
+  "background_color": "#f4ddc9",
+  "theme_color": "#090806",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "https://jkhrpbpdewhkzgqqrwmp.supabase.co/storage/v1/object/public/imagenes/logo.png",
-      "sizes": "512x512",
-      "type": "image/png",
+      "src": "brand-mark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     }
   ],

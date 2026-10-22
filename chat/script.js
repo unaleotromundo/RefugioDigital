@@ -1,13 +1,19 @@
-// script.js - PRIVACIDAD TOTAL Y SINCRONIZACIÓN CON SUPABASE
+// Conversación y archivo personal
 const chatBox = document.getElementById('chat-box');
 const chatInput = document.getElementById('chat-input');
 const sendBtn = document.getElementById('send-btn');
 const historyList = document.getElementById('history-list');
 
-// 1. Inicializar Supabase
-const supabaseClient = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+let supabaseClient = null;
+try {
+    if (window.supabase) {
+        supabaseClient = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+    }
+} catch (error) {
+    console.error("No se pudo iniciar la sincronización en la nube:", error);
+}
 
-const SYSTEM_PROMPT = `Actúa como un licenciado en Derecho por la Universidad de Buenos Aires, doctor en Filosofía (Universidad Complutense de Madrid, en Antropología (Universitat Rovira i Virgili de Tarragona, en Psicología (Universidad Ramon Llull, en Historia (Universidad de Lérida), Teología (Universidad de Murcia), Matemática Aplicada (Universidad de Alicante) y Educación (Universidad Ramon Llull). Y sobre todo Maestro y fundador de Escuelas de capacitacion de cábala hebrea. Hablame siempre como un uruguayo. utiliza los conceptos pero no nombres nunca la cabala ni los judíos, cuando dicen hola responde cortito y al pie. cuando hacen una pregunta expande tu respuesta lo que consideres necesario y termina las respuestas con una pregunta que invite a profundizar en algun aspecto importante del tema. no utilices dialectos como "bo" porque a los mayores no les gusta e intenta siempre hablar sin referirte a un genero femenino o masculino especificamente porque no sabemos quien está escribiendo.`;
+const SYSTEM_PROMPT = `Respondé en español rioplatense claro y cercano. Conversá desde una posición horizontal: no afirmes tener títulos, experiencia personal ni respuestas definitivas. Escuchá lo que la persona plantea, reconocé la incertidumbre y ofrecé ideas como posibilidades, no como órdenes. Si saludan, respondé breve. Si preguntan algo, explicá lo necesario sin alargar por costumbre y, cuando aporte, cerrá con una pregunta abierta. No diagnostiques ni reemplaces atención profesional. Si aparece una situación de riesgo inmediato, alentá a buscar ayuda humana y servicios de emergencia de su zona.`;
 
 let currentChatId = null;
 let chatHistory = [];
@@ -16,11 +22,12 @@ let currentUser = null;
 // --- INICIALIZACIÓN ---
 async function init() {
     try {
-        // Autenticación Anónima: Crea un ID único para este usuario/navegador
-        const { data: authData, error: authError } = await supabaseClient.auth.signInAnonymously();
-        if (authError) throw authError;
-        currentUser = authData.user;
-        console.log("Sesión privada iniciada.");
+        if (supabaseClient) {
+            const { data: authData, error: authError } = await supabaseClient.auth.signInAnonymously();
+            if (authError) throw authError;
+            currentUser = authData.user;
+            console.log("Sesión anónima iniciada.");
+        }
 
         // Cargar solo los chats de ESTE usuario
         const chats = await getSavedChats();
@@ -33,7 +40,7 @@ async function init() {
     } catch (err) {
         console.error("Error en conexión:", err);
         // Fallback local si falla la red
-        if (!currentChatId) createNewChat();
+        if (!currentChatId) await createNewChat();
     }
 }
 
@@ -58,24 +65,26 @@ async function getSavedChats() {
 }
 
 async function saveCurrentChat() {
-    if (!currentChatId || !currentUser) return;
+    if (!currentChatId) return;
 
     const firstMsg = chatHistory.find(m => m.role === "user")?.parts[0].text || "Nueva reflexión";
     const title = firstMsg.substring(0, 35) + (firstMsg.length > 35 ? "..." : "");
 
     const chatData = {
         id: currentChatId,
-        user_id: currentUser.id, // Vinculamos el chat al usuario
+        user_id: currentUser?.id,
         title: title,
         history: chatHistory,
         updated_at: new Date().toISOString()
     };
 
-    // 1. Sincronizar con Supabase
-    try {
-        await supabaseClient.from('chats').upsert(chatData, { onConflict: 'id' });
-    } catch (e) {
-        console.error("Error de sincronización nube:", e);
+    if (supabaseClient && currentUser) {
+        try {
+            const { error } = await supabaseClient.from('chats').upsert(chatData, { onConflict: 'id' });
+            if (error) throw error;
+        } catch (error) {
+            console.error("No se pudo sincronizar el chat; queda guardado en este dispositivo:", error);
+        }
     }
 
     // 2. Respaldo en LocalStorage
@@ -90,7 +99,7 @@ async function createNewChat() {
     currentChatId = Date.now();
     chatHistory = [];
     chatBox.innerHTML = '';
-    appendBubble("Hola. Soy tu espejo digital. En este espacio no existen los juicios, solo la comprensión. ¿Qué necesitas soltar o entender hoy?", false, false);
+    appendBubble("Hola. Podemos ir de a poco. ¿Qué te gustaría poner en palabras?", false, false);
     await saveCurrentChat();
     await refreshHistoryUI();
     toggleHistory(false);
@@ -152,7 +161,10 @@ function renderMessages() {
 function appendBubble(text, isUser, shouldSave = true) {
     const wrapper = document.createElement('div');
     wrapper.className = isUser ? "flex flex-col items-end w-full" : "flex flex-col items-start w-full";
-    wrapper.innerHTML = `<div class="bubble ${isUser ? 'bubble-user' : 'bubble-ai'} ${!isUser ? 'italic' : ''}">${text.replace(/\n/g, '<br>')}</div>`;
+    const bubble = document.createElement('div');
+    bubble.className = `bubble ${isUser ? 'bubble-user' : 'bubble-ai'} ${!isUser ? 'italic' : ''}`;
+    bubble.textContent = text;
+    wrapper.appendChild(bubble);
     chatBox.appendChild(wrapper);
 
     if (shouldSave) {
@@ -203,7 +215,7 @@ async function send() {
     } catch (e) {
         if (document.getElementById(typingId)) document.getElementById(typingId).remove();
         console.error("Error API:", e);
-        appendBubble("El espejo se ha empañado. Prueba de nuevo en unos instantes.", false);
+        appendBubble("No pudimos conectar con el servicio de conversación. Tu mensaje queda en el historial de este dispositivo; podés intentar de nuevo más tarde.", false, false);
     }
 }
 

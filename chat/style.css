@@ -14,10 +14,9 @@ html, body {
 body { 
     display: flex;
     flex-direction: column;
-    background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=1920'); 
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
+    background-image:
+        radial-gradient(ellipse at 85% 5%, rgba(255, 174, 92, 0.48), transparent 36rem),
+        radial-gradient(ellipse at 5% 90%, rgba(213, 112, 119, 0.32), transparent 42rem);
     transition: background-color 0.4s ease;
 }
 
@@ -26,13 +25,13 @@ body::before {
     content: "";
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(255, 252, 247, 0.85); /* Crema claro */
+    background: linear-gradient(145deg, rgba(255, 240, 214, 0.7), rgba(244, 221, 201, 0.74) 58%, rgba(233, 194, 176, 0.72));
     z-index: 0;
     transition: background 0.5s ease;
 }
 
 .dark body::before {
-    background: rgba(8, 10, 15, 0.92); /* Azul oscuro profundo */
+    background: rgba(9, 8, 6, 0.94);
 }
 
 main {
@@ -152,6 +151,8 @@ main {
     border-radius: 1.5rem;
     font-size: 1.05rem;
     line-height: 1.5;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
     position: relative;
     font-weight: 500;
 }
@@ -270,4 +271,78 @@ main {
     .bubble { max-width: 90%; font-size: 0.95rem; }
     #active-agent-name { font-size: 1.5rem !important; }
     main { padding: 0 0.5rem 1rem 0.5rem; }
+}
+
+/* Refined surfaces and controls */
+body {
+    background-color: #f7f4ed;
+    color: #25302b;
+}
+
+.dark body::before {
+    background: rgba(17, 23, 19, 0.92);
+}
+
+.chat-frame {
+    border: 1px solid rgba(68, 77, 67, 0.12);
+    border-radius: 20px;
+    box-shadow: 0 18px 44px rgba(42, 48, 39, 0.09);
+}
+
+.dark .chat-frame {
+    border-color: rgba(232, 238, 224, 0.1);
+}
+
+.nav-btn {
+    border: 1px solid rgba(68, 77, 67, 0.14);
+    box-shadow: 0 4px 12px rgba(42, 48, 39, 0.08);
+    transition: background-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+}
+
+.nav-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(42, 48, 39, 0.12);
+}
+
+.nav-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(42, 48, 39, 0.08);
+}
+
+.bubble {
+    border-radius: 18px;
+    font-size: 1rem;
+    line-height: 1.65;
+}
+
+.bubble-user {
+    background: #b97834;
+    color: #fff !important;
+    box-shadow: none;
+}
+
+.dark .bubble-user {
+    background: #bd8348;
+    color: #171a16 !important;
+}
+
+.bubble-ai {
+    background: #fffdf9;
+    border-color: rgba(68, 77, 67, 0.12);
+}
+
+.dark .bubble-ai {
+    background: #19211c;
+    border-color: rgba(232, 238, 224, 0.1);
+}
+
+#chat-input {
+    border: 1px solid rgba(68, 77, 67, 0.16);
+    border-radius: 14px;
+    box-shadow: 0 8px 24px rgba(42, 48, 39, 0.07);
+}
+
+#chat-input:focus {
+    border-color: #b97834;
+    outline: 3px solid rgba(185, 120, 52, 0.16);
 }
