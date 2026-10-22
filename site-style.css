@@ -132,6 +132,9 @@ a {
 }
 
 .sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
     min-height: 46px;
     padding: 0.7rem 0.85rem;
     border: 1px solid transparent;
@@ -141,6 +144,17 @@ a {
     font-weight: 650;
     letter-spacing: 0.005em;
     text-transform: none;
+}
+
+.sidebar-link svg {
+    width: 19px;
+    height: 19px;
+    flex: 0 0 19px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
 .sidebar-link:hover {
@@ -1003,17 +1017,6 @@ body.chat-page #sidebar {
 body.chat-page .sidebar-link {
     gap: 0.7rem;
     transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease, transform 180ms ease;
-}
-
-body.chat-page .sidebar-link svg {
-    width: 19px;
-    height: 19px;
-    flex: 0 0 19px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.7;
-    stroke-linecap: round;
-    stroke-linejoin: round;
 }
 
 body.chat-page .mobile-header {
