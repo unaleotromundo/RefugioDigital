@@ -81,9 +81,23 @@ main {
     display: flex;
     flex: 1;
     flex-direction: column;
-    width: calc(100% - 258px);
+    width: calc(100% - 220px);
     min-height: 0;
-    margin-left: 258px;
+    margin-left: 220px;
+}
+
+#sidebar {
+    width: 220px;
+    padding: 1.5rem 1rem;
+}
+
+#sidebar .sidebar-nav {
+    flex: 0 1 auto;
+    gap: 0.35rem;
+}
+
+.chat-layout main {
+    padding-top: 1.25rem;
 }
 
 /* ============================================================
@@ -331,6 +345,10 @@ main {
     .chat-layout {
         width: 100%;
         margin-left: 0;
+    }
+
+    .chat-layout main {
+        padding-top: 1rem;
     }
 }
 
