@@ -47,6 +47,45 @@ main {
     z-index: 10;
 }
 
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+    transition: transform 0.3s ease;
+}
+
+.sidebar.open {
+    transform: translateX(0);
+}
+
+.sidebar-nav {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+}
+
+.mobile-header {
+    display: none;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-layout {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    width: calc(100% - 258px);
+    min-height: 0;
+    margin-left: 258px;
+}
+
 /* ============================================================
    2. TEXTOS DINÁMICOS (Títulos y Descripciones)
    ============================================================ */
@@ -274,6 +313,25 @@ main {
     .bubble { max-width: 90%; font-size: 0.95rem; }
     #active-agent-name { font-size: 1.5rem !important; }
     main { padding: 0 0.5rem 1rem 0.5rem; }
+}
+
+@media (max-width: 1023px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .mobile-header {
+        display: flex !important;
+    }
+
+    .chat-layout {
+        width: 100%;
+        margin-left: 0;
+    }
 }
 
 /* Refined surfaces and controls */

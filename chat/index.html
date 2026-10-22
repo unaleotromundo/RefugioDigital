@@ -26,30 +26,60 @@
         </div>
     </div>
 
-    <!-- NAVEGACIÓN SUPERIOR CORREGIDA -->
-    <nav class="p-6 flex justify-between items-center max-w-7xl mx-auto w-full relative z-20">
-        <a href="../index.html" class="text-xs font-bold uppercase tracking-[0.12em] text-amber-700 dark:text-amber-500 flex items-center gap-2">
-            <img src="../cosas%20a%20revisar/logo.png" alt="" class="h-9 w-9 rounded-xl object-contain">
-            <span>Conexión</span>
-        </a>
-        
-        <div class="flex items-center gap-2">
-            <!-- BOTÓN DE MÚSICA -->
-            <button onclick="toggleMusic()" class="p-3 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-500 border border-amber-500/20 hover:scale-110 transition-all">
-                <svg id="speaker-icon" class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <!-- Icono inyectado por music-player.js -->
+    <aside id="sidebar" class="sidebar">
+        <div class="sidebar-logo">
+            <a href="../index.html" class="flex items-center gap-3 group">
+                <img src="../cosas%20a%20revisar/logo.png" alt="" class="w-12 h-12 object-contain">
+                <div class="flex flex-col items-start">
+                    <span class="text-lg font-black tracking-tighter text-amber-600 leading-tight">CONEXIÓN</span>
+                    <span class="text-xs font-semibold tracking-wide text-slate-900 dark:text-white leading-tight">un espacio compartido</span>
+                </div>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../crisis.html" class="sidebar-link text-red-600 hover:text-red-600"><span class="text-xl">🆘</span><span>Si necesitás ayuda</span></a>
+            <a href="../recomendaciones.html" class="sidebar-link text-slate-700 dark:text-slate-300"><span class="text-xl">✨</span><span>Lecturas y hallazgos</span></a>
+            <a href="index.html" class="sidebar-link active" aria-current="page"><span class="text-xl">💬</span><span>Conversar</span></a>
+            <a href="../refugio.html" class="sidebar-link text-slate-700 dark:text-slate-300"><span class="text-xl">🛖</span><span>Compartir</span></a>
+            <a href="../reflexiones.html" class="sidebar-link text-slate-700 dark:text-slate-300"><span class="text-xl">📖</span><span>Voces</span></a>
+        </nav>
+        <div class="sidebar-controls">
+            <button onclick="toggleMusic()" id="music-btn-sidebar" class="flex-1 p-3 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 transition">
+                <svg id="speaker-icon-sidebar" class="w-6 h-6 mx-auto" fill="currentColor" viewBox="0 0 24 24"></svg>
+            </button>
+            <button onclick="toggleDarkMode()" class="flex-1 p-3 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 transition">
+                <svg class="w-6 h-6 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/>
                 </svg>
             </button>
+        </div>
+    </aside>
 
-            <!-- BOTÓN DE TEMA -->
-            <button onclick="toggleDarkMode()" class="p-3 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-500 border border-amber-500/20">
-                <span class="dark:hidden">🌙</span>
-                <span class="hidden dark:inline">☀️</span>
+    <div class="mobile-header">
+        <a href="../index.html" class="flex items-center gap-2">
+            <img src="../cosas%20a%20revisar/logo.png" alt="" class="w-8 h-8 object-contain">
+            <span class="text-lg font-black tracking-tighter text-amber-600">Conexión</span>
+        </a>
+        <div class="flex items-center gap-2">
+            <button onclick="toggleMusic()" class="p-3 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-500 border border-amber-500/20 hover:scale-110 transition-all">
+                <svg id="speaker-icon" class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                </svg>
+            </button>
+            <button onclick="toggleDarkMode()" class="p-2 rounded-full bg-amber-500/10 text-amber-600">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/>
+                </svg>
+            </button>
+            <button onclick="toggleSidebar()" class="p-2 rounded-full bg-amber-600 text-white" aria-label="Abrir menú">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
             </button>
         </div>
-    </nav>
+    </div>
 
-    <main class="relative z-10">
+    <div class="chat-layout">
+      <main class="relative z-10">
         <!-- BOTONES DE CONTROL DE SESIÓN -->
         <div class="flex gap-3 mb-4 w-full max-w-3xl mx-auto">
             <button onclick="createNewChat()" class="flex-1 bg-amber-600 text-white py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-amber-700 transition-all shadow-lg">
@@ -82,7 +112,8 @@
             </button>
         </div>
         <p class="text-center text-xs text-slate-500 dark:text-slate-400">La conversación se guarda en tu historial. Evitá incluir datos que te identifiquen.</p>
-    </main>
+      </main>
+    </div>
 
     <script>
         // Gestión de Tema
@@ -92,6 +123,9 @@
         function toggleDarkMode() {
             document.documentElement.classList.toggle('dark');
             localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+        }
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
         }
 
         // Motor de Partículas Cayendo
